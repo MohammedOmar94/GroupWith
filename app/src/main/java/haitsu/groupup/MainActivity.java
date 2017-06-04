@@ -2,6 +2,7 @@ package haitsu.groupup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +19,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements
           GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -27,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("message");
+    DatabaseReference databaseRef = database.getReference();//Can access any child element with this
 
     private static final String TAG = "MainActivity";
 
@@ -39,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+
+
+
     private String mUsername;
     private String mPhotoUrl;
 
@@ -46,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //helloWorld();
+        //helloWorld();//Writes message to Firebase
 
         // Assign fields
         mSignOutButton = (Button) findViewById(R.id.sign_out_Google);
@@ -71,19 +80,40 @@ public class MainActivity extends AppCompatActivity implements
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
+
+            System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
+            writeNewUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
+
         }
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
+    private void writeNewUser(final String userId, String name, String email) {
+        final User user = new User(name, email);
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.hasChild(userId)) {//If the userid doesn't already exist
+                    databaseRef.child("users").child(userId).setValue(user);//Add users
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //Use push() for auto generated id node.
+    }
+
     private void signOut(){
-        //Firebase sign out
-        FirebaseAuth.getInstance().signOut();
-        // Google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+        FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
         startActivity(new Intent(this, SignInActivity.class));
         finish();
     }
+
 
     @Override
     public void onClick(View v) {
