@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "286270725289",
+    "firebase_url": "https://group-up-34ab2.firebaseio.com",
+    "project_id": "group-up-34ab2",
+    "storage_bucket": "group-up-34ab2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:286270725289:android:facfb416e3b23b7f",
+        "android_client_info": {
+          "package_name": "haitsu.groupup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "286270725289-41chabkm6r8i87muk7ib2v0oauns3c63.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "haitsu.groupup",
+            "certificate_hash": "aca31e76a2808f0588d64ec83f39fe71611212b0"
+          }
+        },
+        {
+          "client_id": "286270725289-h4h4oh7n1lapcci2tduu87r7rvavi0np.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfcJ_180_2A3rEmDbT61l2cgL3uyxNahs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "286270725289-h4h4oh7n1lapcci2tduu87r7rvavi0np.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
