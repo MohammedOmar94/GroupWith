@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -17,6 +19,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -25,6 +29,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import static android.R.attr.id;
 
 public class MainActivity extends AppCompatActivity implements
           GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -40,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private Button mSignOutButton;
+    private Button mDeleteAccountButton;
+    private Button mSubmitButton;
 
 
 
@@ -59,9 +67,13 @@ public class MainActivity extends AppCompatActivity implements
 
         // Assign fields
         mSignOutButton = (Button) findViewById(R.id.sign_out_Google);
+        mDeleteAccountButton = (Button) findViewById(R.id.delete_account);
+        mSubmitButton = (Button) findViewById(R.id.submit_group);
 
         // Set click listeners
         mSignOutButton.setOnClickListener(this);
+        mDeleteAccountButton.setOnClickListener(this);
+        mSubmitButton.setOnClickListener(this);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -107,11 +119,41 @@ public class MainActivity extends AppCompatActivity implements
         //Use push() for auto generated id node.
     }
 
+    private void submitNewGroup() {
+        RadioButton group = (RadioButton) findViewById(R.id.football_radioButton);
+        EditText text = (EditText) findViewById(R.id.editText);
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child("Name").setValue(group.getText());//Add users
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child("Category").setValue("Sports");//Add users
+        //databaseRef.child("Groups").child("").child("Name").setValue(group.getText());//Add users
+        databaseRef.child("Group").child(group.getText().toString()).child("Members").child(mFirebaseUser.getUid()).setValue(true);//Add users
+        //Use push() for auto generated id node.
+    }
+
     private void signOut(){
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
         startActivity(new Intent(this, SignInActivity.class));
         finish();
+    }
+
+    private void deleteAccount(){
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        databaseRef.child(mFirebaseUser.getUid()).removeValue();
+        //System.out.println("ProvideID : " + mFirebaseUser.getDisplayName() + " UserID : " + mFirebaseUser.getUid());
+
+
+        mFirebaseUser.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User account deleted.");
+                            System.out.println("DELETED");
+                        }
+                    }
+                });
+
     }
 
 
@@ -120,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements
         switch (v.getId()) {
             case R.id.sign_out_Google:
                 signOut();
+                break;
+            case R.id.delete_account:
+                deleteAccount();
+                break;
+            case R.id.submit_group:
+                submitNewGroup();
                 break;
         }
     }
