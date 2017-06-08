@@ -18,9 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -113,6 +116,22 @@ public class MainActivity extends AppCompatActivity
             mUsername = mFirebaseUser.getDisplayName();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+                View header=navigationView.getHeaderView(0);
+/*View view=navigationView.inflateHeaderView(R.layout.nav_header_main);*/
+
+                ImageView imgvw = (ImageView)header.findViewById(R.id.account_image);
+
+                //Loading image from url into imageView
+                Glide.with(this)
+                        .load(mPhotoUrl)
+                        .thumbnail(0.8f)
+                        .bitmapTransform(new CircleTransform(this))
+                        .into(imgvw);
+                TextView accountName = (TextView) header.findViewById(R.id.account_name);
+                TextView accountEmail = (TextView) header.findViewById(R.id.account_email);
+                accountName.setText(mUsername);
+                accountEmail.setText(mFirebaseUser.getEmail());
+
             }
 
             System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
