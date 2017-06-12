@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "haitsu.groupup"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -33,6 +33,7 @@ dependencies {
     compile 'com.google.firebase:firebase-database:10.2.6'
     compile 'com.google.firebase:firebase-storage:10.2.6'
     compile 'com.google.android.gms:play-services-auth:10.2.6'
+    compile 'com.android.support:support-v4:25.3.1'
     testCompile 'junit:junit:4.12'
 }
 

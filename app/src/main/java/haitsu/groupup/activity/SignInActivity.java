@@ -1,4 +1,4 @@
-package haitsu.groupup;
+package haitsu.groupup.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +21,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import haitsu.groupup.R;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {

@@ -1,4 +1,4 @@
-package haitsu.groupup;
+package haitsu.groupup.other;
 
 /**
  * Created by moham on 04/06/2017.
