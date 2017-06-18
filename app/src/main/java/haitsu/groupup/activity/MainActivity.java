@@ -1,6 +1,9 @@
 package haitsu.groupup.activity;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,7 +22,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +42,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
@@ -47,7 +55,7 @@ import haitsu.groupup.other.CircleTransform;
 public class MainActivity extends AppCompatActivity
         implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, HomeFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener{
+        SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient mGoogleApiClient;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -61,7 +69,7 @@ public class MainActivity extends AppCompatActivity
 
     private Button mSignOutButton;
     private Button mDeleteAccountButton;
-    private Button mSubmitButton;
+
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -103,7 +111,7 @@ public class MainActivity extends AppCompatActivity
 
         // load toolbar titles from string resources
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-
+        getGroup();
 
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
       /*  fab.setOnClickListener(new View.OnClickListener() {
@@ -127,12 +135,10 @@ public class MainActivity extends AppCompatActivity
         // Assign fields
         mSignOutButton = (Button) findViewById(R.id.sign_out);
         //mDeleteAccountButton = (Button) findViewById(R.id.delete_account);
-        // mSubmitButton = (Button) findViewById(R.id.submit_group);
 
         // Set click listeners
         mSignOutButton.setOnClickListener(this);
         // mDeleteAccountButton.setOnClickListener(this);
-        // mSubmitButton.setOnClickListener(this);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -158,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
                 // initializing navigation menu
                 setUpNavigationView();  // showing dot next to notifications label
-                navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
 
                 if (savedInstanceState == null) {
                     navItemIndex = 0;
@@ -166,10 +172,36 @@ public class MainActivity extends AppCompatActivity
                     loadHomeFragment();
                 }
 
-            }
 
             System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
             writeNewUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
+            //getGroup();
+
+
+                DatabaseReference us = databaseRef.child("users");
+                us.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            User user = ds.getValue(User.class);
+                            /* For a specific user's info.
+                            User user = mew User();
+                            //user.setUsername(ds.child(mFirebaseUser.getUid()).getValue(User.class).getUsername());
+                            //user.setEmail(ds.child(mFirebaseUser.getUid()).getValue(User.class).getEmail());
+                            System.out.println("Group name: " + user.getEmail());
+                            */
+                        }
+                    }
+
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });
+
+            }
 
         }
     }
@@ -282,18 +314,20 @@ public class MainActivity extends AppCompatActivity
         //Use push() for auto generated id node.
     }
 
-/*
-    private void submitNewGroup() {
-        RadioButton group = (RadioButton) findViewById(R.id.football_radioButton);
-        EditText text = (EditText) findViewById(R.id.editText);
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child("Name").setValue(group.getText());//Add users
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child("Category").setValue("Sports");//Add users
-        //databaseRef.child("Groups").child("").child("Name").setValue(group.getText());//Add users
-        databaseRef.child("Group").child(group.getText().toString()).child("Members").child(mFirebaseUser.getUid()).setValue(true);//Add users
-        //Use push() for auto generated id node.
+    private void getGroup() {
+
+        //DatabaseReference groups = databaseRef.child("users");//Add users
+        //System.out.println("Group name: " +  groups.getKey());
+
+
+
     }
-*/
+
+
+
+
+
+
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
@@ -331,9 +365,7 @@ public class MainActivity extends AppCompatActivity
             // case R.id.delete_account:
             //     deleteAccount();
             //     break;
-            //    case R.id.submit_group:
-            //         submitNewGroup();
-            //         break;
+
         }
     }
 
@@ -375,7 +407,7 @@ public class MainActivity extends AppCompatActivity
                         navItemIndex = 2;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
-                    case R.id.nav_about_us:
+                   /* case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
                         drawer.closeDrawers();
@@ -384,7 +416,7 @@ public class MainActivity extends AppCompatActivity
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
                         drawer.closeDrawers();
-                        return true;
+                        return true;*/
                     default:
                         navItemIndex = 0;
                 }
@@ -453,9 +485,17 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 
-        // show menu only when home fragment is selected
+
+        // how menu only when home fragment is selected
         if (navItemIndex == 0) {
             getMenuInflater().inflate(R.menu.main, menu);
+            for (int i = 0; i < menu.size(); i++) {
+                Drawable drawable = menu.getItem(i).getIcon();
+                if (drawable != null) {
+                    drawable.mutate();
+                    drawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
+                }
+            }
         }
 
         // when fragment is notifications, load the menu created for notifications
@@ -473,10 +513,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_logout) {
+      /*  if (id == R.id.action_logout) {
             Toast.makeText(getApplicationContext(), "Logout user!", Toast.LENGTH_LONG).show();
             return true;
-        }
+        }*/
 
         // user is in notifications fragment
         // and selected 'Mark all as Read'
@@ -488,6 +528,10 @@ public class MainActivity extends AppCompatActivity
         // and selected 'Clear All'
         if (id == R.id.action_clear_notifications) {
             Toast.makeText(getApplicationContext(), "Clear all notifications!", Toast.LENGTH_LONG).show();
+        }
+
+        if (id == R.id.action_new_group) {
+            Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
         }
 
         return super.onOptionsItemSelected(item);
