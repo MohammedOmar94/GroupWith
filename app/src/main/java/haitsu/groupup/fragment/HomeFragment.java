@@ -97,14 +97,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mSubmitButton.setOnClickListener(this);
 
 
-
-
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users");
         us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                ArrayList<String> array = new ArrayList<>();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     User user = ds.getValue(User.class);
                             /* For a specific user's info.
@@ -114,32 +111,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             System.out.println("Group name: " + user.getEmail());
                             */
 
-                    System.out.println("Group name: " + ds.getKey());
-                    array.add(user.getUsername());
-                    array.add(user.getEmail());
-                    ArrayAdapter adapter = new ArrayAdapter(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, array);
-                    //mListView.setAdapter(adapter);
-                   /* mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                        public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-
-                            String id2 = (String) mListView.getItemAtPosition(position); //
-                            System.out.println("ID IS " + id2 + dataSnapshot.getKey());
-                        }
-                    });*/
-
-                   final FirebaseListAdapter<User> adapter2 = new FirebaseListAdapter<User>(getActivity(), User.class, android.R.layout.two_line_list_item, us)
-                    {
-                        protected void populateView(View view, User chatMessage, int position)
-                        {
-                            ((TextView)view.findViewById(android.R.id.text1)).setText(chatMessage.getEmail());
+                    final FirebaseListAdapter<User> usersAdapter = new FirebaseListAdapter<User>(getActivity(), User.class, android.R.layout.two_line_list_item, us) {
+                        protected void populateView(View view, User chatMessage, int position) {
+                            ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getEmail());
                         }
                     };
-                    mListView.setAdapter(adapter2);
-                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    mListView.setAdapter(usersAdapter);
+                    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                            String key = adapter2.getRef(position).getKey();
+                            String key = usersAdapter.getRef(position).getKey();
                             User id2 = (User) mListView.getItemAtPosition(position); //
                             System.out.println("ID IS " + key);
                         }

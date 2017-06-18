@@ -6,7 +6,6 @@ package haitsu.groupup.other;
 
 public class User {
 
-    private String id;
     private String username;
     private String email;
 
@@ -19,10 +18,6 @@ public class User {
         this.email = email;
     }
 
-    public User(String id, String username, String email){
-        this.username = username;
-        this.email = email;
-    }
 
     public String getUsername() {
         return username;
@@ -40,11 +35,5 @@ public class User {
         this.email = email;
     }
 
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 }

@@ -2,14 +2,10 @@ package haitsu.groupup.other;
 
 import android.widget.TextView;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import haitsu.groupup.R;
 
 /**
  * Created by moham on 17/06/2017.
@@ -42,16 +38,11 @@ public class DBConnections {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("Group").push();
-         groupId = groupId2.getKey();//
-        //databaseRef.child("users").child(mFirebaseUser.getUid()).child("Group").child("Name").setValue(group.getText());//Add users
+        //groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
 
         groupId2.child("Category").setValue("Sports");
         groupId2.child("AdminID").setValue(mFirebaseUser.getUid());//Adds AdminID
         groupId2.child("Name").setValue(text.getText());//Adds Category to Group
-
-        //databaseRef.child("Groups").child("").child("Name").setValue(group.getText());//Add users
-        //databaseRef.child("Group").child(group.getText().toString()).child("Members").child(mFirebaseUser.getUid()).setValue(true);//Add users
-        //Use push() for auto generated id node.
     }
 
 }

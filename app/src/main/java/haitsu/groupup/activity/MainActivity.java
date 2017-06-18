@@ -3,10 +3,8 @@ package haitsu.groupup.activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -22,9 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,9 +37,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.HomeFragment;
@@ -63,9 +56,6 @@ public class MainActivity extends AppCompatActivity
     DatabaseReference databaseRef = database.getReference();//Can access any child element with this
 
     private static final String TAG = "MainActivity";
-
-    private SharedPreferences mSharedPreferences;
-
 
     private Button mSignOutButton;
     private Button mDeleteAccountButton;
@@ -111,8 +101,6 @@ public class MainActivity extends AppCompatActivity
 
         // load toolbar titles from string resources
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-        getGroup();
-
         //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
       /*  fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,8 +144,8 @@ public class MainActivity extends AppCompatActivity
             mUsername = mFirebaseUser.getDisplayName();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+
                 header = navigationView.getHeaderView(0);
-/*View view=navigationView.inflateHeaderView(R.layout.nav_header_main);*/
                 ImageView imgvw = (ImageView) header.findViewById(R.id.account_image);
                 // load nav menu header data
                 loadNavHeader(imgvw);
@@ -171,38 +159,9 @@ public class MainActivity extends AppCompatActivity
                     CURRENT_TAG = TAG_HOME;
                     loadHomeFragment();
                 }
-
-
-            System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
-            writeNewUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
-            //getGroup();
-
-
-                DatabaseReference us = databaseRef.child("users");
-                us.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            User user = ds.getValue(User.class);
-                            /* For a specific user's info.
-                            User user = mew User();
-                            //user.setUsername(ds.child(mFirebaseUser.getUid()).getValue(User.class).getUsername());
-                            //user.setEmail(ds.child(mFirebaseUser.getUid()).getValue(User.class).getEmail());
-                            System.out.println("Group name: " + user.getEmail());
-                            */
-                        }
-                    }
-
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-
-                });
-
+                //System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
+                //writeNewUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
             }
-
         }
     }
 
@@ -314,21 +273,6 @@ public class MainActivity extends AppCompatActivity
         //Use push() for auto generated id node.
     }
 
-    private void getGroup() {
-
-        //DatabaseReference groups = databaseRef.child("users");//Add users
-        //System.out.println("Group name: " +  groups.getKey());
-
-
-
-    }
-
-
-
-
-
-
-
     private void signOut() {
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
@@ -339,9 +283,6 @@ public class MainActivity extends AppCompatActivity
     private void deleteAccount() {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         databaseRef.child(mFirebaseUser.getUid()).removeValue();
-        //System.out.println("ProvideID : " + mFirebaseUser.getDisplayName() + " UserID : " + mFirebaseUser.getUid());
-
-
         mFirebaseUser.delete()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -362,10 +303,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.sign_out:
                 signOut();
                 break;
-            // case R.id.delete_account:
-            //     deleteAccount();
-            //     break;
-
         }
     }
 
