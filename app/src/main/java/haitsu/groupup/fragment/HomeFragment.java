@@ -2,6 +2,7 @@ package haitsu.groupup.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -92,13 +93,35 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mSubmitButton = (Button) view.findViewById(R.id.submit_button);
         mJoinButton = (Button) view.findViewById(R.id.join_button);
         mListView = (ListView) view.findViewById(R.id.listview);
-
+        mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         mJoinButton.setOnClickListener(this);
         mSubmitButton.setOnClickListener(this);
 
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users");
+        final FirebaseListAdapter<User> usersAdapter = new FirebaseListAdapter<User>(getActivity(), User.class, android.R.layout.two_line_list_item, us) {
+            protected void populateView(View view, User chatMessage, int position) {
+                ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getEmail());
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+                // Get the Item from ListView
+                View view = super.getView(position, convertView, parent);
+
+                // Initialize a TextView for ListView each Item
+                TextView tv = (TextView) view.findViewById(android.R.id.text1);
+
+                // Set the text color of TextView (ListView Item)
+                tv.setTextColor(Color.BLACK);
+
+                // Generate ListView Item using TextView
+                return view;
+            }
+
+
+        };
         us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -111,19 +134,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             System.out.println("Group name: " + user.getEmail());
                             */
 
-                    final FirebaseListAdapter<User> usersAdapter = new FirebaseListAdapter<User>(getActivity(), User.class, android.R.layout.two_line_list_item, us) {
-                        protected void populateView(View view, User chatMessage, int position) {
-                            ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getEmail());
-                        }
-                    };
+
                     mListView.setAdapter(usersAdapter);
                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                            mListView.setFocusable(true);//HACKS
                             String key = usersAdapter.getRef(position).getKey();
                             User id2 = (User) mListView.getItemAtPosition(position); //
                             System.out.println("ID IS " + key);
                         }
+
+
                     });
 
                 }

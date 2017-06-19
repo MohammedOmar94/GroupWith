@@ -1,25 +1,34 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="haitsu.groupup.fragment.HomeFragment">
-
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/textView"
         android:layout_width="77dp"
         android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="Groups"
         android:textAppearance="@android:style/TextAppearance.Material.Large"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
+        android:textColor="@color/common_google_signin_btn_text_dark_focused"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/group_name"
@@ -50,30 +59,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="47dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="86dp"
         android:text="Join group"
         app:layout_constraintLeft_toRightOf="@+id/members_count"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="47dp" />
+        android:layout_marginStart="47dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.529"
+        android:layout_marginEnd="8dp" />
 
     <Button
         android:id="@+id/submit_button"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Submit group"
-        tools:layout_editor_absoluteX="247dp"
-        tools:layout_editor_absoluteY="148dp" />
+        android:layout_marginRight="12dp"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="224dp"
+        android:layout_marginEnd="12dp" />
 
     <ListView
         android:id="@+id/listview"
         android:layout_width="318dp"
         android:layout_height="500dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:background="@color/common_google_signin_btn_text_dark_focused"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="186dp"
+        android:listSelector="@drawable/item_ripple"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="177dp"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </android.support.constraint.ConstraintLayout>
+    </ScrollView>
