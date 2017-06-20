@@ -101,13 +101,13 @@ public class MyGroupsFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups");
+        final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
         final DatabaseReference group = databaseRef.child("group");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
                 System.out.println("Group name is " + groupInfo.getName());
                 ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
-                ((TextView) view.findViewById(android.R.id.text2)).setText("Admin : " + groupInfo.getAdmin());
+                ((TextView) view.findViewById(android.R.id.text2)).setText("Category: " + groupInfo.getCategory() + " Admin: " + groupInfo.getAdmin());
             }
 
             @Override

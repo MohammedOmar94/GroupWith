@@ -19,6 +19,7 @@
         <item>Notifications</item>
         <item>My Groups</item>
         <item>Settings</item>
+        <item>Create Group</item>
     </string-array>
 
     <string name="activity_title_about_us">About Us</string>
@@ -42,6 +43,7 @@
         <item>Food</item>
         <item>Language Learning</item>
         <item>Education</item>
+        <item>Exam Prep</item>
         <item>Travel</item>
     </string-array>
 

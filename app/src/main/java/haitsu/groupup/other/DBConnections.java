@@ -37,8 +37,8 @@ public class DBConnections {
         DatabaseReference userid2 = databaseRef.child("group").child(selectedGroup);
         userid2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
 
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child(selectedGroup).child("name").setValue(groupName);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child(selectedGroup).child("admin").setValue(false);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(selectedGroup).child("name").setValue(groupName);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(selectedGroup).child("admin").setValue(false);
     }
 
     public void submitNewGroup(String selectedCategory, EditText text) {
@@ -54,8 +54,9 @@ public class DBConnections {
         groupId2.child("name").setValue(text.getText().toString());//Adds Category to Group
 
         //Adds to users tree
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child(groupId).child("name").setValue(text.getText().toString());
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups").child(groupId).child("admin").setValue(true);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(selectedCategory);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(text.getText().toString());
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
     }
 
 

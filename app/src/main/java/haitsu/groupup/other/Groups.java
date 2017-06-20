@@ -6,6 +6,7 @@ package haitsu.groupup.other;
 
 public class Groups {
 
+    private String category;
     private String name;
     private Boolean admin;
 
@@ -28,5 +29,13 @@ public class Groups {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

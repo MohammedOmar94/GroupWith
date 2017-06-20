@@ -3,6 +3,7 @@ package haitsu.groupup.activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.transition.Visibility;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
+import haitsu.groupup.fragment.CreateGroupFragment;
 import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity
         implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, HomeFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
-        MyGroupsFragment.OnFragmentInteractionListener {
+        MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient mGoogleApiClient;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_MY_GROUPS = "my groups";
     private static final String TAG_SETTINGS = "settings";
+    private static final String TAG_MY_CREATE_GROUP = "create group";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
@@ -442,6 +445,10 @@ public class MainActivity extends AppCompatActivity
         if (navItemIndex == 1) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
+
+        if(navItemIndex == 4){
+            menu.findItem(R.menu.main).setVisible(false);
+        }
         return true;
     }
 
@@ -471,6 +478,23 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (id == R.id.action_new_group) {
+
+            CURRENT_TAG = TAG_MY_CREATE_GROUP;
+            navItemIndex = 4;
+            Fragment fragment = new CreateGroupFragment();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                    android.R.anim.fade_out);
+            fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
+            fragmentTransaction.commitAllowingStateLoss();
+            // set toolbar title
+            getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+
+            // if user select the current navigation menu again, don't do anything
+            // just close the navigation drawer
+            if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
+                drawer.closeDrawers();
+            }
             Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
         }
 
