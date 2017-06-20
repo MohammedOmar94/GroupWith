@@ -40,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.HomeFragment;
+import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
 import haitsu.groupup.fragment.SettingsFragment;
 import haitsu.groupup.other.User;
@@ -48,7 +49,8 @@ import haitsu.groupup.other.CircleTransform;
 public class MainActivity extends AppCompatActivity
         implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, HomeFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener {
+        SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
+        MyGroupsFragment.OnFragmentInteractionListener {
 
     private GoogleApiClient mGoogleApiClient;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -235,6 +237,10 @@ public class MainActivity extends AppCompatActivity
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
                 return notificationsFragment;
             case 2:
+                // my groups fragment
+            MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+            return myGroupsFragment;
+            case 3:
                 // settings fragment
                 SettingsFragment settingsFragment = new SettingsFragment();
                 return settingsFragment;
@@ -332,8 +338,11 @@ public class MainActivity extends AppCompatActivity
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
-                    case R.id.nav_settings:
+                    case R.id.nav_my_groups:
                         navItemIndex = 2;
+                        break;
+                    case R.id.nav_settings:
+                        navItemIndex = 3;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
                    /* case R.id.nav_about_us:
@@ -428,7 +437,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // when fragment is notifications, load the menu created for notifications
-        if (navItemIndex == 3) {
+        if (navItemIndex == 1) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
         return true;
