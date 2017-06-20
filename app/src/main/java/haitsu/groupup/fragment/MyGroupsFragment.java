@@ -1,14 +1,30 @@
 package haitsu.groupup.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
+import haitsu.groupup.other.Group;
+import haitsu.groupup.other.Groups;
+import haitsu.groupup.other.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +44,17 @@ public class MyGroupsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private String selectedGroup;
+    private String selectedGroupName;
+
     private OnFragmentInteractionListener mListener;
+
+
+    private ListView mListView;
+
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     public MyGroupsFragment() {
         // Required empty public constructor
@@ -65,7 +91,75 @@ public class MyGroupsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_groups, container, false);
+        View view = inflater.inflate(R.layout.fragment_my_groups, container, false);
+
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        mListView = (ListView) view.findViewById(R.id.listview);
+        mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
+
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("Groups");
+        final DatabaseReference group = databaseRef.child("group");
+        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
+            protected void populateView(View view, Groups groupInfo, int position) {
+                System.out.println("Group name is " + groupInfo.getName());
+                ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
+                ((TextView) view.findViewById(android.R.id.text2)).setText("Admin : " + groupInfo.getAdmin());
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+                // Get the Item from ListView
+                View view = super.getView(position, convertView, parent);
+
+                // Initialize a TextView for ListView each Item
+                TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
+
+                // Set the text color of TextView (ListView Item)
+                tv.setTextColor(Color.BLACK);
+                tv2.setTextColor(Color.BLACK);
+
+                // Generate ListView Item using TextView
+                return view;
+            }
+
+
+        };
+        us.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                mListView.setAdapter(usersAdapter);
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                        mListView.setFocusable(true);//HACKS
+                        String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
+                        Groups group = ((Groups) mListView.getItemAtPosition(position));
+                        selectedGroup = key;
+                        selectedGroupName = group.getName();
+                        //User id2 = (User) mListView.getItemAtPosition(position); //
+                        System.out.println("ID IS " + key);
+                    }
+
+
+                });
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
