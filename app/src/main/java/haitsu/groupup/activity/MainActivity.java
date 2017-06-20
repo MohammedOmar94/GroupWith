@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private static final String TAG_HOME = "home";
     private static final String TAG_NOTIFICATIONS = "notifications";
+    private static final String TAG_MY_GROUPS = "my groups";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
 
@@ -340,6 +341,7 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case R.id.nav_my_groups:
                         navItemIndex = 2;
+                        CURRENT_TAG = TAG_MY_GROUPS;
                         break;
                     case R.id.nav_settings:
                         navItemIndex = 3;
