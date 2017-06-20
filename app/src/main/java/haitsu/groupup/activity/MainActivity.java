@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
 
-    private Button mSignOutButton;
+
     private Button mDeleteAccountButton;
 
 
@@ -121,20 +121,17 @@ public class MainActivity extends AppCompatActivity
 
 
         // Assign fields
-        mSignOutButton = (Button) findViewById(R.id.sign_out);
         //mDeleteAccountButton = (Button) findViewById(R.id.delete_account);
 
-        // Set click listeners
-        mSignOutButton.setOnClickListener(this);
         // mDeleteAccountButton.setOnClickListener(this);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
-                .build();
+      //  mGoogleApiClient = new GoogleApiClient.Builder(this)
+        //        .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+          //      .addApi(Auth.GOOGLE_SIGN_IN_API)
+           //     .build();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
@@ -273,12 +270,7 @@ public class MainActivity extends AppCompatActivity
         //Use push() for auto generated id node.
     }
 
-    private void signOut() {
-        FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
-        startActivity(new Intent(this, SignInActivity.class));
-        finish();
-    }
+
 
     private void deleteAccount() {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -300,9 +292,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_out:
-                signOut();
-                break;
+            //case R.id.sign_out:
+            //    signOut();
+          //      break;
         }
     }
 

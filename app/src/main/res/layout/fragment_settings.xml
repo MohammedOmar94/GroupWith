@@ -1,11 +1,23 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="haitsu.groupup.fragment.SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
+    <Button
+        android:id="@+id/sign_out"
+        android:layout_width="172dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="135dp"
+        android:text="Sign out"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="106dp" />
+
     <TextView
+        android:id="@+id/textview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="Hello settings" />

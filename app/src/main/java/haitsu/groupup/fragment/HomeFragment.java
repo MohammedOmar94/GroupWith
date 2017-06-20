@@ -12,8 +12,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.Group;
 import haitsu.groupup.other.User;
 
 /**
@@ -36,7 +40,7 @@ import haitsu.groupup.other.User;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -49,6 +53,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private Button mSubmitButton;
     private Button mJoinButton;
     private ListView mListView;
+
+    private String selectedCategory;
+    private String selectedGroup;
+    private String selectedGroupName;
 
     private OnFragmentInteractionListener mListener;
 
@@ -96,13 +104,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         mJoinButton.setOnClickListener(this);
         mSubmitButton.setOnClickListener(this);
+        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
 
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users");
-        final FirebaseListAdapter<User> usersAdapter = new FirebaseListAdapter<User>(getActivity(), User.class, android.R.layout.two_line_list_item, us) {
-            protected void populateView(View view, User chatMessage, int position) {
-                ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getEmail());
+        final DatabaseReference group = databaseRef.child("group");
+        final FirebaseListAdapter<Group> usersAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, group) {
+            protected void populateView(View view, Group chatMessage, int position) {
+                ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getName());
+                ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getCategory());
             }
 
             @Override
@@ -112,9 +124,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 // Initialize a TextView for ListView each Item
                 TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
 
                 // Set the text color of TextView (ListView Item)
                 tv.setTextColor(Color.BLACK);
+                tv2.setTextColor(Color.BLACK);
 
                 // Generate ListView Item using TextView
                 return view;
@@ -125,8 +139,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    User user = ds.getValue(User.class);
+                //for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    //User user = ds.getValue(User.class);
+                    // final Group group  = ds.getValue(Group.class);
                             /* For a specific user's info.
                             User user = mew User();
                             //user.setUsername(ds.child(mFirebaseUser.getUid()).getValue(User.class).getUsername());
@@ -140,15 +155,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                         public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                             mListView.setFocusable(true);//HACKS
-                            String key = usersAdapter.getRef(position).getKey();
-                            User id2 = (User) mListView.getItemAtPosition(position); //
+                            String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
+                            Group group = ((Group) mListView.getItemAtPosition(position));
+                            selectedGroup = key;
+                            selectedGroupName = group.getName();
+                            //User id2 = (User) mListView.getItemAtPosition(position); //
                             System.out.println("ID IS " + key);
                         }
 
 
                     });
 
-                }
+                //}
             }
 
 
@@ -192,13 +210,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.join_button:
-                dbConnections.joinGroup((TextView) getView().findViewById(R.id.group_name));
+                dbConnections.joinGroup(selectedGroup,selectedGroupName);
+                Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.submit_button:
-                dbConnections.submitNewGroup((TextView) getView().findViewById(R.id.group_name));
+                dbConnections.submitNewGroup(selectedCategory, (EditText) getView().findViewById(R.id.editText));
+                Toast.makeText(getContext().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
                 break;
         }
     }
+
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        parent.getItemAtPosition(pos);
+        selectedCategory = (String) parent.getItemAtPosition(pos);
+        System.out.println("Category is " + selectedCategory);
+
+
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
 
 
     /**

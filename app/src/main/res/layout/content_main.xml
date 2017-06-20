@@ -17,14 +17,5 @@
 
     </FrameLayout>
 
-    <Button
-        android:id="@+id/sign_out"
-        android:layout_width="172dp"
-        android:layout_height="53dp"
-        android:text="Sign out"
-        tools:layout_editor_absoluteX="106dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="135dp" />
-
 
 </android.support.constraint.ConstraintLayout>
