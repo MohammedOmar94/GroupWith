@@ -163,7 +163,8 @@ public class MainActivity extends AppCompatActivity
                     loadHomeFragment();
                 }
                 //System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
-                //writeNewUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
+                //Adds new user to database.
+                addUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
             }
         }
     }
@@ -262,13 +263,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private void writeNewUser(final String userId, String name, String email) {
+    private void addUser(final String userId, String name, String email) {
         final User user = new User(name, email);
-        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference users = databaseRef.child("users");
+        users.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.hasChild(userId)) {//If the userid doesn't already exist
-                    databaseRef.child("users").child(userId).setValue(user);//Add users
+                    databaseRef.child("users").child(userId).setValue(user);//Add user
                 }
             }
 
