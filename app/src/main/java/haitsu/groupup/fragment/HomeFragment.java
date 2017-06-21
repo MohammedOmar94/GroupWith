@@ -40,7 +40,7 @@ import haitsu.groupup.other.User;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class HomeFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,12 +50,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     private String mParam1;
     private String mParam2;
 
-    private Button mSubmitButton;
     private Button mJoinButton;
     private ListView mListView;
 
-    private String selectedCategory;
-    private String selectedGroup;
+    private String selectedGroupCategory;
+    private String selectedGroupID;
     private String selectedGroupName;
 
     private OnFragmentInteractionListener mListener;
@@ -98,15 +97,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        mSubmitButton = (Button) view.findViewById(R.id.submit_button);
         mJoinButton = (Button) view.findViewById(R.id.join_button);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         mJoinButton.setOnClickListener(this);
-        mSubmitButton.setOnClickListener(this);
-        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
-
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users");
@@ -157,8 +151,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
                             mListView.setFocusable(true);//HACKS
                             String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
                             Group group = ((Group) mListView.getItemAtPosition(position));
-                            selectedGroup = key;
+                            selectedGroupID = key;
                             selectedGroupName = group.getName();
+                            selectedGroupCategory = group.getCategory();
                             //User id2 = (User) mListView.getItemAtPosition(position); //
                             System.out.println("ID IS " + key);
                         }
@@ -210,28 +205,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Adap
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.join_button:
-                dbConnections.joinGroup(selectedGroup,selectedGroupName);
+                dbConnections.joinGroup(selectedGroupID,selectedGroupName, selectedGroupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
-            case R.id.submit_button:
-                dbConnections.submitNewGroup(selectedCategory, (EditText) getView().findViewById(R.id.editText));
-                Toast.makeText(getContext().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
-                break;
         }
-    }
-
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        parent.getItemAtPosition(pos);
-        selectedCategory = (String) parent.getItemAtPosition(pos);
-        System.out.println("Category is " + selectedCategory);
-
-
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
     }
 
 
