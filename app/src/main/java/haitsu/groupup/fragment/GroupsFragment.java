@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,7 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
-import haitsu.groupup.other.Groups;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -102,66 +100,38 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
         mJoinButton.setOnClickListener(this);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference us = databaseRef.child("users");
-        final DatabaseReference group = databaseRef.child("group");
-        final Query allPostFromAuthor = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
-        allPostFromAuthor.addListenerForSingleValueEvent(new ValueEventListener() {
+        final Query groupsFromCategory = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
+        groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-               /* for (DataSnapshot ds : snapshot.getChildren()) {
-                    final Group groups = ds.getValue(Group.class);//Go through each category
-                    if (groups.getCategory().equals(filteredCategory)) {//If the category selected matches category value
-                        System.out.println("Group name is " + groups.getName());
-                        array.add(groups.getName());
-                        adapter = new ArrayAdapter(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, array);
+                groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
+                    protected void populateView(View view, Group chatMessage, int position) {
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getName());
+                        ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getCategory());
+
                     }
-                    ;
 
-                }*/
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        // Get the Item from ListView
+                        View view = super.getView(position, convertView, parent);
 
-/*
-                for(DataSnapshot ds: snapshot.getChildren()) {
-                    Group groups = ds.getValue(Group.class);//Go through each category
-                    //String key = snapshot.getKey();
-                    //final DatabaseReference group2 = databaseRef.child("group").child(key);
-                    if (groups.getCategory().equals(filteredCategory)) {//If the category selected matches category value
-                        realGroup = groups;
+                        // Initialize a TextView for ListView each Item
+                        TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                        TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
+
+                        // Set the text color of TextView (ListView Item)
+                        tv.setTextColor(Color.BLACK);
+                        tv2.setTextColor(Color.BLACK);
+
+                        // Generate ListView Item using TextView
+                        return view;
                     }
-                }*/
-
-                //for (DataSnapshot ds : snapshot.getChildren()) {
-                   // final Group groups = ds.getValue(Group.class);//Go through each category
-                    //System.out.println("Group name is " + groups.getName());
-                    groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, allPostFromAuthor) {
-                        protected void populateView(View view, Group chatMessage, int position) {
-                         //   if (groups.getCategory().equals(filteredCategory)) {
-                                ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getName());
-                                ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getCategory());
-                       //     }
-                        }
 
 
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            // Get the Item from ListView
-                            View view = super.getView(position, convertView, parent);
-
-                            // Initialize a TextView for ListView each Item
-                            TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                            TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
-
-                            // Set the text color of TextView (ListView Item)
-                            tv.setTextColor(Color.BLACK);
-                            tv2.setTextColor(Color.BLACK);
-
-                            // Generate ListView Item using TextView
-                            return view;
-                        }
-
-
-                    };
-                }
-         //   }
+                };
+            }
+            //   }
 
 
             @Override
@@ -170,20 +140,9 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        group.addValueEventListener(new ValueEventListener() {
+        groupsFromCategory.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                //for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                //User user = ds.getValue(User.class);
-                // final Group group  = ds.getValue(Group.class);
-                            /* For a specific user's info.
-                            User user = mew User();
-                            //user.setUsername(ds.child(mFirebaseUser.getUid()).getValue(User.class).getUsername());
-                            //user.setEmail(ds.child(mFirebaseUser.getUid()).getValue(User.class).getEmail());
-                            System.out.println("Group name: " + user.getEmail());
-                            */
-
-
                 mListView.setAdapter(groupAdapter);
                 mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -194,14 +153,11 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
                         selectedGroupID = key;
                         selectedGroupName = group.getName();
                         selectedGroupCategory = group.getCategory();
-                        //User id2 = (User) mListView.getItemAtPosition(position); //
-                        System.out.println("ID IS " + key);
+                        System.out.println("Group name is " + group.getName() + " ID is " + key);
                     }
 
 
                 });
-
-                //}
             }
 
 
@@ -211,8 +167,6 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
             }
 
         });
-
-
         return view;
     }
 
@@ -250,15 +204,6 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
                 break;
         }
     }
-
-    public String getFilteredCategory() {
-        return filteredCategory;
-    }
-
-    public void setFilteredCategory(String filteredCategory) {
-        this.filteredCategory = filteredCategory;
-    }
-
 
     /**
      * This interface must be implemented by activities that contain this
