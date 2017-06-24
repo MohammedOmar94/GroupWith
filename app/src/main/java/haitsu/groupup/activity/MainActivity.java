@@ -19,7 +19,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,16 +53,10 @@ public class MainActivity extends AppCompatActivity
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
         MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
 
-    private GoogleApiClient mGoogleApiClient;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference("message");
     DatabaseReference databaseRef = database.getReference();//Can access any child element with this
 
     private static final String TAG = "MainActivity";
-
-
-    private Button mDeleteAccountButton;
-
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -123,21 +116,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //navigationView.setNavigationItemSelectedListener(this);
 
-
-        // Assign fields
-        //mDeleteAccountButton = (Button) findViewById(R.id.delete_account);
-
-        // mDeleteAccountButton.setOnClickListener(this);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-      //  mGoogleApiClient = new GoogleApiClient.Builder(this)
-        //        .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-          //      .addApi(Auth.GOOGLE_SIGN_IN_API)
-           //     .build();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
@@ -162,12 +145,72 @@ public class MainActivity extends AppCompatActivity
                     CURRENT_TAG = TAG_HOME;
                     loadHomeFragment();
                 }
-                //System.out.println("ProvideID : " + mFirebaseUser.getProviderId() + " UserID : " + mFirebaseUser.getUid());
                 //Adds new user to database.
                 addUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
             }
         }
     }
+
+
+
+
+    private void addUser(final String userId, String name, String email) {
+        final User user = new User(name, email);
+        DatabaseReference users = databaseRef.child("users");
+        users.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.hasChild(userId)) {//If the userid doesn't already exist
+                    databaseRef.child("users").child(userId).setValue(user);//Add user
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //Use push() for auto generated id node.
+    }
+
+
+
+    private void deleteAccount() {
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        databaseRef.child(mFirebaseUser.getUid()).removeValue();
+        mFirebaseUser.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User account deleted.");
+                            System.out.println("DELETED");
+                        }
+                    }
+                });
+
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            //case R.id.sign_out:
+            //    signOut();
+          //      break;
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+
+    /*************************************NAVIGATION DRAWER METHODS*************************************/
 
     /***
      * Load navigation menu header information
@@ -243,8 +286,8 @@ public class MainActivity extends AppCompatActivity
                 return notificationsFragment;
             case 2:
                 // my groups fragment
-            MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-            return myGroupsFragment;
+                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+                return myGroupsFragment;
             case 3:
                 // settings fragment
                 SettingsFragment settingsFragment = new SettingsFragment();
@@ -261,69 +304,6 @@ public class MainActivity extends AppCompatActivity
     private void selectNavMenu() {
         navigationView.getMenu().getItem(navItemIndex).setChecked(true);
     }
-
-
-    private void addUser(final String userId, String name, String email) {
-        final User user = new User(name, email);
-        DatabaseReference users = databaseRef.child("users");
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.hasChild(userId)) {//If the userid doesn't already exist
-                    databaseRef.child("users").child(userId).setValue(user);//Add user
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        //Use push() for auto generated id node.
-    }
-
-
-
-    private void deleteAccount() {
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        databaseRef.child(mFirebaseUser.getUid()).removeValue();
-        mFirebaseUser.delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "User account deleted.");
-                            System.out.println("DELETED");
-                        }
-                    }
-                });
-
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            //case R.id.sign_out:
-            //    signOut();
-          //      break;
-        }
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
-    }
-
-    //Adds data to Firebase database.
-    public void helloWorld() {
-        myRef.setValue("Hello, World!");
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
 
     private void setUpNavigationView() {
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
