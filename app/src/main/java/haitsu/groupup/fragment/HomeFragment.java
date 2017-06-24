@@ -1,36 +1,23 @@
 package haitsu.groupup.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-
 import haitsu.groupup.R;
-import haitsu.groupup.other.DBConnections;
-import haitsu.groupup.other.Group;
-import haitsu.groupup.other.User;
+import haitsu.groupup.other.ImageAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,7 +27,7 @@ import haitsu.groupup.other.User;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,16 +37,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private String mParam1;
     private String mParam2;
 
-    private Button mJoinButton;
-    private ListView mListView;
-
-    private String selectedGroupCategory;
-    private String selectedGroupID;
-    private String selectedGroupName;
-
     private OnFragmentInteractionListener mListener;
 
-    private DBConnections dbConnections = new DBConnections();
+    GridView gridView;
+
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -97,20 +79,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        mJoinButton = (Button) view.findViewById(R.id.join_button);
-        mListView = (ListView) view.findViewById(R.id.listview);
-        mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        mJoinButton.setOnClickListener(this);
 
-        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference us = databaseRef.child("users");
-        final DatabaseReference group = databaseRef.child("group");
-        final FirebaseListAdapter<Group> usersAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, group) {
-            protected void populateView(View view, Group chatMessage, int position) {
-                ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getName());
-                ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getCategory());
-            }
+        gridView = (GridView) view.findViewById(R.id.gridview);
 
+       ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.category_arrays)){
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the Item from ListView
@@ -118,61 +91,37 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 // Initialize a TextView for ListView each Item
                 TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
 
                 // Set the text color of TextView (ListView Item)
                 tv.setTextColor(Color.BLACK);
-                tv2.setTextColor(Color.BLACK);
 
                 // Generate ListView Item using TextView
                 return view;
             }
-
-
         };
-        us.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                //for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    //User user = ds.getValue(User.class);
-                    // final Group group  = ds.getValue(Group.class);
-                            /* For a specific user's info.
-                            User user = mew User();
-                            //user.setUsername(ds.child(mFirebaseUser.getUid()).getValue(User.class).getUsername());
-                            //user.setEmail(ds.child(mFirebaseUser.getUid()).getValue(User.class).getEmail());
-                            System.out.println("Group name: " + user.getEmail());
-                            */
+
+        //gridView.setAdapter(adapter);
+        gridView.setAdapter(new ImageAdapter(getContext().getApplicationContext(), getResources().getStringArray(R.array.category_arrays)));
 
 
-                    mListView.setAdapter(usersAdapter);
-                    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                LinearLayout ll = (LinearLayout) v;
+                TextView t = (TextView) ll.findViewById(R.id.grid_item_label);
+                 Toast.makeText(getActivity(),
+                        t.getText(), Toast.LENGTH_SHORT).show();
 
-                        public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                            mListView.setFocusable(true);//HACKS
-                            String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
-                            Group group = ((Group) mListView.getItemAtPosition(position));
-                            selectedGroupID = key;
-                            selectedGroupName = group.getName();
-                            selectedGroupCategory = group.getCategory();
-                            //User id2 = (User) mListView.getItemAtPosition(position); //
-                            System.out.println("ID IS " + key);
-                        }
+                GroupsFragment nextFrag= new GroupsFragment();
+                nextFrag.filteredCategory = t.getText().toString();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.frame, nextFrag ); // give your fragment container id in first parameter
+                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+                transaction.commit();
 
-
-                    });
-
-                //}
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
             }
-
         });
-
-
         return view;
     }
 
@@ -182,7 +131,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             mListener.onFragmentInteraction(uri);
         }
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -200,18 +148,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
         mListener = null;
     }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.join_button:
-                dbConnections.joinGroup(selectedGroupID,selectedGroupName, selectedGroupCategory);
-                Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
-
-
 
     /**
      * This interface must be implemented by activities that contain this

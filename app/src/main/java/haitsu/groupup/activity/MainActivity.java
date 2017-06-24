@@ -3,7 +3,6 @@ package haitsu.groupup.activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.transition.Visibility;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +39,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.CreateGroupFragment;
+import haitsu.groupup.fragment.GroupsFragment;
 import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
@@ -51,6 +50,7 @@ import haitsu.groupup.other.CircleTransform;
 public class MainActivity extends AppCompatActivity
         implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, HomeFragment.OnFragmentInteractionListener,
+        GroupsFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
         MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
 
