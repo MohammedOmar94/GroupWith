@@ -2,10 +2,18 @@ package haitsu.groupup.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +35,7 @@ import haitsu.groupup.activity.SignInActivity;
  * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SettingsFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -68,7 +76,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);// Load the preferences from an XML resource
+        addPreferencesFromResource(R.xml.preferences);
+        EditTextPreference editText = (EditTextPreference) findPreference("example_text");
+        editText.setSummary(editText.getText().toString());
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -76,23 +89,9 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-
-        mSignOutButton = (Button) view.findViewById(R.id.sign_out);
-
-
-        // Set click listeners
-        mSignOutButton.setOnClickListener(this);
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
-                .build();
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        // calculate margins
         return view;
     }
 
@@ -123,28 +122,45 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mGoogleApiClient.stopAutoManage(getActivity());
-        mGoogleApiClient.disconnect();
+        // mGoogleApiClient.stopAutoManage(getActivity());
+//        mGoogleApiClient.disconnect();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_out:
-                signOut();
-                break;
+            //case R.id.sign_out:
+            //    signOut();
+            //    break;
         }
     }
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
-        startActivity(new Intent(getContext(), SignInActivity.class));
+        // startActivity(new Intent(getContext(), SignInActivity.class));
         //finish();
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Preference pref = findPreference(key);
+
+        if (pref instanceof ListPreference) {
+            ListPreference listPref = (ListPreference) pref;
+            pref.setSummary(listPref.getEntry());
+        }
+
+        if (pref instanceof EditTextPreference) {
+            EditTextPreference listPref = (EditTextPreference) pref;
+            pref.setSummary(listPref.getText().toString());
+        }
+
 
     }
 

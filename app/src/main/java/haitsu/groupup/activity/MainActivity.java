@@ -43,8 +43,11 @@ import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
 import haitsu.groupup.fragment.SettingsFragment;
+import haitsu.groupup.other.Groups;
 import haitsu.groupup.other.User;
 import haitsu.groupup.other.CircleTransform;
+
+import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -288,10 +292,10 @@ public class MainActivity extends AppCompatActivity
                 // my groups fragment
                 MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
                 return myGroupsFragment;
-            case 3:
+            //case 3:
                 // settings fragment
-                SettingsFragment settingsFragment = new SettingsFragment();
-                return settingsFragment;
+             //   SettingsFragment settingsFragment = new SettingsFragment();
+              // return settingsFragment;
             default:
                 return new HomeFragment();
         }
@@ -329,9 +333,12 @@ public class MainActivity extends AppCompatActivity
                         CURRENT_TAG = TAG_MY_GROUPS;
                         break;
                     case R.id.nav_settings:
-                        navItemIndex = 3;
-                        CURRENT_TAG = TAG_SETTINGS;
-                        break;
+                        //navItemIndex = 3;
+                       // CURRENT_TAG = TAG_SETTINGS;
+                        // launch new intent instead of loading fragment
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        drawer.closeDrawers();
+                        return true;
                    /* case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
@@ -418,7 +425,7 @@ public class MainActivity extends AppCompatActivity
                 Drawable drawable = menu.getItem(i).getIcon();
                 if (drawable != null) {
                     drawable.mutate();
-                    drawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
+                    drawable.setColorFilter(WHITE, PorterDuff.Mode.SRC_ATOP);
                 }
             }
         }
@@ -449,6 +456,13 @@ public class MainActivity extends AppCompatActivity
 
         // user is in notifications fragment
         // and selected 'Mark all as Read'
+
+        if(id == R.id.home){
+            onBackPressed();
+            return true;
+        }
+
+
         if (id == R.id.action_mark_all_read) {
             Toast.makeText(getApplicationContext(), "All notifications marked as read!", Toast.LENGTH_LONG).show();
         }
@@ -460,17 +474,20 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (id == R.id.action_new_group) {
-
             CURRENT_TAG = TAG_MY_CREATE_GROUP;
             navItemIndex = 4;
             Fragment fragment = new CreateGroupFragment();
+
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                     android.R.anim.fade_out);
+
             fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
             fragmentTransaction.commitAllowingStateLoss();
             // set toolbar title
             getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
 
             // if user select the current navigation menu again, don't do anything
             // just close the navigation drawer
@@ -479,6 +496,9 @@ public class MainActivity extends AppCompatActivity
             }
             Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
         }
+
+
+
 
         return super.onOptionsItemSelected(item);
     }

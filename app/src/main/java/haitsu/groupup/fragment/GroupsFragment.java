@@ -55,6 +55,8 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     private OnFragmentInteractionListener mListener;
 
     private DBConnections dbConnections = new DBConnections();
+    private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    private Query groupsFromCategory;
 
     FirebaseListAdapter<Group> groupAdapter;
 
@@ -87,6 +89,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -98,9 +101,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         mJoinButton.setOnClickListener(this);
-
-        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query groupsFromCategory = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
+        groupsFromCategory = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {

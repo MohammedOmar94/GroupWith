@@ -22,14 +22,13 @@
         android:layout_width="138dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:background="@color/common_google_signin_btn_text_dark_focused"
+        android:layout_marginLeft="54dp"
+        android:layout_marginTop="57dp"
         android:entries="@array/category_arrays"
         android:prompt="@string/category_prompt"
         app:layout_constraintBottom_toTopOf="@+id/editText"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="57dp"
-        android:layout_marginLeft="54dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/group_name"
