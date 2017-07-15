@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import haitsu.groupup.activity.SignInActivity;
 
@@ -59,6 +60,31 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(text.getText().toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
+
+        //Create chats room with group id
+        createChatRoom(groupId);
+    }
+
+    public void createChatRoom(String groupId){
+        DatabaseReference chatRooms = databaseRef.child("chatrooms");
+        chatRooms.child(groupId).child("admin").setValue(mFirebaseUser.getUid());
+    }
+
+    public void deleteGroup(String groupID){
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        //Delete from group tree, which contains detail about the name and its members
+        databaseRef.child("group").child(groupID).removeValue();
+
+        //Delete from the users group tree
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+
+        //Deletes the chatroom
+        databaseRef.child("chatrooms").child(groupID).removeValue();
+    }
+
+    public void addToChatRoom(){
+
     }
 
 

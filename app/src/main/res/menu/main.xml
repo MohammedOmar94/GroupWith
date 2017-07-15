@@ -6,11 +6,18 @@
         android:orderInCategory="100"
         android:title="@string/action_logout"
         app:showAsAction="never" />-->
+  <item
+      android:id="@+id/action_chats"
+      android:icon="@android:drawable/sym_action_chat"
+      android:title="@string/action_mark_all_read"
+      app:showAsAction="always" />
 
   <item
       android:id="@+id/action_new_group"
       android:icon="@android:drawable/ic_input_add"
       android:title="@string/action_mark_all_read"
       app:showAsAction="always" />
+
+
 
 </menu>
