@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import haitsu.groupup.R;
@@ -35,6 +36,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -64,6 +66,13 @@ public class SignInActivity extends AppCompatActivity implements
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser != null) {
+            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
+        }
+
         // Initialize FirebaseAuth
     }
 
@@ -79,6 +88,12 @@ public class SignInActivity extends AppCompatActivity implements
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void signOut(){
+        FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
+        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -12,12 +12,14 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
@@ -46,6 +48,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private String mParam2;
 
     private Button mSignOutButton;
+    Button button;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -81,6 +84,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         EditTextPreference editText = (EditTextPreference) findPreference("example_text");
         editText.setSummary(editText.getText().toString());
 
+        Preference pref = findPreference("sign_out");
+        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                // TODO Auto-generated method stub
+                signOut();
+                //finish();
+               // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -91,7 +107,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .enableAutoManage((FragmentActivity) getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
         // calculate margins
+    //    button = (Button) view.findViewById(R.id.as);
+//        button.setOnClickListener(this);
         return view;
     }
 
@@ -122,14 +144,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // mGoogleApiClient.stopAutoManage(getActivity());
-//        mGoogleApiClient.disconnect();
+         mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
+         mGoogleApiClient.disconnect();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            //case R.id.sign_out:
+        //    case R.id.sign:
+       //         System.out.println("Dat press tho");
+      //          break;
+       //     //case R.id.sign_out:
             //    signOut();
             //    break;
         }
@@ -138,8 +163,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private void signOut() {
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
+        startActivity(new Intent(getActivity(), SignInActivity.class));
+        getActivity().finishAffinity();//Works for Android 4.1 and above only.
         // startActivity(new Intent(getContext(), SignInActivity.class));
-        //finish();
+        //
     }
 
     @Override
