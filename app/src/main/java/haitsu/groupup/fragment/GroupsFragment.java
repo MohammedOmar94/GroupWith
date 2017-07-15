@@ -45,6 +45,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     private String mParam2;
 
     private Button mJoinButton;
+    private Button mDeleteButton;
     private ListView mListView;
 
     public static String filteredCategory;
@@ -98,17 +99,19 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mJoinButton = (Button) view.findViewById(R.id.join_button);
+        mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         mJoinButton.setOnClickListener(this);
+        mDeleteButton.setOnClickListener(this);
         groupsFromCategory = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
                     protected void populateView(View view, Group chatMessage, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getName());
-                        ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getCategory());
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getCategory());
+                        ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
 
                     }
 
@@ -202,6 +205,10 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
             case R.id.join_button:
                 dbConnections.joinGroup(selectedGroupID, selectedGroupName, selectedGroupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.delete_button:
+                dbConnections.deleteGroup(selectedGroupID);
+                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
         }
     }
