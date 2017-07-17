@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import haitsu.groupup.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.CreateGroupFragment;
 import haitsu.groupup.fragment.GroupsFragment;
@@ -495,6 +496,10 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawers();
             }
             Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+        }
+
+        if (id == R.id.action_chats) {
+            startActivity(new Intent(this, ChatRoomActivity.class));
         }
 
 

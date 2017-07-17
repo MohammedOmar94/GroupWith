@@ -1,6 +1,7 @@
 package haitsu.groupup.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import haitsu.groupup.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.other.Group;
 import haitsu.groupup.other.Groups;
@@ -141,6 +143,12 @@ public class MyGroupsFragment extends Fragment {
                         Groups group = ((Groups) mListView.getItemAtPosition(position));
                         selectedGroup = key;
                         selectedGroupName = group.getName();
+                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                        Bundle extras = new Bundle();
+                        extras.putString("GROUP_ID", selectedGroup);
+                        extras.putString("GROUP_NAME", selectedGroupName);
+                        intent.putExtras(extras);
+                        startActivity(intent);
                         //User id2 = (User) mListView.getItemAtPosition(position); //
                         System.out.println("ID IS " + key);
                     }

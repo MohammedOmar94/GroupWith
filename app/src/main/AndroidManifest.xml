@@ -17,6 +17,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -26,9 +27,12 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/Toolbar"
-            android:parentActivityName=".activity.MainActivity">
-        </activity>
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/Toolbar"></activity>
+        <activity
+            android:name=".ChatRoomActivity"
+            android:label="@string/title_activity_chat_room"
+            android:theme="@style/Toolbar"></activity>
     </application>
 
 </manifest>
