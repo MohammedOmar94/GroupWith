@@ -498,9 +498,9 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
         }
 
-        if (id == R.id.action_chats) {
+  /*      if (id == R.id.action_chats) {
             startActivity(new Intent(this, ChatRoomActivity.class));
-        }
+        }*/
 
 
 

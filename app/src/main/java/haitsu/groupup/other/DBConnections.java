@@ -62,7 +62,7 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
 
         //Create chats room with group id
-        createChatRoom(groupId);
+      //  createChatRoom(groupId);
     }
 
     public void createChatRoom(String groupId){
