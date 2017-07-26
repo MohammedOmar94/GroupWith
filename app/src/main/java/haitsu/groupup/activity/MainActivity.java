@@ -47,6 +47,7 @@ import haitsu.groupup.fragment.SettingsFragment;
 import haitsu.groupup.other.Groups;
 import haitsu.groupup.other.User;
 import haitsu.groupup.other.CircleTransform;
+import haitsu.groupup.tabbedGroupsActivity;
 
 import static android.graphics.Color.WHITE;
 
@@ -289,10 +290,10 @@ public class MainActivity extends AppCompatActivity
                 // notifications fragment
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
                 return notificationsFragment;
-            case 2:
+           // case 2:
                 // my groups fragment
-                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-                return myGroupsFragment;
+             //   MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+            //    return myGroupsFragment;
             //case 3:
                 // settings fragment
              //   SettingsFragment settingsFragment = new SettingsFragment();
@@ -330,9 +331,11 @@ public class MainActivity extends AppCompatActivity
                         CURRENT_TAG = TAG_NOTIFICATIONS;
                         break;
                     case R.id.nav_my_groups:
-                        navItemIndex = 2;
-                        CURRENT_TAG = TAG_MY_GROUPS;
-                        break;
+                        //navItemIndex = 2;
+                        //CURRENT_TAG = TAG_MY_GROUPS;
+                        startActivity(new Intent(MainActivity.this, tabbedGroupsActivity.class));
+                        drawer.closeDrawers();
+                        return true;
                     case R.id.nav_settings:
                         //navItemIndex = 3;
                        // CURRENT_TAG = TAG_SETTINGS;

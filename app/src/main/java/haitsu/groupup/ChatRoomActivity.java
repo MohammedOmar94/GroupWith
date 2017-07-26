@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,7 +34,11 @@ public class ChatRoomActivity extends AppCompatActivity {
     private FirebaseListAdapter<ChatMessage> adapter;
     private FirebaseRecyclerAdapter<ChatMessage, MessageViewHolder>
             mFirebaseAdapter;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
     private DatabaseReference chatroom;
+    private DatabaseReference lastMessage;
+
     private String groupID;
     private String groupName;
 
@@ -67,12 +72,17 @@ public class ChatRoomActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         getSupportActionBar().setTitle(groupName);
 
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
 
         System.out.println("groupID " + groupID);
         if (groupID.equals(null)) {
             chatroom = FirebaseDatabase.getInstance().getReference().child("chatrooms");
         } else {
             chatroom = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
+            lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("lastMessage");
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -88,6 +98,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 FirebaseAuth.getInstance()
                                         .getCurrentUser()
                                         .getDisplayName()));
+
+                lastMessage.setValue(new ChatMessage(input.getText().toString(),
+                        FirebaseAuth.getInstance()
+                                .getCurrentUser()
+                                .getDisplayName()));
 
                 // Clear the input
                 input.setText("");

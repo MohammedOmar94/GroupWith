@@ -28,11 +28,15 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Toolbar"></activity>
+            android:theme="@style/Toolbar" />
         <activity
             android:name=".ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
-            android:theme="@style/Toolbar"></activity>
+            android:theme="@style/Toolbar" />
+        <activity
+            android:name=".tabbedGroupsActivity"
+            android:label="@string/title_activity_tabbed_groups"
+            android:theme="@style/tabs"></activity>
     </application>
 
 </manifest>

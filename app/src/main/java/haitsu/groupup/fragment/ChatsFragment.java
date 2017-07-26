@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,21 +24,24 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import haitsu.groupup.ChatRoomActivity;
 import haitsu.groupup.R;
-import haitsu.groupup.other.Group;
+import haitsu.groupup.other.ChatMessage;
 import haitsu.groupup.other.Groups;
-import haitsu.groupup.other.User;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyGroupsFragment.OnFragmentInteractionListener} interface
+ * {@link ChatsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyGroupsFragment#newInstance} factory method to
+ * Use the {@link ChatsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyGroupsFragment extends Fragment {
+public class ChatsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,7 +63,7 @@ public class MyGroupsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    public MyGroupsFragment() {
+    public ChatsFragment() {
         // Required empty public constructor
     }
 
@@ -72,8 +76,8 @@ public class MyGroupsFragment extends Fragment {
      * @return A new instance of fragment MyGroupsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyGroupsFragment newInstance(String param1, String param2) {
-        MyGroupsFragment fragment = new MyGroupsFragment();
+    public static ChatsFragment newInstance(String param1, String param2) {
+        ChatsFragment fragment = new ChatsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -104,15 +108,26 @@ public class MyGroupsFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
+        final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
+        final Query us2 = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("lastMessage");
         final DatabaseReference group = databaseRef.child("group");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
+        final DatabaseReference chats = databaseRef.child("chats");
+        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.messages, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
-                System.out.println("Group name is " + groupInfo.getName());
-                ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
-                ((TextView) view.findViewById(android.R.id.text2)).setText("Category: " + groupInfo.getCategory() + " Admin: " + groupInfo.getAdmin());
-            }
+               // Map<String,String> lastMessage = groupInfo.getLastMessage();
+               // System.out.println("Group name is " + lastMessage);
+                ChatMessage message = groupInfo.getLastMessage();
 
+                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
+                if(groupInfo.getLastMessage() != null){
+                    ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
+                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", message.getMessageTime()));
+                } else {
+                    ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
+                }
+         //  (
+            }
+/*
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the Item from ListView
@@ -129,7 +144,35 @@ public class MyGroupsFragment extends Fragment {
                 // Generate ListView Item using TextView
                 return view;
             }
+*/
 
+        };
+        final FirebaseListAdapter<Groups> usersAdapter2 = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.messages, us) {
+            protected void populateView(View view, Groups groupInfo, int position) {
+                // Map<String,String> lastMessage = groupInfo.getLastMessage();
+                // System.out.println("Group name is " + lastMessage);
+                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
+                // ((TextView) view.findViewById(R.id.message_text)).setText(groupInfo.getCategory());
+                // ((TextView) view.findViewById(R.id.message_time)).setText("aaa");
+            }
+/*
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+                // Get the Item from ListView
+                View view = super.getView(position, convertView, parent);
+
+                // Initialize a TextView for ListView each Item
+                TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
+
+                // Set the text color of TextView (ListView Item)
+                tv.setTextColor(Color.BLACK);
+                tv2.setTextColor(Color.BLACK);
+
+                // Generate ListView Item using TextView
+                return view;
+            }
+*/
 
         };
         us.addValueEventListener(new ValueEventListener() {
