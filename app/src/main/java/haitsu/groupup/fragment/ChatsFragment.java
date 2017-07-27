@@ -112,7 +112,7 @@ public class ChatsFragment extends Fragment {
         final Query us2 = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("lastMessage");
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.messages, us) {
+        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.group_chat, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
                // Map<String,String> lastMessage = groupInfo.getLastMessage();
                // System.out.println("Group name is " + lastMessage);
@@ -121,7 +121,7 @@ public class ChatsFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
                 if(groupInfo.getLastMessage() != null){
                     ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", message.getMessageTime()));
+                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
                 } else {
                     ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
                 }
