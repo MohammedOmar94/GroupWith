@@ -2,7 +2,6 @@ package haitsu.groupup.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,11 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import haitsu.groupup.ChatRoomActivity;
+import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
 import haitsu.groupup.other.Groups;
@@ -155,24 +150,7 @@ public class ChatsFragment extends Fragment {
                 // ((TextView) view.findViewById(R.id.message_text)).setText(groupInfo.getCategory());
                 // ((TextView) view.findViewById(R.id.message_time)).setText("aaa");
             }
-/*
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the Item from ListView
-                View view = super.getView(position, convertView, parent);
 
-                // Initialize a TextView for ListView each Item
-                TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
-
-                // Set the text color of TextView (ListView Item)
-                tv.setTextColor(Color.BLACK);
-                tv2.setTextColor(Color.BLACK);
-
-                // Generate ListView Item using TextView
-                return view;
-            }
-*/
 
         };
         us.addValueEventListener(new ValueEventListener() {

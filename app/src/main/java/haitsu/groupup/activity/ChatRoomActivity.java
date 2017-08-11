@@ -1,4 +1,4 @@
-package haitsu.groupup;
+package haitsu.groupup.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -190,7 +191,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Format the date before showing it
                 viewHolder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
                         model.getMessageTime()));
-
 
                 viewHolder.messageUser.setOnClickListener(new View.OnClickListener() {
 

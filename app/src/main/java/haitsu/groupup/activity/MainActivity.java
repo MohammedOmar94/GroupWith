@@ -36,7 +36,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import haitsu.groupup.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.CreateGroupFragment;
 import haitsu.groupup.fragment.GroupsFragment;
@@ -44,10 +43,8 @@ import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
 import haitsu.groupup.fragment.SettingsFragment;
-import haitsu.groupup.other.Groups;
 import haitsu.groupup.other.User;
 import haitsu.groupup.other.CircleTransform;
-import haitsu.groupup.tabbedGroupsActivity;
 
 import static android.graphics.Color.WHITE;
 

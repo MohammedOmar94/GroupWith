@@ -36,19 +36,29 @@ public class DBConnections {
     public void joinGroup(String groupID, String groupName, String groupCategory) {
         //String userid = databaseRef.child("Group").push().getKey();
         DatabaseReference userid2 = databaseRef.child("group").child(groupID);
+        DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
+
         userid2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
 
 
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("category").setValue(groupCategory);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("name").setValue(groupName);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("admin").setValue(false);
+
+        //Add to notifications
+        notifications.setValue(new Notification("You joined the group " + groupName + "!"));
+
+        notifications.child("messageText").setValue("You joined the group " + groupName + "!");
+
     }
 
     public void submitNewGroup(String groupCategory, EditText text) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("group").push();
+        DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
+       // String notificationId = notifications.getKey();
 
         //Adds to group tree
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
@@ -61,6 +71,10 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(text.getText().toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
 
+        //Add to notifications
+        notifications.setValue(new Notification("You created the group " + text.getText().toString() + "!"));
+
+        //databaseRef.child("notifications").child(mFirebaseUser.getUid()).push().setValue("You joined the group " + text.getText().toString() + "!");
         //Create chats room with group id
       //  createChatRoom(groupId);
     }

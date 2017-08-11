@@ -23,11 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import haitsu.groupup.ChatRoomActivity;
+import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
-import haitsu.groupup.other.Group;
 import haitsu.groupup.other.Groups;
-import haitsu.groupup.other.User;
 
 /**
  * A simple {@link Fragment} subclass.

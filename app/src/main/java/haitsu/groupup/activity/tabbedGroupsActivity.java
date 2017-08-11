@@ -1,4 +1,4 @@
-package haitsu.groupup;
+package haitsu.groupup.activity;
 
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import haitsu.groupup.R;
 import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
