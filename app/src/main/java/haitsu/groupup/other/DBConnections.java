@@ -1,15 +1,20 @@
 package haitsu.groupup.other;
 
 import android.content.Intent;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.activity.SignInActivity;
 
@@ -26,10 +31,12 @@ public class DBConnections {
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+    boolean groupAdmin;
+
 
     //String groupId;
 
-    public DBConnections(){
+    public DBConnections() {
 
     }
 
@@ -58,7 +65,7 @@ public class DBConnections {
         DatabaseReference groupId2 = databaseRef.child("group").push();
         DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
-       // String notificationId = notifications.getKey();
+        // String notificationId = notifications.getKey();
 
         //Adds to group tree
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
@@ -76,15 +83,15 @@ public class DBConnections {
 
         //databaseRef.child("notifications").child(mFirebaseUser.getUid()).push().setValue("You joined the group " + text.getText().toString() + "!");
         //Create chats room with group id
-      //  createChatRoom(groupId);
+        //  createChatRoom(groupId);
     }
 
-    public void createChatRoom(String groupId){
+    public void createChatRoom(String groupId) {
         DatabaseReference chatRooms = databaseRef.child("chatrooms");
         chatRooms.child(groupId).child("admin").setValue(mFirebaseUser.getUid());
     }
 
-    public void deleteGroup(String groupID){
+    public void deleteGroup(String groupID) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         //Delete from group tree, which contains detail about the name and its members
@@ -97,10 +104,33 @@ public class DBConnections {
         databaseRef.child("chatrooms").child(groupID).removeValue();
     }
 
-    public void addToChatRoom(){
+    public boolean checkGroup(final String groupID) {
+        DatabaseReference query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("admin");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() != null){//Delete group if it's the users
+                    System.out.println("Group ID is " + groupID + " " + dataSnapshot.getValue());
+                    groupAdmin = true;
+                } else {
+                    System.out.println("Group ID is " + groupID + " " + dataSnapshot.getValue());
+                    groupAdmin = false;
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        System.out.println("Group ID is " + groupAdmin);
+        return groupAdmin;
     }
 
+    public void addToChatRoom() {
+
+    }
 
 
 }
