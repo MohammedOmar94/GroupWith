@@ -11,12 +11,14 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -477,6 +479,12 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_new_group) {
             CURRENT_TAG = TAG_MY_CREATE_GROUP;
             navItemIndex = 4;
+
+            startActivity(new Intent(MainActivity.this, CreateGroupActivity.class));
+            drawer.closeDrawers();
+            return true;
+
+            /*
             Fragment fragment = new CreateGroupFragment();
 
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -496,6 +504,7 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawers();
             }
             Toast.makeText(getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+            */
         }
 
   /*      if (id == R.id.action_chats) {

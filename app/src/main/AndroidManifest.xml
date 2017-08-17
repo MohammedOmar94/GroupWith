@@ -37,6 +37,9 @@
             android:name=".activity.tabbedGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:theme="@style/tabs"></activity>
+        <activity
+            android:name=".activity.CreateGroupActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

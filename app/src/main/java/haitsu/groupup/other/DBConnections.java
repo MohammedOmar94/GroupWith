@@ -59,7 +59,7 @@ public class DBConnections {
 
     }
 
-    public void submitNewGroup(String groupCategory, EditText text) {
+    public void submitNewGroup(String groupCategory, EditText groupName, EditText groupDescription, String groupGender) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("group").push();
@@ -71,15 +71,18 @@ public class DBConnections {
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
         groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
-        groupId2.child("name").setValue(text.getText().toString());//Adds Category to Group
+        groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
+        groupId2.child("description").setValue(groupDescription.getText().toString());
+        groupId2.child("genders").setValue(groupGender);
+
 
         //Adds to users tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(text.getText().toString());
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.getText().toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
 
         //Add to notifications
-        notifications.setValue(new Notification("You created the group " + text.getText().toString() + "!"));
+        notifications.setValue(new Notification("You created the group " + groupName.getText().toString() + "!"));
 
         //databaseRef.child("notifications").child(mFirebaseUser.getUid()).push().setValue("You joined the group " + text.getText().toString() + "!");
         //Create chats room with group id

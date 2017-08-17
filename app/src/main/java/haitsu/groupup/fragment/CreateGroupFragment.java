@@ -3,7 +3,7 @@ package haitsu.groupup.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +35,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     private String mParam2;
 
     private String selectedCategory;
+    private String selectedGender;
 
 
 
@@ -120,8 +121,8 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         switch (v.getId()) {
             case R.id.submit_button:
-                dbConnections.submitNewGroup(selectedCategory, (EditText) getView().findViewById(R.id.group_name));
-                Toast.makeText(getContext().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+                dbConnections.submitNewGroup(selectedCategory, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.group_description), selectedGender);
+                Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
                 break;
         }
     }
@@ -131,6 +132,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         // An item was selected. You can retrieve the selected item using
         parent.getItemAtPosition(pos);
         selectedCategory = (String) parent.getItemAtPosition(pos);
+        selectedGender = (String) parent.getItemAtPosition(pos);
         System.out.println("Category is " + selectedCategory);
 
 
