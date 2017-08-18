@@ -112,7 +112,9 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         mJoinButton = (Button) view.findViewById(R.id.join_button);
+        mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mJoinButton.setOnClickListener(this);
+        mDeleteButton.setOnClickListener(this);
 
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
@@ -177,6 +179,15 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 System.out.println("Group desc is " + selectedGroupName);
                 dbConnections.joinGroup(selectedGroupInfo, selectedGroupName, selectedGroupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.delete_button:
+                boolean groupAdmin = dbConnections.checkGroup(selectedGroupInfo);
+                if(groupAdmin) {
+                    dbConnections.deleteGroup(selectedGroupInfo);
+                }
+                Toast.makeText(getContext().getApplicationContext(), "GROUP ADMIN?  " + groupAdmin + "", Toast.LENGTH_LONG).show();
+
+//                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
         }
     }

@@ -36,7 +36,7 @@ import haitsu.groupup.other.Group;
  * Use the {@link GroupsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupsFragment extends Fragment implements View.OnClickListener {
+public class GroupsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -103,12 +103,8 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
-        mJoinButton = (Button) view.findViewById(R.id.join_button);
-        mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        mJoinButton.setOnClickListener(this);
-        mDeleteButton.setOnClickListener(this);
         groupsFromCategory = databaseRef.child("group").orderByChild("category").equalTo(filteredCategory);
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -211,24 +207,6 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.join_button:
-                dbConnections.joinGroup(selectedGroupID, selectedGroupName, selectedGroupCategory);
-                Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
-                break;
-            case R.id.delete_button:
-                boolean groupAdmin = dbConnections.checkGroup(selectedGroupID);
-                if(groupAdmin) {
-                    dbConnections.deleteGroup(selectedGroupID);
-                }
-                Toast.makeText(getContext().getApplicationContext(), "GROUP ADMIN?  " + groupAdmin + "", Toast.LENGTH_LONG).show();
-
-//                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
 
     /**
      * This interface must be implemented by activities that contain this
