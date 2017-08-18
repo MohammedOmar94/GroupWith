@@ -24,8 +24,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.ChatRoomActivity;
-import haitsu.groupup.activity.GroupDescription;
+import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
@@ -164,7 +163,7 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
                         selectedGroupName = group.getName();
                         selectedGroupCategory = group.getCategory();
                         selectedGroupInfo = key;//DIS WORKS, DELETE INTENT EXTRAS OR CHECK WHY NOT BEING USED!
-                        Intent intent = new Intent(getActivity(), GroupDescription.class);
+                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();
                         //extras.putString("GROUP_ID", selectedGroup);
                         extras.putString("GROUP_INFO", selectedGroupInfo);

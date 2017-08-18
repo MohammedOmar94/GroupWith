@@ -7,9 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
-import haitsu.groupup.fragment.GroupInfo;
+import haitsu.groupup.fragment.GroupInfoFragment;
 
-public class GroupDescription extends AppCompatActivity  implements GroupInfo.OnFragmentInteractionListener{
+public class GroupInfoActivity extends AppCompatActivity  implements GroupInfoFragment.OnFragmentInteractionListener{
 
     private String activityTitles [];
     private Toolbar toolbar;
@@ -28,7 +28,7 @@ public class GroupDescription extends AppCompatActivity  implements GroupInfo.On
 
         // Display the fragment as the main content.
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame, new GroupInfo())
+                .replace(R.id.frame, new GroupInfoFragment())
                 .commit();
     }
 

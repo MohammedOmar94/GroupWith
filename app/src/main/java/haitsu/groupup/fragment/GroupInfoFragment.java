@@ -1,8 +1,6 @@
 package haitsu.groupup.fragment;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,7 +8,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,22 +24,20 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
-import haitsu.groupup.other.Groups;
 
 import static haitsu.groupup.fragment.GroupsFragment.selectedGroupInfo;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link GroupInfo.OnFragmentInteractionListener} interface
+ * {@link GroupInfoFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link GroupInfo#newInstance} factory method to
+ * Use the {@link GroupInfoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupInfo extends Fragment implements View.OnClickListener {
+public class GroupInfoFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -58,7 +53,7 @@ public class GroupInfo extends Fragment implements View.OnClickListener {
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
     private Query groupsFromCategory;
 
-    private GroupInfo.OnFragmentInteractionListener mListener;
+    private GroupInfoFragment.OnFragmentInteractionListener mListener;
 
     private Button mJoinButton;
     private Button mDeleteButton;
@@ -75,7 +70,7 @@ public class GroupInfo extends Fragment implements View.OnClickListener {
 
     FirebaseListAdapter<Group> groupAdapter;
 
-    public GroupInfo() {
+    public GroupInfoFragment() {
         // Required empty public constructor
     }
 
@@ -85,11 +80,11 @@ public class GroupInfo extends Fragment implements View.OnClickListener {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment GroupInfo.
+     * @return A new instance of fragment GroupInfoFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GroupInfo newInstance(String param1, String param2) {
-        GroupInfo fragment = new GroupInfo();
+    public static GroupInfoFragment newInstance(String param1, String param2) {
+        GroupInfoFragment fragment = new GroupInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
