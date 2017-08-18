@@ -1,6 +1,7 @@
 package haitsu.groupup.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.ChatRoomActivity;
+import haitsu.groupup.activity.GroupDescription;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
@@ -49,6 +52,9 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
     private ListView mListView;
 
     public static String filteredCategory;
+    public static String selectedGroupInfo;
+
+
     private String selectedGroupCategory;
     private String selectedGroupID;
     private String selectedGroupName;
@@ -157,6 +163,13 @@ public class GroupsFragment extends Fragment implements View.OnClickListener {
                         selectedGroupID = key;
                         selectedGroupName = group.getName();
                         selectedGroupCategory = group.getCategory();
+                        selectedGroupInfo = key;//DIS WORKS, DELETE INTENT EXTRAS OR CHECK WHY NOT BEING USED!
+                        Intent intent = new Intent(getActivity(), GroupDescription.class);
+                        Bundle extras = new Bundle();
+                        //extras.putString("GROUP_ID", selectedGroup);
+                        extras.putString("GROUP_INFO", selectedGroupInfo);
+                        intent.putExtras(extras);
+                        startActivity(intent);
                         System.out.println("Group name is " + group.getName() + " ID is " + key);
                     }
 

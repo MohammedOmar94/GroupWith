@@ -87,7 +87,9 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
         spinner.setOnItemSelectedListener(this);
+        spinner2.setOnItemSelectedListener(this);
 
         return view;
     }
@@ -130,10 +132,19 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         // An item was selected. You can retrieve the selected item using
-        parent.getItemAtPosition(pos);
-        selectedCategory = (String) parent.getItemAtPosition(pos);
-        selectedGender = (String) parent.getItemAtPosition(pos);
-        System.out.println("Category is " + selectedCategory);
+        Spinner spinner = (Spinner) parent;
+        if(spinner.getId() == R.id.spinner)
+        {
+            selectedCategory = (String) parent.getItemAtPosition(pos);
+            //do this
+        }
+        else if(spinner.getId() == R.id.group_gender)
+        {
+            selectedGender = (String) parent.getItemAtPosition(pos);
+            //do this
+        }
+      //  parent.getItemAtPosition(pos);
+     //   System.out.println("Category is " + selectedCategory);
 
 
     }

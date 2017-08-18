@@ -20,6 +20,7 @@
         <item>My Groups</item>
         <item>Settings</item>
         <item>Create Group</item>
+        <item>Group Info</item>
     </string-array>
 
     <string name="activity_title_about_us">About Us</string>

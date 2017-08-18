@@ -36,10 +36,12 @@
         <activity
             android:name=".activity.tabbedGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
-            android:theme="@style/tabs"></activity>
+            android:theme="@style/tabs" />
         <activity
             android:name=".activity.CreateGroupActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.GroupDescription"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
