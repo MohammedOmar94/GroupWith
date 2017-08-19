@@ -16,6 +16,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import haitsu.groupup.activity.AccountSetupActivity;
+import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.activity.SignInActivity;
 
 /**
@@ -26,6 +28,8 @@ public class DBConnections {
 
     //Can access any child element within the database using this reference.
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+
 
     //Firebase details
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
@@ -39,6 +43,14 @@ public class DBConnections {
     public DBConnections() {
 
     }
+
+    public void createUserAccount(EditText username, String email, String age) {
+        User user = new User(username.getText().toString(), email, age);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).setValue(user);//Add user}
+    }
+
+
+
 
     public void joinGroup(String groupID, String groupName, String groupCategory) {
         //String userid = databaseRef.child("Group").push().getKey();
@@ -112,7 +124,7 @@ public class DBConnections {
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() != null){//Delete group if it's the users
+                if (dataSnapshot.getValue() != null) {//Delete group if it's the users
                     System.out.println("Group ID is " + groupID + " " + dataSnapshot.getValue());
                     groupAdmin = true;
                 } else {

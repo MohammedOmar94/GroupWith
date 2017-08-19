@@ -2,6 +2,7 @@ package haitsu.groupup.activity;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -45,6 +46,7 @@ import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
 import haitsu.groupup.fragment.SettingsFragment;
+import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.User;
 import haitsu.groupup.other.CircleTransform;
 
@@ -62,6 +64,10 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
 
+
+    User userInfo;
+
+    private DBConnections dbConnections = new DBConnections();
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -132,14 +138,11 @@ public class MainActivity extends AppCompatActivity
             finish();
             return;
         } else {
-            mUsername = mFirebaseUser.getDisplayName();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
 
                 header = navigationView.getHeaderView(0);
                 ImageView imgvw = (ImageView) header.findViewById(R.id.account_image);
-                // load nav menu header data
-                loadNavHeader(imgvw);
 
                 // initializing navigation menu
                 setUpNavigationView();  // showing dot next to notifications label
@@ -150,35 +153,41 @@ public class MainActivity extends AppCompatActivity
                     CURRENT_TAG = TAG_HOME;
                     loadHomeFragment();
                 }
-                //Adds new user to database.
-                addUser(mFirebaseUser.getUid(), mFirebaseUser.getDisplayName(), mFirebaseUser.getEmail());
+                getUser(imgvw);
             }
+            //mUsername = mFirebaseUser.getDisplayName();
+            //
         }
     }
 
 
 
-
-    private void addUser(final String userId, String name, String email) {
-        final User user = new User(name, email);
-        DatabaseReference users = databaseRef.child("users");
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void getUser(final ImageView imgvw) {
+        DatabaseReference username = databaseRef.child("users");
+        username.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.hasChild(userId)) {//If the userid doesn't already exist
-                    databaseRef.child("users").child(userId).setValue(user);//Add user
+            public void onDataChange(final DataSnapshot snapshot) {
+                userInfo = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);//ISSUE IF USER LEAVES APP ON ACCOUNT CREATION, CAN STILL USE APP USING FIREBASE.
+                if (!snapshot.hasChild((mFirebaseUser.getUid()))) {//User not saved account details then setup account.
+//                    System.out.println("User with " + userInfo.getUsername());
+                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
+                    finish();
+                } else {
+                    System.out.println("User with " + snapshot.hasChild((mFirebaseUser.getUid())));
+                    System.out.println("User with " + userInfo.getUsername());
+                    mUsername = userInfo.getUsername();
+                    // load nav menu header data
+                    loadNavHeader(imgvw);
+                    }
                 }
-            }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-        //Use push() for auto generated id node.
     }
-
-
 
     private void deleteAccount() {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -202,7 +211,7 @@ public class MainActivity extends AppCompatActivity
         switch (v.getId()) {
             //case R.id.sign_out:
             //    signOut();
-          //      break;
+            //      break;
         }
     }
 
@@ -289,14 +298,14 @@ public class MainActivity extends AppCompatActivity
                 // notifications fragment
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
                 return notificationsFragment;
-           // case 2:
-                // my groups fragment
-             //   MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+            // case 2:
+            // my groups fragment
+            //   MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
             //    return myGroupsFragment;
             //case 3:
-                // settings fragment
-             //   SettingsFragment settingsFragment = new SettingsFragment();
-              // return settingsFragment;
+            // settings fragment
+            //   SettingsFragment settingsFragment = new SettingsFragment();
+            // return settingsFragment;
             default:
                 return new HomeFragment();
         }
@@ -337,7 +346,7 @@ public class MainActivity extends AppCompatActivity
                         return true;
                     case R.id.nav_settings:
                         //navItemIndex = 3;
-                       // CURRENT_TAG = TAG_SETTINGS;
+                        // CURRENT_TAG = TAG_SETTINGS;
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                         drawer.closeDrawers();
@@ -438,7 +447,7 @@ public class MainActivity extends AppCompatActivity
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
 
-        if(navItemIndex == 4){
+        if (navItemIndex == 4) {
             menu.findItem(R.menu.main).setVisible(false);
         }
         return true;
@@ -460,7 +469,7 @@ public class MainActivity extends AppCompatActivity
         // user is in notifications fragment
         // and selected 'Mark all as Read'
 
-        if(id == R.id.home){
+        if (id == R.id.home) {
             onBackPressed();
             return true;
         }
@@ -510,8 +519,6 @@ public class MainActivity extends AppCompatActivity
   /*      if (id == R.id.action_chats) {
             startActivity(new Intent(this, ChatRoomActivity.class));
         }*/
-
-
 
 
         return super.onOptionsItemSelected(item);

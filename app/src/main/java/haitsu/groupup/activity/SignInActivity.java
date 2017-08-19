@@ -22,8 +22,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
+import haitsu.groupup.other.DBConnections;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -33,6 +39,9 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
     private Button mSignInButton;
 
+
+    private DBConnections dbConnections = new DBConnections();
+    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
@@ -88,6 +97,27 @@ public class SignInActivity extends AppCompatActivity implements
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
+        //Adds new user to database.
+    }
+
+    private void addUser(final String userId) {
+        //final User user = new User(name, email);
+        DatabaseReference users = databaseRef.child("users");
+        users.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.hasChild(userId)) {//If new user, set up account
+                    startActivity(new Intent(SignInActivity.this, AccountSetupActivity.class));
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //Use push() for auto generated id node.
     }
 
     private void signOut(){
@@ -131,8 +161,10 @@ public class SignInActivity extends AppCompatActivity implements
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                            finish();
+                            mFirebaseUser = mFirebaseAuth.getCurrentUser();
+                            addUser(mFirebaseUser.getUid());
+                            //startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                            //finish();
                         }
                     }
                 });

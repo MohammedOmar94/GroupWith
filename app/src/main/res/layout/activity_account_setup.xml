@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="haitsu.groupup.activity.AccountSetupActivity">
+
+
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="49dp"
+        android:layout_marginTop="42dp"
+        android:text="Username"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="49dp" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="49dp"
+        android:layout_marginTop="9dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        android:layout_marginStart="49dp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Age"
+        android:textSize="18sp"
+        android:layout_marginLeft="49dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        android:layout_marginStart="49dp" />
+
+    <Spinner
+        android:id="@+id/spinner2"
+        android:layout_width="253dp"
+        android:layout_height="36dp"
+        android:layout_marginLeft="49dp"
+        android:layout_marginTop="8dp"
+        android:entries="@array/age_arrays"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+    <Button
+        android:id="@+id/finish_setup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="49dp"
+        android:layout_marginTop="22dp"
+        android:text="Finish setup"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+</android.support.constraint.ConstraintLayout>

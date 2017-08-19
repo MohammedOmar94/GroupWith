@@ -40,7 +40,10 @@
         <activity
             android:name=".activity.CreateGroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.GroupInfoActivity"
+        <activity
+            android:name=".activity.GroupInfoActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.AccountSetupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
