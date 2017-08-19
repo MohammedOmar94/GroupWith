@@ -120,12 +120,6 @@ public class SignInActivity extends AppCompatActivity implements
         //Use push() for auto generated id node.
     }
 
-    private void signOut(){
-        FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

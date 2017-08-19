@@ -54,7 +54,7 @@ import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity
         implements
-        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, HomeFragment.OnFragmentInteractionListener,
+        GoogleApiClient.OnConnectionFailedListener, HomeFragment.OnFragmentInteractionListener,
         GroupsFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
         MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
@@ -111,14 +111,6 @@ public class MainActivity extends AppCompatActivity
 
         // load toolbar titles from string resources
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-      /*  fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -155,11 +147,8 @@ public class MainActivity extends AppCompatActivity
                 }
                 getUser(imgvw);
             }
-            //mUsername = mFirebaseUser.getDisplayName();
-            //
         }
     }
-
 
 
     public void getUser(final ImageView imgvw) {
@@ -169,18 +158,14 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(final DataSnapshot snapshot) {
                 userInfo = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);//ISSUE IF USER LEAVES APP ON ACCOUNT CREATION, CAN STILL USE APP USING FIREBASE.
                 if (!snapshot.hasChild((mFirebaseUser.getUid()))) {//User not saved account details then setup account.
-//                    System.out.println("User with " + userInfo.getUsername());
                     startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
-                    System.out.println("User with " + snapshot.hasChild((mFirebaseUser.getUid())));
-                    System.out.println("User with " + userInfo.getUsername());
                     mUsername = userInfo.getUsername();
                     // load nav menu header data
                     loadNavHeader(imgvw);
                     }
                 }
-
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -206,14 +191,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            //case R.id.sign_out:
-            //    signOut();
-            //      break;
-        }
-    }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {

@@ -50,8 +50,6 @@ public class DBConnections {
     }
 
 
-
-
     public void joinGroup(String groupID, String groupName, String groupCategory) {
         //String userid = databaseRef.child("Group").push().getKey();
         DatabaseReference userid2 = databaseRef.child("group").child(groupID);
@@ -95,10 +93,6 @@ public class DBConnections {
 
         //Add to notifications
         notifications.setValue(new Notification("You created the group " + groupName.getText().toString() + "!"));
-
-        //databaseRef.child("notifications").child(mFirebaseUser.getUid()).push().setValue("You joined the group " + text.getText().toString() + "!");
-        //Create chats room with group id
-        //  createChatRoom(groupId);
     }
 
     public void createChatRoom(String groupId) {
