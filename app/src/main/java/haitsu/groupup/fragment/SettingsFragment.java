@@ -10,6 +10,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,7 +25,11 @@ import android.widget.Toast;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.data.DataBuffer;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.SignInActivity;
@@ -51,6 +56,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     Button button;
 
     private GoogleApiClient mGoogleApiClient;
+
+    private FirebaseUser mFirebaseUser;
+    private FirebaseAuth mFirebaseAuth;
+    private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
 
     private OnFragmentInteractionListener mListener;
@@ -80,8 +89,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);// Load the preferences from an XML resource
+
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
         addPreferencesFromResource(R.xml.preferences);
         EditTextPreference editText = (EditTextPreference) findPreference("example_text");
+
+        //databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(editText.getText().toString());//Add user}
         editText.setSummary(editText.getText().toString());
 
         Preference pref = findPreference("sign_out");
@@ -149,6 +164,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // Set up a listener whenever a key changes
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Unregister the listener whenever a key changes
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
         //    case R.id.sign:
@@ -185,6 +217,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (pref instanceof EditTextPreference) {
             EditTextPreference listPref = (EditTextPreference) pref;
+            databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
             pref.setSummary(listPref.getText().toString());
         }
 
