@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser mFirebaseUser;
 
 
-    private String mUsername;
+    public static String mUsername;
     private String mPhotoUrl;
 
     private DrawerLayout drawer;

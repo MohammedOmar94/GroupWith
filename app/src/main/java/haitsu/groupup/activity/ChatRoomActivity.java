@@ -95,15 +95,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatroom.push()
-                        .setValue(new ChatMessage(input.getText().toString(),
-                                FirebaseAuth.getInstance()
-                                        .getCurrentUser()
-                                        .getDisplayName()));
+                        .setValue(new ChatMessage(input.getText().toString(),MainActivity.mUsername));
 
-                lastMessage.setValue(new ChatMessage(input.getText().toString(),
-                        FirebaseAuth.getInstance()
-                                .getCurrentUser()
-                                .getDisplayName()));
+                lastMessage.setValue(new ChatMessage(input.getText().toString(),MainActivity.mUsername));
 
                 // Clear the input
                 input.setText("");
