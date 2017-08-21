@@ -101,30 +101,25 @@ public class DBConnections {
     }
 
     public void deleteGroup(String groupID) {
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        //Delete from group tree, which contains detail about the name and its members
-        databaseRef.child("group").child(groupID).removeValue();
-
-        //Delete from the users group tree
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
-
-        //Deletes the chatroom
-        databaseRef.child("chatrooms").child(groupID).removeValue();
     }
 
-    public boolean checkGroup(final String groupID) {
-        DatabaseReference query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("admin");
-        query.addValueEventListener(new ValueEventListener() {
+    public void checkGroup(final String groupID) {
+        Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {//Delete group if it's the users
-                    System.out.println("Group ID is " + groupID + " " + dataSnapshot.getValue());
-                    groupAdmin = true;
-                } else {
-                    System.out.println("Group ID is " + groupID + " " + dataSnapshot.getValue());
-                    groupAdmin = false;
-                }
+                    mFirebaseUser = mFirebaseAuth.getCurrentUser();
+                    if(dataSnapshot.getValue() != null) {
+                        //Delete from group tree, which contains detail about the name and its members
+                        databaseRef.child("group").child(groupID).removeValue();
+
+                        //Delete from the users group tree
+                        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+
+                        //Deletes the chatroom
+                        databaseRef.child("chatrooms").child(groupID).removeValue();
+                    } 
             }
 
             @Override
@@ -132,9 +127,6 @@ public class DBConnections {
 
             }
         });
-
-        System.out.println("Group ID is " + groupAdmin);
-        return groupAdmin;
     }
 
     public void addToChatRoom() {

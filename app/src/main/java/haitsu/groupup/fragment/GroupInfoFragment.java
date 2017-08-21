@@ -181,12 +181,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.delete_button:
-                boolean groupAdmin = dbConnections.checkGroup(selectedGroupInfo);
-                if(groupAdmin) {
-                    dbConnections.deleteGroup(selectedGroupInfo);
-                }
-                Toast.makeText(getContext().getApplicationContext(), "GROUP ADMIN?  " + groupAdmin + "", Toast.LENGTH_LONG).show();
-
+                dbConnections.checkGroup(selectedGroupInfo);
 //                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
         }

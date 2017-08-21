@@ -157,8 +157,8 @@ public class SignInActivity extends AppCompatActivity implements
                         } else {
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             addUser(mFirebaseUser.getUid());
-                            //startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                            //finish();
+                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                            finish();
                         }
                     }
                 });

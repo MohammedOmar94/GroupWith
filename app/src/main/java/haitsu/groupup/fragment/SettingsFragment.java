@@ -15,11 +15,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -28,11 +30,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.DataBuffer;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.SignInActivity;
+import haitsu.groupup.other.Group;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,10 +100,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         addPreferencesFromResource(R.xml.preferences);
-        EditTextPreference editText = (EditTextPreference) findPreference("example_text");
+        final EditTextPreference editText = (EditTextPreference) findPreference("example_text");
 
-        //databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(editText.getText().toString());//Add user}
-        editText.setSummary(editText.getText().toString());
+        DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid()).child("username");
+        user.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+                System.out.println("Hi " + snapshot.getValue());
+                editText.setSummary(snapshot.getValue(String.class));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         Preference pref = findPreference("sign_out");
         pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
