@@ -11,6 +11,7 @@ public class Group {
     private String name;
     private String description;
     private String genders;
+    private String type;
 
     public Group(){
 
@@ -55,5 +56,13 @@ public class Group {
 
     public void setGenders(String genders) {
         this.genders = genders;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

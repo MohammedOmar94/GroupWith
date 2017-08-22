@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -29,15 +27,16 @@ import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
+import static haitsu.groupup.fragment.GroupsFragment.selectedGroupInfo;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link GroupsFragment.OnFragmentInteractionListener} interface
+ * {@link MoviesGroupFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link GroupsFragment#newInstance} factory method to
+ * Use the {@link MoviesGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupsFragment extends Fragment {
+public class MoviesGroupFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -51,8 +50,9 @@ public class GroupsFragment extends Fragment {
     private Button mDeleteButton;
     private ListView mListView;
 
-    public static String filteredCategory;
-    public static String selectedGroupInfo;
+
+    public static String groupType;
+    public static String groupType2;
 
 
     private String selectedGroupCategory;
@@ -67,7 +67,7 @@ public class GroupsFragment extends Fragment {
 
     FirebaseListAdapter<Group> groupAdapter;
 
-    public GroupsFragment() {
+    public MoviesGroupFragment() {
         // Required empty public constructor
     }
 
@@ -80,8 +80,8 @@ public class GroupsFragment extends Fragment {
      * @return A new instance of fragment GroupsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GroupsFragment newInstance(String param1, String param2) {
-        GroupsFragment fragment = new GroupsFragment();
+    public static MoviesGroupFragment newInstance(String param1, String param2) {
+        MoviesGroupFragment fragment = new MoviesGroupFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -106,7 +106,9 @@ public class GroupsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        groupsFromCategory = databaseRef.child("group").child(filteredCategory).orderByChild("type").equalTo("Interests");
+        groupsFromCategory = databaseRef.child("group").child(GroupsFragment.filteredCategory).orderByChild("type").equalTo("Events");
+
+
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {

@@ -69,21 +69,22 @@ public class DBConnections {
 
     }
 
-    public void submitNewGroup(String groupCategory, EditText groupName, EditText groupDescription, String groupGender) {
+    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        DatabaseReference groupId2 = databaseRef.child("group").push();
+        DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).push();
         DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
         // String notificationId = notifications.getKey();
 
         //Adds to group tree
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
-        groupId2.child("category").setValue(groupCategory);
+        //groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
         groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
+        groupId2.child("type").setValue(groupType);
 
 
         //Adds to users tree

@@ -22,7 +22,7 @@
         android:id="@+id/spinner"
         android:layout_width="138dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="61dp"
+        android:layout_marginLeft="54dp"
         android:layout_marginTop="58dp"
         android:entries="@array/category_arrays"
         android:prompt="@string/category_prompt"
@@ -90,9 +90,19 @@
         android:layout_width="220dp"
         android:layout_height="34dp"
         android:layout_marginLeft="54dp"
-        android:layout_marginTop="-1dp"
         android:entries="@array/group_gender_arrays"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        android:layout_marginStart="54dp" />
+
+    <Spinner
+        android:id="@+id/spinner3"
+        android:layout_width="138dp"
+        android:layout_height="23dp"
+        android:layout_marginRight="39dp"
+        android:entries="@array/group_type_arrays"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="58dp" />
 
 </android.support.constraint.ConstraintLayout>

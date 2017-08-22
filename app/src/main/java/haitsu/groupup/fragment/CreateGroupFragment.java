@@ -36,6 +36,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
     private String selectedCategory;
     private String selectedGender;
+    private String selectedGroupType;
 
 
 
@@ -88,8 +89,10 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
         Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
+        Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
         spinner.setOnItemSelectedListener(this);
         spinner2.setOnItemSelectedListener(this);
+        spinner3.setOnItemSelectedListener(this);
 
         return view;
     }
@@ -123,7 +126,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         switch (v.getId()) {
             case R.id.submit_button:
-                dbConnections.submitNewGroup(selectedCategory, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.group_description), selectedGender);
+                dbConnections.submitNewGroup(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.group_description), selectedGender);
                 Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
                 break;
         }
@@ -133,20 +136,19 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
                                int pos, long id) {
         // An item was selected. You can retrieve the selected item using
         Spinner spinner = (Spinner) parent;
-        if(spinner.getId() == R.id.spinner)
-        {
+        if (spinner.getId() == R.id.spinner) {
             selectedCategory = (String) parent.getItemAtPosition(pos);
             //do this
-        }
-        else if(spinner.getId() == R.id.group_gender)
-        {
+        } else if (spinner.getId() == R.id.group_gender) {
             selectedGender = (String) parent.getItemAtPosition(pos);
             //do this
+        } else if (spinner.getId() == R.id.spinner3) {
+            selectedGroupType = (String) parent.getItemAtPosition(pos);
+            //  parent.getItemAtPosition(pos);
+            //   System.out.println("Category is " + selectedCategory);
+
+
         }
-      //  parent.getItemAtPosition(pos);
-     //   System.out.println("Category is " + selectedCategory);
-
-
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

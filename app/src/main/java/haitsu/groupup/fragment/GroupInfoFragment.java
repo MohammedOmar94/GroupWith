@@ -120,7 +120,8 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final DatabaseReference groups2 = databaseRef.child("group").child(selectedGroupInfo);
+        System.out.println("Group is " + GroupsFragment.filteredCategory  + " " + selectedGroupInfo);
+        final DatabaseReference groups2 = databaseRef.child("group").child(GroupsFragment.filteredCategory).child(selectedGroupInfo);
         groupsFromCategory = databaseRef.child("group").orderByValue().equalTo(selectedGroupInfo);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

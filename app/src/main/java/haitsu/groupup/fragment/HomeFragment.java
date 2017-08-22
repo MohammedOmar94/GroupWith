@@ -1,6 +1,7 @@
 package haitsu.groupup.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.MainActivity;
+import haitsu.groupup.activity.MovieGroupActivity;
+import haitsu.groupup.activity.SettingsActivity;
 import haitsu.groupup.other.ImageAdapter;
 
 /**
@@ -114,10 +118,14 @@ public class HomeFragment extends Fragment {
 
                 GroupsFragment nextFrag= new GroupsFragment();
                 nextFrag.filteredCategory = t.getText().toString();
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.frame, nextFrag ); // give your fragment container id in first parameter
-                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
-                transaction.commit();
+
+                startActivity(new Intent(getActivity(), MovieGroupActivity.class));
+
+
+                //FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                //transaction.replace(R.id.frame, nextFrag ); // give your fragment container id in first parameter
+                //transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+                //transaction.commit();
 
 
             }

@@ -1,24 +1,26 @@
 package haitsu.groupup.activity;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
+import haitsu.groupup.fragment.GroupsFragment;
+import haitsu.groupup.fragment.MoviesGroupFragment;
+import haitsu.groupup.other.MoviesPagerAdapter;
 import haitsu.groupup.other.ViewPagerAdapter;
 import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 
-public class tabbedGroupsActivity extends AppCompatActivity implements
-        ChatsFragment.OnFragmentInteractionListener,
-        MyGroupsFragment.OnFragmentInteractionListener {
+public class MovieGroupActivity extends AppCompatActivity implements
+        GroupsFragment.OnFragmentInteractionListener,
+        MoviesGroupFragment.OnFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -30,7 +32,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
      */
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private String[] pageTitle = {"Chats", "My Groups"};
+    private String[] pageTitle = {"Today", "Upcoming Events", "Interests"};
 
 
     /**
@@ -45,24 +47,24 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
         viewPager = (ViewPager)findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Group Up");
+        getSupportActionBar().setTitle(GroupsFragment.filteredCategory);
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(pageTitle[i]));
         }
 
         //set gravity for tab bar
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);  //set viewpager adapter
-        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        MoviesPagerAdapter pagerAdapter = new MoviesPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
         //change Tab selection when swipe ViewPager
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         //change ViewPager page when tab selected
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());

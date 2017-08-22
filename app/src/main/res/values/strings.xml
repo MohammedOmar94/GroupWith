@@ -49,6 +49,12 @@
         <item>Female</item>
     </string-array>
 
+    <string-array name="group_type_arrays">
+        <item>Events</item>
+        <item>Interests</item>
+    </string-array>
+
+
     <string-array name="age_arrays">
         <item>18</item>
         <item>20</item>
