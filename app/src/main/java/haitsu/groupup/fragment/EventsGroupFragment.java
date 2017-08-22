@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -29,15 +27,16 @@ import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
+import static haitsu.groupup.fragment.InterestsGroupFragment.selectedGroupInfo;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link GroupsFragment.OnFragmentInteractionListener} interface
+ * {@link EventsGroupFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link GroupsFragment#newInstance} factory method to
+ * Use the {@link EventsGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GroupsFragment extends Fragment {
+public class EventsGroupFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -51,13 +50,15 @@ public class GroupsFragment extends Fragment {
     private Button mDeleteButton;
     private ListView mListView;
 
-    public static String filteredCategory;
-    public static String selectedGroupInfo;
+
+    public static String groupType;
+    public static String groupType2;
 
 
     private String selectedGroupCategory;
     private String selectedGroupID;
     private String selectedGroupName;
+    public static String filteredCatzzz;
 
     private OnFragmentInteractionListener mListener;
 
@@ -67,7 +68,7 @@ public class GroupsFragment extends Fragment {
 
     FirebaseListAdapter<Group> groupAdapter;
 
-    public GroupsFragment() {
+    public EventsGroupFragment() {
         // Required empty public constructor
     }
 
@@ -77,11 +78,11 @@ public class GroupsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment GroupsFragment.
+     * @return A new instance of fragment InterestsGroupFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GroupsFragment newInstance(String param1, String param2) {
-        GroupsFragment fragment = new GroupsFragment();
+    public static EventsGroupFragment newInstance(String param1, String param2) {
+        EventsGroupFragment fragment = new EventsGroupFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -106,13 +107,15 @@ public class GroupsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        groupsFromCategory = databaseRef.child("group").child(filteredCategory).orderByChild("type").equalTo("Interests");
+        groupsFromCategory = databaseRef.child("group").child(filteredCatzzz).orderByChild("type").equalTo("Events");
+
+
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
                     protected void populateView(View view, Group chatMessage, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getCategory());
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(filteredCatzzz);
                         ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
 
                     }

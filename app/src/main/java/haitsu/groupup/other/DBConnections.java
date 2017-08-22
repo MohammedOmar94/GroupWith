@@ -52,7 +52,7 @@ public class DBConnections {
 
     public void joinGroup(String groupID, String groupName, String groupCategory) {
         //String userid = databaseRef.child("Group").push().getKey();
-        DatabaseReference userid2 = databaseRef.child("group").child(groupID);
+        DatabaseReference userid2 = databaseRef.child("group").child(groupCategory).child(groupID);
         DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
 
         userid2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
@@ -105,15 +105,16 @@ public class DBConnections {
 
     }
 
-    public void checkGroup(final String groupID) {
+    public void checkGroup(final String groupID, final String groupCategory) {
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                     mFirebaseUser = mFirebaseAuth.getCurrentUser();
                     if(dataSnapshot.getValue() != null) {
+                        System.out.println("Category is" + groupCategory);
                         //Delete from group tree, which contains detail about the name and its members
-                        databaseRef.child("group").child(groupID).removeValue();
+                        databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
 
                         //Delete from the users group tree
                         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();

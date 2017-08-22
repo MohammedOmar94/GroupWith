@@ -27,16 +27,15 @@ import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
-import static haitsu.groupup.fragment.GroupsFragment.selectedGroupInfo;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MoviesGroupFragment.OnFragmentInteractionListener} interface
+ * {@link InterestsGroupFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MoviesGroupFragment#newInstance} factory method to
+ * Use the {@link InterestsGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MoviesGroupFragment extends Fragment {
+public class InterestsGroupFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,9 +49,8 @@ public class MoviesGroupFragment extends Fragment {
     private Button mDeleteButton;
     private ListView mListView;
 
-
-    public static String groupType;
-    public static String groupType2;
+    public static String filteredCategory;
+    public static String selectedGroupInfo;
 
 
     private String selectedGroupCategory;
@@ -67,7 +65,7 @@ public class MoviesGroupFragment extends Fragment {
 
     FirebaseListAdapter<Group> groupAdapter;
 
-    public MoviesGroupFragment() {
+    public InterestsGroupFragment() {
         // Required empty public constructor
     }
 
@@ -77,11 +75,11 @@ public class MoviesGroupFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment GroupsFragment.
+     * @return A new instance of fragment InterestsGroupFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MoviesGroupFragment newInstance(String param1, String param2) {
-        MoviesGroupFragment fragment = new MoviesGroupFragment();
+    public static InterestsGroupFragment newInstance(String param1, String param2) {
+        InterestsGroupFragment fragment = new InterestsGroupFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -106,15 +104,13 @@ public class MoviesGroupFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        groupsFromCategory = databaseRef.child("group").child(GroupsFragment.filteredCategory).orderByChild("type").equalTo("Events");
-
-
+        groupsFromCategory = databaseRef.child("group").child(filteredCategory).orderByChild("type").equalTo("Interests");
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
                     protected void populateView(View view, Group chatMessage, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(chatMessage.getCategory());
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(filteredCategory);
                         ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
 
                     }
@@ -160,7 +156,7 @@ public class MoviesGroupFragment extends Fragment {
                         Group group = ((Group) mListView.getItemAtPosition(position));
                         selectedGroupID = key;
                         selectedGroupName = group.getName();
-                        selectedGroupCategory = group.getCategory();
+                        selectedGroupCategory = filteredCategory;
                         selectedGroupInfo = key;//DIS WORKS, DELETE INTENT EXTRAS OR CHECK WHY NOT BEING USED!
                         Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();

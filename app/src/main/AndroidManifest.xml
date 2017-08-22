@@ -46,7 +46,7 @@
         <activity android:name=".activity.AccountSetupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.MovieGroupActivity"
+            android:name=".activity.GroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

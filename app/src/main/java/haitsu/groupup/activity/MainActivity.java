@@ -2,7 +2,6 @@ package haitsu.groupup.activity;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -41,7 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.CreateGroupFragment;
-import haitsu.groupup.fragment.GroupsFragment;
+import haitsu.groupup.fragment.InterestsGroupFragment;
 import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
@@ -55,7 +54,7 @@ import static android.graphics.Color.WHITE;
 public class MainActivity extends AppCompatActivity
         implements
         GoogleApiClient.OnConnectionFailedListener, HomeFragment.OnFragmentInteractionListener,
-        GroupsFragment.OnFragmentInteractionListener,
+        InterestsGroupFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
         MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
 

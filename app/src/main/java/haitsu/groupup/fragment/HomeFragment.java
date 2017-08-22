@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.MainActivity;
-import haitsu.groupup.activity.MovieGroupActivity;
-import haitsu.groupup.activity.SettingsActivity;
+import haitsu.groupup.activity.GroupsActivity;
 import haitsu.groupup.other.ImageAdapter;
 
 /**
@@ -116,10 +113,12 @@ public class HomeFragment extends Fragment {
                  Toast.makeText(getActivity(),
                         t.getText(), Toast.LENGTH_SHORT).show();
 
-                GroupsFragment nextFrag= new GroupsFragment();
+                InterestsGroupFragment nextFrag= new InterestsGroupFragment();
+                EventsGroupFragment nextFrag2 = new EventsGroupFragment();
                 nextFrag.filteredCategory = t.getText().toString();
+                nextFrag2.filteredCatzzz = t.getText().toString();
 
-                startActivity(new Intent(getActivity(), MovieGroupActivity.class));
+                startActivity(new Intent(getActivity(), GroupsActivity.class));
 
 
                 //FragmentTransaction transaction = getFragmentManager().beginTransaction();

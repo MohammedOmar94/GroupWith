@@ -27,7 +27,7 @@ import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
-import static haitsu.groupup.fragment.GroupsFragment.selectedGroupInfo;
+import static haitsu.groupup.fragment.InterestsGroupFragment.selectedGroupInfo;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -120,15 +120,14 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        System.out.println("Group is " + GroupsFragment.filteredCategory  + " " + selectedGroupInfo);
-        final DatabaseReference groups2 = databaseRef.child("group").child(GroupsFragment.filteredCategory).child(selectedGroupInfo);
-        groupsFromCategory = databaseRef.child("group").orderByValue().equalTo(selectedGroupInfo);
+        System.out.println("Group is " + InterestsGroupFragment.filteredCategory  + " " + selectedGroupInfo);
+        final DatabaseReference groups2 = databaseRef.child("group").child(InterestsGroupFragment.filteredCategory).child(selectedGroupInfo);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 Group groupInfo = snapshot.getValue(Group.class);
                 selectedGroupName = groupInfo.getName();
-                selectedGroupCategory = groupInfo.getCategory();
+                selectedGroupCategory = InterestsGroupFragment.filteredCategory;
                 ((TextView) view.findViewById(R.id.group_name)).setText(groupInfo.getName());
                 ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
                 ((TextView) view.findViewById(R.id.group_description)).setText(groupInfo.getDescription());
@@ -182,7 +181,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.delete_button:
-                dbConnections.checkGroup(selectedGroupInfo);
+                dbConnections.checkGroup(selectedGroupInfo, selectedGroupCategory);
 //                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 break;
         }

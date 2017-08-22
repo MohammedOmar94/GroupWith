@@ -12,25 +12,13 @@
     android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="haitsu.groupup.fragment.GroupsFragment">
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="77dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Groups"
-        android:textAppearance="@android:style/TextAppearance.Material.Large"
-        android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" /><![CDATA[
+    tools:context="haitsu.groupup.fragment.InterestsGroupFragment">
+    <!-- TODO: Update blank fragment layout --><![CDATA[
+
 
     " />
+
+
 
     ]]>
 
@@ -42,13 +30,13 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
         android:divider="@color/colorPrimaryDark"
         android:dividerHeight="4px"
         android:listSelector="@drawable/item_ripple"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp" />
 
 
 </android.support.constraint.ConstraintLayout>

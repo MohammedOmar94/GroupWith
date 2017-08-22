@@ -11,16 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
-import haitsu.groupup.fragment.GroupsFragment;
-import haitsu.groupup.fragment.MoviesGroupFragment;
-import haitsu.groupup.other.MoviesPagerAdapter;
-import haitsu.groupup.other.ViewPagerAdapter;
-import haitsu.groupup.fragment.ChatsFragment;
-import haitsu.groupup.fragment.MyGroupsFragment;
+import haitsu.groupup.fragment.InterestsGroupFragment;
+import haitsu.groupup.fragment.EventsGroupFragment;
+import haitsu.groupup.other.GroupTypePagerAdapter;
 
-public class MovieGroupActivity extends AppCompatActivity implements
-        GroupsFragment.OnFragmentInteractionListener,
-        MoviesGroupFragment.OnFragmentInteractionListener{
+public class GroupsActivity extends AppCompatActivity implements
+        InterestsGroupFragment.OnFragmentInteractionListener,
+        EventsGroupFragment.OnFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -47,7 +44,7 @@ public class MovieGroupActivity extends AppCompatActivity implements
         viewPager = (ViewPager)findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(GroupsFragment.filteredCategory);
+        getSupportActionBar().setTitle(InterestsGroupFragment.filteredCategory);
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -57,7 +54,7 @@ public class MovieGroupActivity extends AppCompatActivity implements
 
         //set gravity for tab bar
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);  //set viewpager adapter
-        MoviesPagerAdapter pagerAdapter = new MoviesPagerAdapter(getSupportFragmentManager());
+        GroupTypePagerAdapter pagerAdapter = new GroupTypePagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(pagerAdapter);
 
         //change Tab selection when swipe ViewPager

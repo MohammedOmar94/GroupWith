@@ -9,17 +9,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
-
-import static haitsu.groupup.fragment.GroupsFragment.selectedGroupInfo;
 
 public class AccountSetupActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
