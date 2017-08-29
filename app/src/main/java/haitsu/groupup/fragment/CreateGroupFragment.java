@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -43,6 +44,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     private OnFragmentInteractionListener mListener;
 
     private Button mSubmitButton;
+    private Spinner spinner3;
 
 
     private DBConnections dbConnections = new DBConnections();
@@ -89,7 +91,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
         Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
-        Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
+        spinner3 = (Spinner) view.findViewById(R.id.spinner3);
         spinner.setOnItemSelectedListener(this);
         spinner2.setOnItemSelectedListener(this);
         spinner3.setOnItemSelectedListener(this);
@@ -138,6 +140,21 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         Spinner spinner = (Spinner) parent;
         if (spinner.getId() == R.id.spinner) {
             selectedCategory = (String) parent.getItemAtPosition(pos);
+            if(selectedCategory.equals("Gaming")){
+                ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+                        getActivity(),
+                        R.array.games_type_arrays, //<!--Your Array -->
+                        android.R.layout.simple_spinner_item);
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner3.setAdapter(spinnerArrayAdapter);
+            } else {
+                ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+                        getActivity(),
+                        R.array.group_type_arrays, //<!--Your Array -->
+                        android.R.layout.simple_spinner_item);
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner3.setAdapter(spinnerArrayAdapter);
+            }
             //do this
         } else if (spinner.getId() == R.id.group_gender) {
             selectedGender = (String) parent.getItemAtPosition(pos);

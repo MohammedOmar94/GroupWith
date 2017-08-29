@@ -54,6 +54,12 @@
         <item>Interests</item>
     </string-array>
 
+    <string-array name="games_type_arrays">
+        <item>Competitive</item>
+        <item>Events</item>
+        <item>Interests</item>
+    </string-array>
+
 
     <string-array name="age_arrays">
         <item>18</item>
