@@ -16,14 +16,17 @@ import com.google.firebase.auth.FirebaseUser;
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 
-public class AccountSetupActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class AccountSetupActivity extends AppCompatActivity
+        implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
+    //Age users selects from the dropdown list.
     private String selectedAge;
 
     private Button mfinishSetup;
     private Toolbar toolbar;
 
-    DBConnections dbConnections = new DBConnections();
+    //Access to methods dealing with Firebase.
+    private DBConnections dbConnections = new DBConnections();
 
     FirebaseAuth mFirebaseAuth;
     FirebaseUser mFirebaseUser;
@@ -43,7 +46,8 @@ public class AccountSetupActivity extends AppCompatActivity implements View.OnCl
         mfinishSetup = (Button) findViewById(R.id.finish_setup);
         mfinishSetup.setOnClickListener(this);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
+        //Age dropdown list.
+        Spinner spinner = (Spinner) findViewById(R.id.age_spinner);
         spinner.setOnItemSelectedListener(this);
     }
 
@@ -51,7 +55,9 @@ public class AccountSetupActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.finish_setup:
-                dbConnections.createUserAccount(((EditText) findViewById(R.id.username)),mFirebaseUser.getEmail(), selectedAge);
+                //Passes the users details (Username, Email, Age) and stores them in the database.
+                dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), mFirebaseUser.getEmail(), selectedAge);
+                //Redirects user to the Home screen.
                 startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));
                 finish();
         }
@@ -59,11 +65,10 @@ public class AccountSetupActivity extends AppCompatActivity implements View.OnCl
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
         Spinner spinner = (Spinner) parent;
-        if (spinner.getId() == R.id.spinner2) {
+        //Stores the age selected from the dropdown list.
+        if (spinner.getId() == R.id.age_spinner) {
             selectedAge = (String) parent.getItemAtPosition(pos);
-            //do this
         }
     }
 
