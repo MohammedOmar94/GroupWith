@@ -1,10 +1,7 @@
 package haitsu.groupup.activity;
 
-
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -14,9 +11,9 @@ import haitsu.groupup.R;
 import haitsu.groupup.fragment.CreateGroupFragment;
 
 public class CreateGroupActivity extends AppCompatActivity
-        implements CreateGroupFragment.OnFragmentInteractionListener{
+        implements CreateGroupFragment.OnFragmentInteractionListener {
 
-    private String activityTitles [];
+    private String activityTitles[];
     private Toolbar toolbar;
 
     @Override
@@ -28,6 +25,7 @@ public class CreateGroupActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
         getSupportActionBar().setTitle(activityTitles[4]);
+        //Setups the back button seen in the toolbar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -41,6 +39,7 @@ public class CreateGroupActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //Handles the back button click.
             case android.R.id.home:
                 onBackPressed();
                 return true;
