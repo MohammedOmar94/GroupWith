@@ -57,7 +57,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
 
     private Button mJoinButton;
     private Button mDeleteButton;
-    private ListView mListView;
+    private Button mLeaveButton;
 
     private String selectedGroupCategory;
     private String selectedGroupID;
@@ -113,8 +113,10 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
 
         mJoinButton = (Button) view.findViewById(R.id.join_button);
         mDeleteButton = (Button) view.findViewById(R.id.delete_button);
+        mLeaveButton = (Button) view.findViewById(R.id.leave_button);
         mJoinButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
+        mLeaveButton.setOnClickListener(this);
 
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
@@ -133,7 +135,13 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 ((TextView) view.findViewById(R.id.group_description)).setText(groupInfo.getDescription());
                 ((TextView) view.findViewById(R.id.group_description)).setMovementMethod(new ScrollingMovementMethod());
                 if(groupInfo.getAdminID().equals(mFirebaseUser.getUid())){//If group admin, delete button should be visible.
+                    view.findViewById(R.id.join_button).setVisibility(View.GONE);
                     view.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+                    //Not group admin but are a group member, show leave button.
+                } else if(!groupInfo.getAdminID().equals(mFirebaseUser.getUid()) &&
+                        snapshot.child("members").hasChild(mFirebaseUser.getUid())){
+                    view.findViewById(R.id.join_button).setVisibility(View.GONE);
+                    view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
                 }
             }
 
@@ -182,12 +190,17 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 System.out.println("Group desc is " + selectedGroupName);
                 dbConnections.joinGroup(selectedGroupInfo, selectedGroupName, selectedGroupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
+                getActivity().finish();
                 break;
             case R.id.delete_button:
                 dbConnections.checkGroup(selectedGroupInfo, selectedGroupCategory);
-//                Toast.makeText(getContext().getApplicationContext(), "You deleted the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
+                getActivity().finish();
                 break;
-        }
+            case R.id.leave_button:
+                dbConnections.leaveGroup(selectedGroupInfo, selectedGroupCategory);
+                getActivity().finish();
+                break;
+      }
     }
 
 

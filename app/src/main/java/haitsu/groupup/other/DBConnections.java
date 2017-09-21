@@ -119,9 +119,34 @@ public class DBConnections {
                         //Delete from the users group tree
                         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
 
-                        //Deletes the chatroom
+                        //Deletes the chatroom for everyone.
                         databaseRef.child("chatrooms").child(groupID).removeValue();
                     } 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void leaveGroup(final String groupID, final String groupCategory) {
+        Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                mFirebaseUser = mFirebaseAuth.getCurrentUser();
+                if(dataSnapshot.getValue() != null) {
+                    System.out.println("Category is" + groupCategory);
+                    //Delete member from group tree
+                    databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid())
+                            .removeValue();
+
+                    //Delete from the users group tree
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                    
+                }
             }
 
             @Override
