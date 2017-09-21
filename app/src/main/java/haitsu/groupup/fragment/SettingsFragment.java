@@ -100,14 +100,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         addPreferencesFromResource(R.xml.preferences);
-        final EditTextPreference editText = (EditTextPreference) findPreference("example_text");
 
+        final EditTextPreference editText = (EditTextPreference) findPreference("display_name");
         DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid()).child("username");
         user.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                System.out.println("Hi " + snapshot.getValue());
                 editText.setSummary(snapshot.getValue(String.class));
+                editText.setText(snapshot.getValue(String.class));
             }
 
             @Override
@@ -237,6 +237,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             EditTextPreference listPref = (EditTextPreference) pref;
             databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
             pref.setSummary(listPref.getText().toString());
+            ((EditTextPreference) pref).setText(listPref.getText().toString());
         }
 
 

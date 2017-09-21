@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private View header;
+    private ImageView imgvw;
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
 
                 header = navigationView.getHeaderView(0);
-                ImageView imgvw = (ImageView) header.findViewById(R.id.account_image);
+                imgvw = (ImageView) header.findViewById(R.id.account_image);
 
                 // initializing navigation menu
                 setUpNavigationView();  // showing dot next to notifications label
@@ -144,13 +145,13 @@ public class MainActivity extends AppCompatActivity
                     CURRENT_TAG = TAG_HOME;
                     loadHomeFragment();
                 }
-                getUser(imgvw);
+                getUser();
             }
         }
     }
 
 
-    public void getUser(final ImageView imgvw) {
+    public void getUser() {
         DatabaseReference username = databaseRef.child("users");
         username.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -197,6 +198,14 @@ public class MainActivity extends AppCompatActivity
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        //Reloads any changes to user details in the nav drawer.
+        getUser();
+
     }
 
 
