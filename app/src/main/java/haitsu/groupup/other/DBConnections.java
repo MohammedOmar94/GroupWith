@@ -44,8 +44,8 @@ public class DBConnections {
 
     }
 
-    public void createUserAccount(EditText username, String email, String age) {
-        User user = new User(username.getText().toString(), email, age);
+    public void createUserAccount(EditText username, String gender, String email, TextView age, String city, String country, double latitude, double longitude) {
+        User user = new User(username.getText().toString(), gender,  email, age.getText().toString(), city, country, latitude, longitude);
         databaseRef.child("users").child(mFirebaseUser.getUid()).setValue(user);//Add user}
     }
 
