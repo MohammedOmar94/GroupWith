@@ -16,11 +16,17 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
+import haitsu.groupup.other.Group;
+import haitsu.groupup.other.Groups;
 
 public class ChatRoomActivity extends AppCompatActivity {
     private FirebaseRecyclerAdapter<ChatMessage, MessageViewHolder> mFirebaseAdapter;
@@ -29,6 +35,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private DatabaseReference chatrooms;
     private DatabaseReference lastMessage;
+    private Query queryStuff;
 
     private String groupID;
     private String groupName;
@@ -70,23 +77,64 @@ public class ChatRoomActivity extends AppCompatActivity {
         //Location: https://group-up-34ab2.firebaseio.com/chatrooms
         chatrooms = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
         //Creates a reference to the lastMessage node from the JSON tree.
-        //Path: users/userid/groups/groupid/lastMessage
-        lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid())
-                .child("groups").child(groupID).child("lastMessage");
+        queryStuff = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
 
+        /*queryStuff.addValueEventListener(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                            //Path: users/userid/groups/groupid/lastMessage
+                            lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
+                                    .child("groups").child(groupID).child("lastMessage");
+                            Groups groupData = snapshot.getValue(Groups.class);
+                            ChatMessage usersLastMessage = groupData.getLastMessage();
+                            lastMessage.setValue(usersLastMessage);
+                            System.out.println("Snapshot " + snapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+     */
         //The send message button.
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.send_button);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText input = (EditText) findViewById(R.id.input);
+                final EditText input = (EditText) findViewById(R.id.input);
+                final String message = input.getText().toString();
 
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
                         .setValue(new ChatMessage(input.getText().toString(), MainActivity.mUsername));
                 //Stores the last message sent.
-                lastMessage.setValue(new ChatMessage(input.getText().toString(), MainActivity.mUsername));
+
+                //If this isn't Single Value, message updates continously forever.
+                queryStuff.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                            //Path: users/userid/groups/groupid/lastMessage
+                            lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
+                                    .child("groups").child(groupID).child("lastMessage");
+                            Groups groupData = snapshot.getValue(Groups.class);
+                            ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername);
+                            lastMessage.setValue(usersLastMessage);
+                            System.out.println("Snapshot " + snapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 // Clear the input
                 input.setText("");

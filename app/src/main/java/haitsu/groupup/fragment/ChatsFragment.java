@@ -118,7 +118,7 @@ public class ChatsFragment extends Fragment {
                     ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
                     ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
                 } else {
-                    ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
+                    ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
                 }
          //  (
             }
