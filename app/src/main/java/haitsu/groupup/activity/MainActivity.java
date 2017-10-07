@@ -501,6 +501,12 @@ public class MainActivity extends AppCompatActivity
             */
         }
 
+        if (id == R.id.action_search) {
+            startActivity(new Intent(MainActivity.this, SearchActivity.class));
+            drawer.closeDrawers();
+            return true;
+        }
+
   /*      if (id == R.id.action_chats) {
             startActivity(new Intent(this, ChatRoomActivity.class));
         }*/

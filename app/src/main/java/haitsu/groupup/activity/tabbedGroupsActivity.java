@@ -1,5 +1,8 @@
 package haitsu.groupup.activity;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +18,8 @@ import haitsu.groupup.R;
 import haitsu.groupup.other.ViewPagerAdapter;
 import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
+
+import static android.graphics.Color.WHITE;
 
 public class tabbedGroupsActivity extends AppCompatActivity implements
         ChatsFragment.OnFragmentInteractionListener,
@@ -84,6 +89,13 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_tabbed_groups, menu);
+        for (int i = 0; i < menu.size(); i++) {
+            Drawable drawable = menu.getItem(i).getIcon();
+            if (drawable != null) {
+                drawable.mutate();
+                drawable.setColorFilter(WHITE, PorterDuff.Mode.SRC_ATOP);
+            }
+        }
         return true;
     }
 
@@ -94,8 +106,8 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_new_group) {
+            startActivity(new Intent(tabbedGroupsActivity.this, CreateGroupActivity.class));
             return true;
         }
 

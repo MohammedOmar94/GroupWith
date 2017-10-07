@@ -14,11 +14,10 @@
       app:showAsAction="always" />-->
 
   <item
-      android:id="@+id/action_new_group"
-      android:icon="@android:drawable/ic_input_add"
+      android:id="@+id/action_search"
+      android:icon="@android:drawable/ic_search_category_default"
       android:title="@string/action_mark_all_read"
       app:showAsAction="always" />
-
 
 
 </menu>
