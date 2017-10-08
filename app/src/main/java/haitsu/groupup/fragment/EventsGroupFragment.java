@@ -27,7 +27,6 @@ import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
-import static haitsu.groupup.fragment.InterestsGroupFragment.selectedGroupInfo;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -51,14 +50,10 @@ public class EventsGroupFragment extends Fragment {
     private ListView mListView;
 
 
-    public static String groupType;
-    public static String groupType2;
-
-
     private String selectedGroupCategory;
     private String selectedGroupID;
     private String selectedGroupName;
-    public static String filteredCatzzz;
+    private String groupCategory;
 
     private OnFragmentInteractionListener mListener;
 
@@ -107,7 +102,12 @@ public class EventsGroupFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        groupsFromCategory = databaseRef.child("group").child(filteredCatzzz).orderByChild("type").equalTo("Events");
+
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        groupCategory = extras.getString("GROUP_CATEGORY");
+
+        groupsFromCategory = databaseRef.child("group").child(groupCategory).orderByChild("type").equalTo("Events");
 
 
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,7 +115,7 @@ public class EventsGroupFragment extends Fragment {
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
                     protected void populateView(View view, Group chatMessage, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(filteredCatzzz);
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(groupCategory);
                         ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
 
                     }
@@ -161,12 +161,11 @@ public class EventsGroupFragment extends Fragment {
                         Group group = ((Group) mListView.getItemAtPosition(position));
                         selectedGroupID = key;
                         selectedGroupName = group.getName();
-                        selectedGroupCategory = group.getCategory();
-                        selectedGroupInfo = key;//DIS WORKS, DELETE INTENT EXTRAS OR CHECK WHY NOT BEING USED!
                         Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();
                         //extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_INFO", selectedGroupInfo);
+                        extras.putString("GROUP_ID", selectedGroupID);
+                        extras.putString("GROUP_CATEGORY", groupCategory);
                         intent.putExtras(extras);
                         startActivity(intent);
                         System.out.println("Group name is " + group.getName() + " ID is " + key);

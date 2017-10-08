@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,6 +30,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.ChatRoomActivity;
+import haitsu.groupup.activity.CreateGroupActivity;
+import haitsu.groupup.activity.ResultsActivity;
+import haitsu.groupup.activity.SearchActivity;
 import haitsu.groupup.activity.SignInActivity;
 
 /**
@@ -48,6 +53,9 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String genderValue;
+    private String categoryValue;
+    private String typeValue;
 
     private Button mSignOutButton;
     Button button;
@@ -57,6 +65,10 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+    ListPreference listPreference;
+    ListPreference listPreference2;
+    ListPreference listPreference3;
 
 
     private OnFragmentInteractionListener mListener;
@@ -86,40 +98,14 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);// Load the preferences from an XML resource
-
+        setHasOptionsMenu(true);
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         addPreferencesFromResource(R.xml.pref_search);
 
-        final EditTextPreference editText = (EditTextPreference) findPreference("display_name");
-        DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid()).child("username");
-        user.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                editText.setSummary(snapshot.getValue(String.class));
-                editText.setText(snapshot.getValue(String.class));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
-        Preference pref = findPreference("sign_out");
-        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // TODO Auto-generated method stub
-                signOut();
-                //finish();
-               // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
 
 
         if (getArguments() != null) {
@@ -201,15 +187,6 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         }
     }
 
-    private void signOut() {
-        FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
-        startActivity(new Intent(getActivity(), SignInActivity.class));
-        getActivity().finishAffinity();//Works for Android 4.1 and above only.
-        // startActivity(new Intent(getContext(), SignInActivity.class));
-        //
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
@@ -232,6 +209,48 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         }
 
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.action_submit) {
+            search();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void search(){
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        listPreference = (ListPreference) findPreference("example_list");
+        listPreference2 = (ListPreference) findPreference("example_list2");
+        listPreference3 = (ListPreference) findPreference("example_list3");
+
+        CharSequence currText = listPreference.getEntry();
+        CharSequence currText2 = listPreference2.getEntry();
+        CharSequence currText3 = listPreference3.getEntry();
+
+        genderValue = currText.toString();
+        categoryValue = currText2.toString();
+        typeValue = currText3.toString();
+        if(genderValue == null || categoryValue == null || typeValue == null){
+            //
+            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue);
+        } else {
+            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue);
+            Intent intent = new Intent(getActivity(), ResultsActivity.class);
+            Bundle extras = new Bundle();
+            extras.putString("GROUP_GENDER", genderValue);
+            extras.putString("GROUP_CATEGORY", categoryValue);
+            extras.putString("GROUP_TYPE", typeValue);
+            intent.putExtras(extras);
+            startActivity(intent);
+        }
     }
 
     /**

@@ -2,33 +2,43 @@
 <PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
-    <EditTextPreference
-        android:textColor="@android:color/black"
-        android:capitalize="words"
-        android:inputType="textCapWords"
-        android:key="display_name"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="Search" />
+    <!--<EditTextPreference-->
+        <!--android:textColor="@android:color/black"-->
+        <!--android:capitalize="words"-->
+        <!--android:inputType="textCapWords"-->
+        <!--android:maxLines="1"-->
+        <!--android:selectAllOnFocus="true"-->
+        <!--android:singleLine="true"-->
+        <!--android:title="Keyword" />-->
 
     <ListPreference
         android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
+        android:entries="@array/pref_gender_list"
+        android:entryValues="@array/pref_gender_values"
+        android:summary="%s"
         android:key="example_list"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages" />
+        android:title="@string/pref_title_gender" />
 
+    <ListPreference
+        android:defaultValue="-1"
+        android:entries="@array/category_arrays"
+        android:entryValues="@array/pref_category_values"
+        android:summary="%s"
+        android:key="example_list2"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_category" />
 
-    <Preference
-        android:key="sign_out"
-        android:title="Sign out"></Preference>
-
-    <Preference
-        android:key="delete_account"
-        android:title="Delete account"></Preference>
-
+    <ListPreference
+        android:defaultValue="-1"
+        android:entries="@array/group_type_arrays"
+        android:entryValues="@array/pref_type_values"
+        android:summary="%s"
+        android:key="example_list3"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_type" />
 
 </PreferenceScreen>

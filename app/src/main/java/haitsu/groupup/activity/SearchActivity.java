@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -23,6 +25,7 @@ import android.preference.RingtonePreference;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
@@ -30,6 +33,8 @@ import haitsu.groupup.fragment.SearchFragment;
 import haitsu.groupup.fragment.SettingsFragment;
 
 import java.util.List;
+
+import static android.graphics.Color.WHITE;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -61,6 +66,21 @@ public class SearchActivity extends AppCompatActivity implements SearchFragment.
                 .commit();
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        for (int i = 0; i < menu.size(); i++) {
+            Drawable drawable = menu.getItem(i).getIcon();
+            if (drawable != null) {
+                drawable.mutate();
+                drawable.setColorFilter(WHITE, PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+        return true;
+    }
+
 
 
 

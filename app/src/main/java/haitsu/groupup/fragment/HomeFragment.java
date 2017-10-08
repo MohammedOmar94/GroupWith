@@ -17,8 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.activity.GroupsActivity;
 import haitsu.groupup.other.ImageAdapter;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +43,6 @@ public class HomeFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     GridView gridView;
-
 
 
     public HomeFragment() {
@@ -83,10 +84,10 @@ public class HomeFragment extends Fragment {
 
         gridView = (GridView) view.findViewById(R.id.gridview);
 
-       ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.category_arrays)){
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.category_arrays)) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent){
+            public View getView(int position, View convertView, ViewGroup parent) {
                 // Get the Item from ListView
                 View view = super.getView(position, convertView, parent);
 
@@ -109,16 +110,17 @@ public class HomeFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 LinearLayout ll = (LinearLayout) v;
-                TextView t = (TextView) ll.findViewById(R.id.grid_item_label);
-                 Toast.makeText(getActivity(),
-                        t.getText(), Toast.LENGTH_SHORT).show();
+                TextView categoryLabel = (TextView) ll.findViewById(R.id.grid_item_label);
+                Toast.makeText(getActivity(),
+                        categoryLabel.getText(), Toast.LENGTH_SHORT).show();
 
-                InterestsGroupFragment nextFrag= new InterestsGroupFragment();
-                EventsGroupFragment nextFrag2 = new EventsGroupFragment();
-                nextFrag.filteredCategory = t.getText().toString();
-                nextFrag2.filteredCatzzz = t.getText().toString();
+                Intent intent = new Intent(getActivity(), GroupsActivity.class);
+                Bundle extras = new Bundle();
+                extras.putString("GROUP_CATEGORY",
+                        categoryLabel.getText().toString());
+                intent.putExtras(extras);
 
-                startActivity(new Intent(getActivity(), GroupsActivity.class));
+                startActivity(intent);
 
 
                 //FragmentTransaction transaction = getFragmentManager().beginTransaction();

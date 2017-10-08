@@ -53,6 +53,11 @@
             android:label="@string/title_activity_tabbed_groups"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activity.ResultsActivity"
+            android:parentActivityName=".activity.SearchActivity"
+            android:label="@string/title_activity_results"
+            android:theme="@style/Toolbar" />
+        <activity
             android:name=".activity.SearchActivity"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/Toolbar"

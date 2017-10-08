@@ -46,10 +46,12 @@ public class GroupsActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabbed_groups);
+        Bundle extras = getIntent().getExtras();
+        String groupCategory = extras.getString("GROUP_CATEGORY");
         viewPager = (ViewPager)findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(InterestsGroupFragment.filteredCategory);
+        getSupportActionBar().setTitle(groupCategory);
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);

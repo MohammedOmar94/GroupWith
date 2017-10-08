@@ -85,6 +85,7 @@ public class DBConnections {
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
+        groupId2.child("type_gender").setValue(groupType + "_" + groupGender);
 
 
         //Adds to users tree

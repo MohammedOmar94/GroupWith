@@ -27,7 +27,6 @@ import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Group;
 
-import static haitsu.groupup.fragment.InterestsGroupFragment.selectedGroupInfo;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,8 +58,8 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private Button mDeleteButton;
     private Button mLeaveButton;
 
-    private String selectedGroupCategory;
-    private String selectedGroupID;
+    private String groupCategory;
+    private String groupID;
     private String selectedGroupName;
 
 
@@ -118,18 +117,22 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mDeleteButton.setOnClickListener(this);
         mLeaveButton.setOnClickListener(this);
 
+        Bundle extras = getActivity().getIntent().getExtras();
+        groupCategory = extras.getString("GROUP_CATEGORY");
+        groupID = extras.getString("GROUP_ID");
+
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        System.out.println("Group is " + InterestsGroupFragment.filteredCategory  + " " + selectedGroupInfo);
-        final DatabaseReference groups2 = databaseRef.child("group").child(InterestsGroupFragment.filteredCategory).child(selectedGroupInfo);
+        System.out.println("Group is " + groupCategory  + " " + groupID);
+        final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 Group groupInfo = snapshot.getValue(Group.class);
                 selectedGroupName = groupInfo.getName();
-                selectedGroupCategory = InterestsGroupFragment.filteredCategory;
+                //selectedGroupCategory = InterestsGroupFragment.filteredCategory;
                 ((TextView) view.findViewById(R.id.group_name)).setText(groupInfo.getName());
                 ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
                 ((TextView) view.findViewById(R.id.group_description)).setText(groupInfo.getDescription());
@@ -188,16 +191,16 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.join_button:
                 System.out.println("Group desc is " + selectedGroupName);
-                dbConnections.joinGroup(selectedGroupInfo, selectedGroupName, selectedGroupCategory);
+                dbConnections.joinGroup(groupID, selectedGroupName, groupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
                 getActivity().finish();
                 break;
             case R.id.delete_button:
-                dbConnections.checkGroup(selectedGroupInfo, selectedGroupCategory);
+                dbConnections.checkGroup(groupID, groupCategory);
                 getActivity().finish();
                 break;
             case R.id.leave_button:
-                dbConnections.leaveGroup(selectedGroupInfo, selectedGroupCategory);
+                dbConnections.leaveGroup(groupID, groupCategory);
                 getActivity().finish();
                 break;
       }

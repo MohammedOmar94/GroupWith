@@ -49,13 +49,11 @@ public class InterestsGroupFragment extends Fragment {
     private Button mDeleteButton;
     private ListView mListView;
 
-    public static String filteredCategory;
-    public static String selectedGroupInfo;
-
-
     private String selectedGroupCategory;
     private String selectedGroupID;
     private String selectedGroupName;
+
+    private String groupCategory;
 
     private OnFragmentInteractionListener mListener;
 
@@ -104,13 +102,17 @@ public class InterestsGroupFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        groupsFromCategory = databaseRef.child("group").child(filteredCategory).orderByChild("type").equalTo("Interests");
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        groupCategory = extras.getString("GROUP_CATEGORY");
+
+        groupsFromCategory = databaseRef.child("group").child(groupCategory).orderByChild("type").equalTo("Interests");
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
                     protected void populateView(View view, Group chatMessage, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(filteredCategory);
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(groupCategory);
                         ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
 
                     }
@@ -156,12 +158,11 @@ public class InterestsGroupFragment extends Fragment {
                         Group group = ((Group) mListView.getItemAtPosition(position));
                         selectedGroupID = key;
                         selectedGroupName = group.getName();
-                        selectedGroupCategory = filteredCategory;
-                        selectedGroupInfo = key;//DIS WORKS, DELETE INTENT EXTRAS OR CHECK WHY NOT BEING USED!
                         Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();
                         //extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_INFO", selectedGroupInfo);
+                        extras.putString("GROUP_ID", selectedGroupID);
+                        extras.putString("GROUP_CATEGORY", groupCategory);
                         intent.putExtras(extras);
                         startActivity(intent);
                         System.out.println("Group name is " + group.getName() + " ID is " + key);

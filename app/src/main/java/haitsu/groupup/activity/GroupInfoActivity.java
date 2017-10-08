@@ -14,6 +14,10 @@ public class GroupInfoActivity extends AppCompatActivity  implements GroupInfoFr
     private String activityTitles [];
     private Toolbar toolbar;
 
+
+    private String groupCategory;
+    private String groupID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +29,9 @@ public class GroupInfoActivity extends AppCompatActivity  implements GroupInfoFr
         getSupportActionBar().setTitle(activityTitles[5]);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+
+
 
         // Display the fragment as the main content.
         getSupportFragmentManager().beginTransaction()
