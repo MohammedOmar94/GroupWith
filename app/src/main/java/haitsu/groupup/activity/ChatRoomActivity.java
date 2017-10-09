@@ -194,7 +194,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 viewHolder.messageUser.setText(model.getMessageUser());
 
                 // Format the date before showing it
-                viewHolder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                viewHolder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)",
                         model.getMessageTime()));
 
                 viewHolder.messageUser.setOnClickListener(new View.OnClickListener() {

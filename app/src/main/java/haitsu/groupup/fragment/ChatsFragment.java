@@ -23,6 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
@@ -115,8 +118,20 @@ public class ChatsFragment extends Fragment {
 
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
                 if(groupInfo.getLastMessage() != null){
+                    Date messageDate = new Date(message.getMessageTime());
+                    Date currentDate = new Date();
+                    long diff = currentDate.getTime() - messageDate.getTime();
+                    float days = (diff / (1000*60*60*24));
+                    int daysRounded =  Math.round(days);
+
                     ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
+                    if(daysRounded == 0) {
+                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
+                    } else if(daysRounded == 1) {
+                        ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
+                    } else {
+                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy HH:mm", messageDate));
+                    }
                 } else {
                     ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
                 }
