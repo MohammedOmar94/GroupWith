@@ -120,13 +120,17 @@ public class ChatRoomActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                            //Path: users/userid/groups/groupid/lastMessage
-                            lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
-                                    .child("groups").child(groupID).child("lastMessage");
-                            Groups groupData = snapshot.getValue(Groups.class);
-                            ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername);
-                            lastMessage.setValue(usersLastMessage);
-                            System.out.println("Snapshot " + snapshot.getKey());
+                            //System.out.println("Snapshot " + snapshot);
+                            if(snapshot
+                                    .child("groups").hasChild(groupID)) {
+                                //Path: users/userid/groups/groupid/lastMessage
+                                lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
+                                        .child("groups").child(groupID).child("lastMessage");
+                                Groups groupData = snapshot.getValue(Groups.class);
+                                ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername);
+                                lastMessage.setValue(usersLastMessage);
+                                System.out.println("Snapshot " + snapshot);
+                            }
                         }
                     }
 
