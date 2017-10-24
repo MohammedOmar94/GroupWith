@@ -161,5 +161,9 @@ public class DBConnections {
 
     }
 
+    public void submitReport(String groupID, String reason, String reportedMember, String reportingMember, String comments){
+        Report report = new Report(groupID, reason, reportedMember, reportingMember , comments);
+       databaseRef.child("reports").push().setValue(report);
+    }
 
 }

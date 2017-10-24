@@ -21,6 +21,7 @@
         <item>Settings</item>
         <item>Create Group</item>
         <item>Group Info</item>
+        <item>Report</item>
     </string-array>
 
     <string name="activity_title_about_us">About Us</string>
@@ -29,6 +30,7 @@
     <string name="action_logout">Logout</string>
     <string name="action_mark_all_read">Mark All as Read</string>
     <string name="action_submit">Submit</string>
+    <string name="action_report">Report</string>
     <string name="privacy_policy">Privacy Policy</string>
 
     <string name="action_settings">Settings</string>
@@ -64,6 +66,13 @@
         <item>Competitive</item>
         <item>Events</item>
         <item>Interests</item>
+    </string-array>
+
+    <string-array name="report_reason_arrays">
+        <item>Abusive Member</item>
+        <item>Hate speech</item>
+        <item>Sex and Nudity</item>
+        <item>Spam</item>
     </string-array>
 
 

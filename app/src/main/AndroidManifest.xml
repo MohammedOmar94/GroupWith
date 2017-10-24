@@ -62,6 +62,9 @@
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/Toolbar"
             android:label="@string/title_activity_search"></activity>
+        <activity
+            android:name=".activity.ReportActivity"
+            android:theme="@style/Toolbar" />
     </application>
 
 </manifest>
