@@ -225,6 +225,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatRoomActivity.this, ReportActivity.class);
                 Bundle extras = new Bundle();
                 extras.putString("GROUP_ID", groupID);
+                extras.putString("REPORT_TYPE", "group");
                 intent.putExtras(extras);
                 startActivity(intent);
                 break;

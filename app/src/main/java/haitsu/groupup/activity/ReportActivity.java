@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -50,13 +51,30 @@ public class ReportActivity extends AppCompatActivity implements AdapterView.OnI
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        Spinner spinner3 = (Spinner) findViewById(R.id.spinner3);
         spinner.setOnItemSelectedListener(this);
-        spinner3.setOnItemSelectedListener(this);
         getSupportActionBar().setTitle(activityTitles[6]);
         //Setups the back button seen in the toolbar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+
+        Bundle extras = this.getIntent().getExtras();
+        String reportType = extras.getString("REPORT_TYPE");
+        if(reportType.equals("group")){
+            ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+                    this,
+                    R.array.group_report_reasons_arrays, //<!--Your Array -->
+                    android.R.layout.simple_spinner_item);
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(spinnerArrayAdapter);
+        } else if(reportType.equals("member")){
+            ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+                    this,
+                    R.array.member_report_reasons_arrays, //<!--Your Array -->
+                    android.R.layout.simple_spinner_item);
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(spinnerArrayAdapter);
+        }
 
 
     }

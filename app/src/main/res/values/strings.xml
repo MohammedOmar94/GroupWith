@@ -68,8 +68,14 @@
         <item>Interests</item>
     </string-array>
 
-    <string-array name="report_reason_arrays">
-        <item>Abusive Member</item>
+    <string-array name="group_report_reasons_arrays">
+        <item>Hate speech</item>
+        <item>Sex and Nudity</item>
+        <item>Spam</item>
+    </string-array>
+
+    <string-array name="member_report_reasons_arrays">
+        <item>Abusive Members</item>
         <item>Hate speech</item>
         <item>Sex and Nudity</item>
         <item>Spam</item>
