@@ -1,14 +1,18 @@
 package haitsu.groupup.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,11 +41,28 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.data.DataBuffer;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+
+import android.location.LocationListener;
+
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -54,12 +75,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.net.ssl.SNIHostName;
 
 import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.ResultsActivity;
+import haitsu.groupup.activity.SettingsActivity;
 import haitsu.groupup.activity.SignInActivity;
 import haitsu.groupup.other.Group;
 
@@ -74,6 +97,7 @@ import static android.R.attr.country;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener,
+        com.google.android.gms.location.LocationListener,
         View.OnClickListener, GoogleApiClient.OnConnectionFailedListener,
         DialogInterface.OnDismissListener, GoogleApiClient.ConnectionCallbacks,
         PermissionUtils.PermissionResultCallback {
@@ -93,6 +117,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private final static int PLAY_SERVICES_REQUEST = 1000;
     private final static int REQUEST_CHECK_SETTINGS = 2000;
     private Location mLastLocation;
+    private LocationRequest mLocationRequest;
+
+
+    /**
+     * Callback for Location events.
+     */
+    private LocationCallback mLocationCallback;
+
+    /**
+     * Represents a geographical location.
+     */
+    private Location mCurrentLocation;
 
     double latitude;
     double longitude;
@@ -142,7 +178,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.preferences);
 
         final EditTextPreference editText = (EditTextPreference) findPreference("display_name");
-        pref2 = findPreference("update_location");
         DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid());
         user.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -173,6 +208,36 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        pref2 = findPreference("update_location");
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .enableAutoManage((FragmentActivity) getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        // calculate margins
+        //    button = (Button) view.findViewById(R.id.as);
+//        button.setOnClickListener(this);
+
+
         pref2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
             @Override
@@ -186,32 +251,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage((FragmentActivity) getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
-        // calculate margins
-        //    button = (Button) view.findViewById(R.id.as);
-//        button.setOnClickListener(this);
         return view;
     }
 
@@ -285,11 +324,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void openDialog() {
-        AlertDialog.Builder builder;
+        final AlertDialog.Builder builder;
+        final LocationSettingsRequest.Builder settingsBuilder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
         } else {
             builder = new AlertDialog.Builder(getActivity());
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
         }
         builder.setTitle("Update Location")
                 .setMessage("Are you sure you want to update your current location?")
@@ -305,23 +348,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             // for ActivityCompat#requestPermissions for more details.
                             return;
                         }
-                        mLastLocation = LocationServices.FusedLocationApi
-                                .getLastLocation(mGoogleApiClient);
+                        checkLocationStatus(settingsBuilder);
 
-                        if (mLastLocation != null) {
-                            latitude = mLastLocation.getLatitude();
-                            longitude = mLastLocation.getLongitude();
-                            getAddress();
-                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("city").setValue(city);
-                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("country").setValue(country);
-                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("latitude").setValue(latitude);
-                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("longitude").setValue(longitude);
 
-                        } else {
-                            Toast.makeText(getActivity().getApplicationContext(),
-                                    "Please turn on your Location.", Toast.LENGTH_LONG)
-                                    .show();
-                        }
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -333,6 +362,95 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
     }
+
+    public void checkLocationStatus(LocationSettingsRequest.Builder settingsBuilder) {
+        SettingsClient client = LocationServices.getSettingsClient(getActivity());
+        final Task<LocationSettingsResponse> task = client.checkLocationSettings(settingsBuilder.build());
+
+        task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                mLastLocation = LocationServices.FusedLocationApi
+                        .getLastLocation(mGoogleApiClient);
+
+                if (mLastLocation != null) {
+                    updateLocation();
+                } else {
+                    requestLocation(task);
+                }
+
+            }
+        });
+
+        task.addOnFailureListener(getActivity(), new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                int statusCode = ((ApiException) e).getStatusCode();
+                switch (statusCode) {
+                    case CommonStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied, but this can be fixed
+                        // by showing the user a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            resolvable.startResolutionForResult(getActivity(),
+                                    REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException sendEx) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
+    }
+    public void requestLocation(Task<LocationSettingsResponse> task){
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+        updateLocation();
+
+
+
+
+    }
+
+    public void updateLocation(){
+        latitude = mLastLocation.getLatitude();
+        longitude = mLastLocation.getLongitude();
+        getAddress();
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("city").setValue(city);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("country").setValue(country);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("latitude").setValue(latitude);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("longitude").setValue(longitude);
+    }
+
 
     public Address getAddress(double latitude, double longitude) {
         Geocoder geocoder;
@@ -372,7 +490,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 pref2.setSummary(currentLocation);
                 Toast.makeText(getActivity().getApplicationContext(),
-                        "Location is " + currentLocation, Toast.LENGTH_LONG)
+                        "Location has been updated to " + currentLocation, Toast.LENGTH_LONG)
                         .show();
 
 
@@ -438,6 +556,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void NeverAskAgain(int request_code) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
 
     }
 
