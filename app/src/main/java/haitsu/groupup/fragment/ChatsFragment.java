@@ -2,8 +2,10 @@ package haitsu.groupup.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -29,7 +31,10 @@ import java.util.concurrent.TimeUnit;
 import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
+import haitsu.groupup.other.DBHandler;
 import haitsu.groupup.other.Groups;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -104,6 +109,10 @@ public class ChatsFragment extends Fragment {
 
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
+        final DBHandler db = new DBHandler(getActivity());
+        //db.dropTable("MyGroups");
+        SQLiteDatabase s = getActivity().openOrCreateDatabase("GroupUp",MODE_PRIVATE,null);
+        // db.onCreate(s);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
@@ -115,6 +124,10 @@ public class ChatsFragment extends Fragment {
                // Map<String,String> lastMessage = groupInfo.getLastMessage();
                // System.out.println("Group name is " + lastMessage);
                 ChatMessage message = groupInfo.getLastMessage();
+                if(message != null) {
+                    db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
+                }
+                db.displayMessage();
 
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
                 if(groupInfo.getLastMessage() != null){

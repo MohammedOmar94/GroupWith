@@ -1,5 +1,6 @@
 package haitsu.groupup.activity;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -46,6 +47,7 @@ import haitsu.groupup.fragment.MyGroupsFragment;
 import haitsu.groupup.fragment.NotificationsFragment;
 import haitsu.groupup.fragment.SettingsFragment;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.DBHandler;
 import haitsu.groupup.other.User;
 import haitsu.groupup.other.CircleTransform;
 
@@ -106,6 +108,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        DBHandler db = new DBHandler(this);
+        // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
+        // db.onCreate(s);
+        // db.dropTable("MyGroups");
+        // db.addData();
+//        db.displayMessage();
 
         mHandler = new Handler();
 
