@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,10 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +53,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     private String groupName;
 
 
+    private ImageView mAddMessageImageView;
+    private static final int REQUEST_IMAGE = 2;
+
+
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
 
@@ -55,6 +64,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         TextView messageText;
         TextView messageUser;
         TextView messageTime;
+        ImageView profileImage;
         //CircleImageView messengerImageView;
 
         public MessageViewHolder(View v) {
@@ -62,6 +72,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             messageText = (TextView) v.findViewById(R.id.message_text);
             messageUser = (TextView) v.findViewById(R.id.message_user);
             messageTime = (TextView) v.findViewById(R.id.message_time);
+            profileImage = (ImageView) v.findViewById(R.id.messengerImageView);
             // messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
         }
     }
@@ -114,11 +125,13 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final EditText input = (EditText) findViewById(R.id.input);
                 final String message = input.getText().toString();
+                final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ChatRoomActivity.this);
+                System.out.println("photo old " + account.getPhotoUrl());
 
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
-                        .setValue(new ChatMessage(input.getText().toString(), MainActivity.mUsername));
+                        .setValue(new ChatMessage(input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
                 //Stores the last message sent.
 
                 //If this isn't Single Value, message updates continously forever.
@@ -133,7 +146,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
                                         .child("groups").child(groupID).child("lastMessage");
                                 Groups groupData = snapshot.getValue(Groups.class);
-                                ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername);
+                                ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername, account.getPhotoUrl().toString());
                                 lastMessage.setValue(usersLastMessage);
                                 System.out.println("Snapshot " + snapshot);
                             }
@@ -182,6 +195,17 @@ public class ChatRoomActivity extends AppCompatActivity {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mMessageRecyclerView.getContext(),
                 mLinearLayoutManager.getOrientation());
         mMessageRecyclerView.addItemDecoration(dividerItemDecoration);
+
+        mAddMessageImageView = (ImageView) findViewById(R.id.addMessageImageView);
+        mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_IMAGE);
+            }
+        });
     }
 
     public void displayRecycler() {
@@ -198,6 +222,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Set their text
                 viewHolder.messageText.setText(model.getMessageText());
                 viewHolder.messageUser.setText(model.getMessageUser());
+                if (model.getImageUrl() == null) {
+                    viewHolder.profileImage.setImageDrawable(ContextCompat.getDrawable(ChatRoomActivity.this,
+                            R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    System.out.println("URI is " + model.getImageUrl());
+                    Glide.with(ChatRoomActivity.this)
+                            .load(model.getImageUrl())
+                            .into(viewHolder.profileImage);
+                }
 
                 // Format the date before showing it
                 viewHolder.messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm)",

@@ -27,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -132,6 +134,7 @@ public class MainActivity extends AppCompatActivity
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
@@ -139,7 +142,7 @@ public class MainActivity extends AppCompatActivity
             return;
         } else {
             if (mFirebaseUser.getPhotoUrl() != null) {
-                mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+                mPhotoUrl = account.getPhotoUrl().toString();
 
                 header = navigationView.getHeaderView(0);
                 imgvw = (ImageView) header.findViewById(R.id.account_image);

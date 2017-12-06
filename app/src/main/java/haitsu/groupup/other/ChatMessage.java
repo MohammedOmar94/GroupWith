@@ -11,13 +11,15 @@ public class ChatMessage {
     private String messageText;
     private String messageUser;
     private long messageTime;
+    private String imageUrl;
 
-    public ChatMessage(String messageText, String messageUser) {
+    public ChatMessage(String messageText, String messageUser, String imageUrl) {
         this.messageText = messageText;
         this.messageUser = messageUser;
 
         // Initialize to current time
         messageTime = new Date().getTime();
+        this.imageUrl = imageUrl;
     }
 
     public ChatMessage(){
@@ -46,5 +48,13 @@ public class ChatMessage {
 
     public void setMessageTime(long messageTime) {
         this.messageTime = messageTime;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

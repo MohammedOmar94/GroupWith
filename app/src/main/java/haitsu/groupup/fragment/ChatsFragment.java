@@ -111,7 +111,7 @@ public class ChatsFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
         final DBHandler db = new DBHandler(getActivity());
         //db.dropTable("MyGroups");
-        SQLiteDatabase s = getActivity().openOrCreateDatabase("GroupUp",MODE_PRIVATE,null);
+        // SQLiteDatabase s = getActivity().openOrCreateDatabase("GroupUp",MODE_PRIVATE,null);
         // db.onCreate(s);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
@@ -125,9 +125,9 @@ public class ChatsFragment extends Fragment {
                // System.out.println("Group name is " + lastMessage);
                 ChatMessage message = groupInfo.getLastMessage();
                 if(message != null) {
-                    db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
+                   // db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
                 }
-                db.displayMessage();
+                //db.displayMessage();
 
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
                 if(groupInfo.getLastMessage() != null){
