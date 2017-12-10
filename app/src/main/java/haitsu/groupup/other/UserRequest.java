@@ -1,33 +1,38 @@
 package haitsu.groupup.other;
 
+import java.util.Date;
+
 /**
  * Created by moham on 04/06/2017.
  */
 
-public class User {
-
+public class UserRequest {
+    private String userId;
+    private String groupId;
     private String username;
     private String gender;
-    private String email;
+    private String groupname;
     private String age;
     private String city;
     private String country;
-    private Groups group;
+    private long timeOfRequest;
     private double latitude;
     private double longitude;
 
-    public User() {
+    public UserRequest() {
+        timeOfRequest = new Date().getTime();
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String gender, String email, String age, String city, String country, Groups group, double latitude, double longitude){
+    public UserRequest(String username, String gender, String groupname, String age, String city, String country, double latitude, double longitude){
         this.username = username;
         this.gender = gender;
-        this.email = email;
+        this.groupname = groupname;
         this.age = age;
         this.city = city;
         this.country = country;
-        this.group = group;
+        // Initialize to current time
+        timeOfRequest = new Date().getTime();
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -41,12 +46,12 @@ public class User {
         this.username = username;
     }
 
-    public String getEmail() {
-        return email;
+    public String getGroupName() {
+        return groupname;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setGroupName(String groupname) {
+        this.groupname = groupname;
     }
 
 
@@ -98,11 +103,27 @@ public class User {
         this.gender = gender;
     }
 
-    public Groups getGroup() {
-        return group;
+    public long getTimeOfRequest() {
+        return timeOfRequest;
     }
 
-    public void setGroup(Groups group) {
-        this.group = group;
+    public void setTimeOfRequest(long timeOfRequest) {
+        this.timeOfRequest = timeOfRequest;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

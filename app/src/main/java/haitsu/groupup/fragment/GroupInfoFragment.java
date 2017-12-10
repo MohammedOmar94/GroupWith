@@ -46,7 +46,6 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private String mParam2;
 
 
-
     private DBConnections dbConnections = new DBConnections();
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
     private Query groupsFromCategory;
@@ -56,9 +55,11 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private Button mJoinButton;
     private Button mDeleteButton;
     private Button mLeaveButton;
+    private Button mCancelButton;
 
     private String groupCategory;
     private String groupID;
+    private String groupAdminId;
     private String selectedGroupName;
 
 
@@ -112,19 +113,22 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mJoinButton = (Button) view.findViewById(R.id.join_button);
         mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mLeaveButton = (Button) view.findViewById(R.id.leave_button);
+        mCancelButton = (Button) view.findViewById(R.id.cancelRequest_button);
         mJoinButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
         mLeaveButton.setOnClickListener(this);
+        mCancelButton.setOnClickListener(this);
 
         Bundle extras = getActivity().getIntent().getExtras();
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupID = extras.getString("GROUP_ID");
+        groupAdminId = extras.getString("GROUP_ADMIN");
 
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        System.out.println("Group is " + groupCategory  + " " + groupID);
+        // System.out.println("Group is " + groupCategory  + " " + groupID);
         final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -136,14 +140,26 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
                 ((TextView) view.findViewById(R.id.further_comments)).setText(groupInfo.getDescription());
                 ((TextView) view.findViewById(R.id.further_comments)).setMovementMethod(new ScrollingMovementMethod());
-                if(groupInfo.getAdminID().equals(mFirebaseUser.getUid())){//If group admin, delete button should be visible.
+                if (groupInfo.getAdminID().equals(mFirebaseUser.getUid())) {//If group admin, delete button should be visible.
                     view.findViewById(R.id.join_button).setVisibility(View.GONE);
                     view.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
                     //Not group admin but are a group member, show leave button.
-                } else if(!groupInfo.getAdminID().equals(mFirebaseUser.getUid()) &&
-                        snapshot.child("members").hasChild(mFirebaseUser.getUid())){
-                    view.findViewById(R.id.join_button).setVisibility(View.GONE);
-                    view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
+                } else if (!groupInfo.getAdminID().equals(mFirebaseUser.getUid()) &&
+                        snapshot.child("members").hasChild(mFirebaseUser.getUid())) {
+                    System.out.println("Type is child " + snapshot.child("members").child(mFirebaseUser.getUid()).getValue());
+                    // Approved member
+                    if (snapshot.child("members").child(mFirebaseUser.getUid()).getValue(Boolean.class)) {
+                        System.out.println("Type is true");
+                        view.findViewById(R.id.join_button).setVisibility(View.GONE);
+                        view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.cancelRequest_button).setVisibility(View.GONE);
+                    // Request sent to join group, but not approved.
+                    } else if (!snapshot.child("members").child(mFirebaseUser.getUid()).getValue(Boolean.class)) {
+                        System.out.println("Type is false");
+                        view.findViewById(R.id.join_button).setVisibility(View.GONE);
+                        view.findViewById(R.id.leave_button).setVisibility(View.GONE);
+                        view.findViewById(R.id.cancelRequest_button).setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
@@ -152,10 +168,6 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
 
             }
         });
-
-
-
-
 
 
         return view;
@@ -189,9 +201,8 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.join_button:
-                System.out.println("Group desc is " + selectedGroupName);
-                dbConnections.joinGroup(groupID, selectedGroupName, groupCategory);
-                Toast.makeText(getContext().getApplicationContext(), "You joined the " + selectedGroupName + " group!", Toast.LENGTH_LONG).show();
+                dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId);
+                Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
                 getActivity().finish();
                 break;
             case R.id.delete_button:
@@ -202,7 +213,12 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 dbConnections.leaveGroup(groupID, groupCategory);
                 getActivity().finish();
                 break;
-      }
+            case R.id.cancelRequest_button:
+                Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " cancelled", Toast.LENGTH_LONG).show();
+                dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId);
+                getActivity().finish();
+                break;
+        }
     }
 
 

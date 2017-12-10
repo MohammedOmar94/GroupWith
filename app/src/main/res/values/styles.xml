@@ -47,7 +47,6 @@
     </style>
 
 
-
     <style name="TabTextStyle" parent="@style/Widget.AppCompat.ActionBar.TabText">
         <item name="android:textColor">@drawable/selector_tab_text</item>
     </style>

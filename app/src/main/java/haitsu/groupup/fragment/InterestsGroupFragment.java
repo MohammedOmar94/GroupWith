@@ -51,6 +51,7 @@ public class InterestsGroupFragment extends Fragment {
 
     private String selectedGroupCategory;
     private String selectedGroupID;
+    private String selectedAdminId;
     private String selectedGroupName;
 
     private String groupCategory;
@@ -157,12 +158,14 @@ public class InterestsGroupFragment extends Fragment {
                         String key = groupAdapter.getRef(position).getKey();//Gets key of listview item
                         Group group = ((Group) mListView.getItemAtPosition(position));
                         selectedGroupID = key;
+                        selectedAdminId = group.getAdminID();
                         selectedGroupName = group.getName();
                         Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();
                         //extras.putString("GROUP_ID", selectedGroup);
                         extras.putString("GROUP_ID", selectedGroupID);
                         extras.putString("GROUP_CATEGORY", groupCategory);
+                        extras.putString("GROUP_ADMIN", selectedAdminId);
                         intent.putExtras(extras);
                         startActivity(intent);
                         System.out.println("Group name is " + group.getName() + " ID is " + key);

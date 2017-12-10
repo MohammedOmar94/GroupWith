@@ -88,7 +88,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_tabbed_groups, menu);
+        getMenuInflater().inflate(R.menu.group_requests, menu);
         for (int i = 0; i < menu.size(); i++) {
             Drawable drawable = menu.getItem(i).getIcon();
             if (drawable != null) {
@@ -106,8 +106,8 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_new_group) {
-            startActivity(new Intent(tabbedGroupsActivity.this, CreateGroupActivity.class));
+        if (id == R.id.action_mark_all_read) {
+            startActivity(new Intent(tabbedGroupsActivity.this, JoinRequests.class));
             return true;
         }
 

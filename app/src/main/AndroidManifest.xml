@@ -54,17 +54,21 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.ResultsActivity"
-            android:parentActivityName=".activity.SearchActivity"
             android:label="@string/title_activity_results"
+            android:parentActivityName=".activity.SearchActivity"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.SearchActivity"
+            android:label="@string/title_activity_search"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/Toolbar"
-            android:label="@string/title_activity_search"></activity>
+            android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.ReportActivity"
             android:theme="@style/Toolbar" />
+        <activity
+            android:name=".activity.JoinRequests"
+            android:label="@string/title_activity_join_requests"
+            android:theme="@style/Toolbar"></activity>
     </application>
 
 </manifest>
