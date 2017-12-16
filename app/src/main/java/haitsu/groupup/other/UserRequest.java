@@ -12,6 +12,7 @@ public class UserRequest {
     private String username;
     private String gender;
     private String groupname;
+    private String groupCategory;
     private String age;
     private String city;
     private String country;
@@ -125,5 +126,13 @@ public class UserRequest {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getGroupCategory() {
+        return groupCategory;
+    }
+
+    public void setGroupCategory(String groupCategory) {
+        this.groupCategory = groupCategory;
     }
 }

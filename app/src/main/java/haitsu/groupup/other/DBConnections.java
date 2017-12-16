@@ -58,6 +58,9 @@ public class DBConnections {
             public void onDataChange(final DataSnapshot snapshot) {
                 request = snapshot.getValue(UserRequest.class);
                 request.setUserId(snapshot.getKey());
+                request.setGroupName(groupName);
+                request.setGroupId(groupID);
+                request.setGroupCategory(groupCategory);
                 // Not even needed, what has the users own groups has to do with anything.
                 // Groups group = snapshot.child("groups").getValue(Groups.class);
                 // System.out.println("group admin is " + group.getName());
@@ -94,8 +97,6 @@ public class DBConnections {
     public void joinGroup(String groupID, String groupName, String groupCategory, String groupAdminId, UserRequest request) {
         //String userid = databaseRef.child("Group").push().getKey();
         DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
-        request.setGroupName(groupName);
-        request.setGroupId(groupID);
 
         // Adds user requested to be joined in admins tree. Delete also needs a rework to remove from userRequest tree.
         groupRef.child("members").child(request.getUserId()).setValue(false);//Adds Members, need approval from admin before true.
