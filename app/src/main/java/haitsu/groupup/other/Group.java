@@ -12,7 +12,7 @@ public class Group {
     private String description;
     private String genders;
     private String type;
-    private String memberLimit;
+    private int memberLimit;
     private double latitude;
     private double longitude;
 
@@ -85,11 +85,11 @@ public class Group {
         this.longitude = longitude;
     }
 
-    public String getMemberLimit() {
+    public int getMemberLimit() {
         return memberLimit;
     }
 
-    public void setMemberLimit(String memberLimit) {
+    public void setMemberLimit(int memberLimit) {
         this.memberLimit = memberLimit;
     }
 }

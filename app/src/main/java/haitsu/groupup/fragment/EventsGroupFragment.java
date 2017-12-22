@@ -115,9 +115,9 @@ public class EventsGroupFragment extends Fragment {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
-                    protected void populateView(View view, Group chatMessage, int position) {
+                    protected void populateView(View view, Group group, int position) {
                         ((TextView) view.findViewById(android.R.id.text1)).setText(groupCategory);
-                        ((TextView) view.findViewById(android.R.id.text2)).setText(chatMessage.getName());
+                        ((TextView) view.findViewById(android.R.id.text2)).setText(group.getName());
 
                     }
 

@@ -142,7 +142,7 @@ public class DBConnections {
         //groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
         groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
-        groupId2.child("memberLimit").setValue(memeberCount);
+        groupId2.child("memberLimit").setValue(Integer.parseInt(memeberCount));
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
