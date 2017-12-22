@@ -35,6 +35,7 @@ import org.joda.time.Years;
 
 import haitsu.groupup.R;
 import haitsu.groupup.other.ChatMessage;
+import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Groups;
 import haitsu.groupup.other.Notification;
 import haitsu.groupup.other.User;
@@ -48,6 +49,8 @@ public class JoinRequests extends AppCompatActivity {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+
+    private DBConnections dbConnections = new DBConnections();
 
 
     DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
@@ -191,6 +194,8 @@ public class JoinRequests extends AppCompatActivity {
     public void declineJoinRequest(String requestId, UserRequest request) {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).removeValue();
-        // Need to add groups tree for that user who was accepted to join.
+
+        //Reverts group type from full if already so.
+        dbConnections.revertGroupType(request.getGroupCategory(), request.getGroupId());
     }
 }

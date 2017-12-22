@@ -96,11 +96,36 @@ public class DBConnections {
 
     public void joinGroup(String groupID, String groupName, String groupCategory, String groupAdminId, UserRequest request) {
         //String userid = databaseRef.child("Group").push().getKey();
-        DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
+        final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
+
+
+
 
         // Adds user requested to be joined in admins tree. Delete also needs a rework to remove from userRequest tree.
         groupRef.child("members").child(request.getUserId()).setValue(false);//Adds Members, need approval from admin before true.
+
         databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
+
+        // Checks if member count has now exceeded after this new member has joined
+        groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("Count is " + dataSnapshot.child("members").getChildrenCount());
+                Group group = dataSnapshot.getValue(Group.class);
+                if(dataSnapshot.child("members").getChildrenCount() <= 3){ // Can maybe get snapshot of groupref, find member limit there?
+                    // Change group type to Full, will no longer show in results.
+                    // Will also be the case until admin approves or declines member.
+                    groupRef.child("type").setValue("FULL_" + group.getType());//Combine Full and type of group, remove if member leaves or gets kicked. Group should then show up in results
+                } else {
+                    // Most likely nothing. Group should still appear in results search
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 //
 //        //Add to notifications
@@ -221,10 +246,38 @@ public class DBConnections {
         });
     }
 
-    public void cancelJoinRequest(String groupID, String groupCategory, String adminId) {
+    public void cancelJoinRequest(String groupID, final String groupCategory, String adminId) {
         databaseRef.child("users").child(adminId).child("userRequest").removeValue();
         databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
+        // Is this really needed? The group disappears, so you can't even have the choice to select that group to cancel your request.
+        //revertGroupType(groupCategory,groupID);
     }
+
+    public void revertGroupType(final String groupCategory, final String groupID){
+        //Separate full and type of group, should reappear as avaliable.
+        databaseRef.child("group").child(groupCategory).child(groupID).child("type")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String type = dataSnapshot.getValue(String.class);
+                        if(type.contains("FULL")) {
+                            String[] parts = type.split("FULL_");
+                            String groupType = parts[1]; // group type
+                            //Reverts back type to normal
+                            databaseRef.child("group").child(groupCategory).child(groupID).child("type").setValue(groupType);
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+
 
     public void deleteRequest(final String groupID) {
         DatabaseReference requestRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
