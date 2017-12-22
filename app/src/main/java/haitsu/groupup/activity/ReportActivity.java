@@ -97,7 +97,7 @@ public class ReportActivity extends AppCompatActivity implements AdapterView.OnI
         Spinner spinner = (Spinner) parent;
         if (spinner.getId() == R.id.spinner) {
             selectedReason = (String) parent.getItemAtPosition(position);
-        } else if (spinner.getId() == R.id.spinner3) {
+        } else if (spinner.getId() == R.id.member_count) {
             selectedMember = (String) parent.getItemAtPosition(position);
         }
     }

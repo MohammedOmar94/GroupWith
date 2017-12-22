@@ -74,7 +74,7 @@ public class DBConnections {
         });
     }
 
-    public void newGroupRequest(final String groupCategory, final String groupType, final EditText groupName, final EditText groupDescription, final String groupGender) {
+    public void newGroupRequest(final String groupCategory, final String groupType, final EditText groupName, final EditText groupDescription, final String groupGender, final String memberCount) {
         DatabaseReference userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -83,7 +83,7 @@ public class DBConnections {
                 // Not even needed, what has the users own groups has to do with anything.
                 // Groups group = snapshot.child("groups").getValue(Groups.class);
                 // System.out.println("group admin is " + group.getName());
-                submitNewGroup(groupCategory, groupType, groupName, groupDescription, groupGender, user);
+                submitNewGroup(groupCategory, groupType, groupName, groupDescription, groupGender, memberCount, user);
             }
 
             @Override
@@ -129,7 +129,7 @@ public class DBConnections {
 
     }
 
-    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender, User user) {
+    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender, String memeberCount, User user) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).push();
@@ -142,6 +142,7 @@ public class DBConnections {
         //groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
         groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
+        groupId2.child("memberLimit").setValue(memeberCount);
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
@@ -176,14 +177,15 @@ public class DBConnections {
                 mFirebaseUser = mFirebaseAuth.getCurrentUser();
                 if (dataSnapshot.getValue() != null) {
                     System.out.println("Category is" + groupCategory);
+                    deleteRequest(groupID);
                     //Delete from group tree, which contains detail about the name and its members
-                    databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
+                     databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
 
                     //Delete from the users group tree
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                     databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
 
                     //Deletes the chatroom for everyone.
-                    databaseRef.child("chatrooms").child(groupID).removeValue();
+                     databaseRef.child("chatrooms").child(groupID).removeValue();
                 }
             }
 
@@ -224,7 +226,28 @@ public class DBConnections {
         databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
     }
 
-    public void addToChatRoom() {
+    public void deleteRequest(final String groupID) {
+        DatabaseReference requestRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
+        requestRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                for (DataSnapshot requestSnapshot: dataSnapshot.getChildren()) {
+                    UserRequest request = requestSnapshot.getValue(UserRequest.class);
+                    if(request.getGroupId().equals(groupID)) {
+//                        System.out.println("Ref is " + request.getGroupId() + " grouo id" + request.getGroupId());
+                        System.out.println("Ref is " + requestSnapshot.getRef());
+                        requestSnapshot.getRef().removeValue();
+                    }
+                }
+                //dataSnapshot.getRef().removeValue()
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 

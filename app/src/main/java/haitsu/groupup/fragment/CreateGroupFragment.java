@@ -38,6 +38,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     private String selectedCategory;
     private String selectedGender;
     private String selectedGroupType;
+    private String selectedMemberCount;
 
 
 
@@ -91,10 +92,12 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
         Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
+        Spinner memberCount = (Spinner) view.findViewById(R.id.member_count);
         spinner3 = (Spinner) view.findViewById(R.id.spinner3);
         spinner.setOnItemSelectedListener(this);
         spinner2.setOnItemSelectedListener(this);
         spinner3.setOnItemSelectedListener(this);
+        memberCount.setOnItemSelectedListener(this);
 
         return view;
     }
@@ -128,8 +131,9 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         switch (v.getId()) {
             case R.id.submit_button:
-                dbConnections.newGroupRequest(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.further_comments), selectedGender);
+                dbConnections.newGroupRequest(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.further_comments), selectedGender, selectedMemberCount);
                 Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+                getActivity().finish();
                 break;
         }
     }
@@ -161,6 +165,12 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
             //do this
         } else if (spinner.getId() == R.id.spinner3) {
             selectedGroupType = (String) parent.getItemAtPosition(pos);
+            //  parent.getItemAtPosition(pos);
+            //   System.out.println("Category is " + selectedCategory);
+
+
+        } else if (spinner.getId() == R.id.member_count) {
+            selectedMemberCount = (String) parent.getItemAtPosition(pos);
             //  parent.getItemAtPosition(pos);
             //   System.out.println("Category is " + selectedCategory);
 

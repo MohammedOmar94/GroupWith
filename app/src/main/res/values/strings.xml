@@ -57,6 +57,11 @@
         <item>Female</item>
     </string-array>
 
+    <string-array name="group_member_arrays">
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
     <string-array name="group_type_arrays">
         <item>Events</item>
         <item>Interests</item>
