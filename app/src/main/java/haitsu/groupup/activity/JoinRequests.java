@@ -184,17 +184,15 @@ public class JoinRequests extends AppCompatActivity {
     public void acceptJoinRequest(String requestId, UserRequest request) {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).setValue(true);
-        DatabaseReference usersGroupsTree = databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId());
-        usersGroupsTree.child("name").setValue(request.getGroupName());
-        usersGroupsTree.child("category").setValue(request.getGroupCategory());
-        usersGroupsTree.child("admin").setValue(false);
+
         // Need to add groups tree for that user who was accepted to join.
     }
 
     public void declineJoinRequest(String requestId, UserRequest request) {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).removeValue();
-
+        //Removes from users tree if admin declines request
+        databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId()).removeValue();
         //Reverts group type from full if already so.
         dbConnections.revertGroupType(request.getGroupCategory(), request.getGroupId());
     }

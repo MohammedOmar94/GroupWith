@@ -123,7 +123,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupID = extras.getString("GROUP_ID");
         groupAdminId = extras.getString("GROUP_ADMIN");
-
+        System.out.println("group cat" + groupCategory + " " + groupID);
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 

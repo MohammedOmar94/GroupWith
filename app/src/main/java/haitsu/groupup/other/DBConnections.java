@@ -104,6 +104,12 @@ public class DBConnections {
         // Adds user requested to be joined in admins tree. Delete also needs a rework to remove from userRequest tree.
         groupRef.child("members").child(request.getUserId()).setValue(false);//Adds Members, need approval from admin before true.
 
+        //Adds to users group tree when user has sent join request.
+        DatabaseReference usersGroupsTree = databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId());
+        usersGroupsTree.child("name").setValue(request.getGroupName());
+        usersGroupsTree.child("category").setValue(request.getGroupCategory());
+        usersGroupsTree.child("admin").setValue(false);
+
         databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
 
         // Checks if member count has now exceeded after this new member has joined

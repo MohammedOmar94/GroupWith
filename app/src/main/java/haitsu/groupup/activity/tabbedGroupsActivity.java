@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
+import haitsu.groupup.fragment.GroupsJoinedFragment;
 import haitsu.groupup.other.ViewPagerAdapter;
 import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.MyGroupsFragment;
@@ -23,6 +24,7 @@ import static android.graphics.Color.WHITE;
 
 public class tabbedGroupsActivity extends AppCompatActivity implements
         ChatsFragment.OnFragmentInteractionListener,
+        GroupsJoinedFragment.OnFragmentInteractionListener,
         MyGroupsFragment.OnFragmentInteractionListener {
 
     /**
@@ -35,7 +37,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
      */
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private String[] pageTitle = {"Chats", "My Groups"};
+    private String[] pageTitle = {"Chats", "Groups joined", "My Groups"};
 
 
     /**
@@ -54,7 +56,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(pageTitle[i]));
         }
 

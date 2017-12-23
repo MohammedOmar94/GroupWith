@@ -23,20 +23,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
+import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.activity.GroupInfoActivity;
 import haitsu.groupup.other.Groups;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyGroupsFragment.OnFragmentInteractionListener} interface
+ * {@link GroupsJoinedFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyGroupsFragment#newInstance} factory method to
+ * Use the {@link GroupsJoinedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyGroupsFragment extends Fragment {
+public class GroupsJoinedFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -58,7 +58,7 @@ public class MyGroupsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    public MyGroupsFragment() {
+    public GroupsJoinedFragment() {
         // Required empty public constructor
     }
 
@@ -71,8 +71,8 @@ public class MyGroupsFragment extends Fragment {
      * @return A new instance of fragment MyGroupsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyGroupsFragment newInstance(String param1, String param2) {
-        MyGroupsFragment fragment = new MyGroupsFragment();
+    public static GroupsJoinedFragment newInstance(String param1, String param2) {
+        GroupsJoinedFragment fragment = new GroupsJoinedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -103,11 +103,11 @@ public class MyGroupsFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
+        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
         final DatabaseReference group = databaseRef.child("group");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
-                System.out.println("Frag is MyGroups");
+                System.out.println("Frag is GroupsJoined");
                 System.out.println("Group name is " + groupInfo.getName());
                 ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
                 ((TextView) view.findViewById(android.R.id.text2)).setText("Category: " + groupInfo.getCategory() + " Admin: " + groupInfo.getAdmin());
