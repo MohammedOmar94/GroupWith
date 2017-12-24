@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private Button mDeleteButton;
     private Button mLeaveButton;
     private Button mCancelButton;
+    private ProgressBar progressSpinner;
 
     private String groupCategory;
     private String groupID;
@@ -106,6 +108,9 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_group_info, container, false);
+        progressSpinner = (ProgressBar)view.findViewById(R.id.progressBar1);
+        view.setVisibility(View.GONE);
+        progressSpinner.setVisibility(View.VISIBLE);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -115,6 +120,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mLeaveButton = (Button) view.findViewById(R.id.leave_button);
         mCancelButton = (Button) view.findViewById(R.id.cancelRequest_button);
+        progressSpinner = (ProgressBar)view.findViewById(R.id.progressBar1);
         mJoinButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
         mLeaveButton.setOnClickListener(this);
@@ -147,6 +153,8 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 if (groupInfo.getAdminID().equals(mFirebaseUser.getUid())) {//If group admin, delete button should be visible.
                     view.findViewById(R.id.join_button).setVisibility(View.GONE);
                     view.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
+                    progressSpinner.setVisibility(View.GONE);
+                    view.setVisibility(View.VISIBLE);
                     //Not group admin but are a group member, show leave button.
                 } else if (!groupInfo.getAdminID().equals(mFirebaseUser.getUid()) &&
                         snapshot.child("members").hasChild(mFirebaseUser.getUid())) {
@@ -157,12 +165,16 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);
                         view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
                         view.findViewById(R.id.cancelRequest_button).setVisibility(View.GONE);
+                        progressSpinner.setVisibility(View.GONE);
+                        view.setVisibility(View.VISIBLE);
                     // Request sent to join group, but not approved.
                     } else if (!snapshot.child("members").child(mFirebaseUser.getUid()).getValue(Boolean.class)) {
                         System.out.println("Type is false");
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);
                         view.findViewById(R.id.leave_button).setVisibility(View.GONE);
                         view.findViewById(R.id.cancelRequest_button).setVisibility(View.VISIBLE);
+                        progressSpinner.setVisibility(View.GONE);
+                        view.setVisibility(View.VISIBLE);
                     }
                 }
             }

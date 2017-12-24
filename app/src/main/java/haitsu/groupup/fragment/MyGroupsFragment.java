@@ -152,7 +152,7 @@ public class MyGroupsFragment extends Fragment {
                         intent.putExtras(extras);
                         startActivity(intent);
                         //User id2 = (User) mListView.getItemAtPosition(position); //
-                        System.out.println("ID IS " + key);
+                        // System.out.println("ID IS " + key);
                     }
 
 
