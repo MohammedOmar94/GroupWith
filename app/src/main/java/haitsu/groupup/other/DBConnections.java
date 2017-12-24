@@ -109,6 +109,7 @@ public class DBConnections {
         usersGroupsTree.child("name").setValue(request.getGroupName());
         usersGroupsTree.child("category").setValue(request.getGroupCategory());
         usersGroupsTree.child("admin").setValue(false);
+        usersGroupsTree.child("userApproved").setValue(false);
 
         databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
 
@@ -186,6 +187,8 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.getText().toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("userApproved").setValue(true);
+
 
         //Add to notifications
         notifications.setValue(new Notification("You created the group " + groupName.getText().toString() + "!"));
@@ -227,6 +230,7 @@ public class DBConnections {
         });
     }
 
+    // If an Approved user wants to leave the group they're in
     public void leaveGroup(final String groupID, final String groupCategory) {
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -242,6 +246,9 @@ public class DBConnections {
                     //Delete from the users group tree
                     databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
 
+                    //Change group to not full, so group should reappear again in results
+                    revertGroupType(groupCategory, groupID);
+
                 }
             }
 
@@ -252,15 +259,20 @@ public class DBConnections {
         });
     }
 
+    // Done by the user who changes their mind about joining a specific group
     public void cancelJoinRequest(String groupID, final String groupCategory, String adminId) {
+        // Deletes request from admin's user tree
         databaseRef.child("users").child(adminId).child("userRequest").removeValue();
+        // Deletes group from the user's user tree
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+        // Delete member from the group tree
         databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
-        // Is this really needed? The group disappears, so you can't even have the choice to select that group to cancel your request.
-        //revertGroupType(groupCategory,groupID);
+        // Group is no longer full anymore, so revert the type back to normal to reappear in group results.
+        revertGroupType(groupCategory,groupID);
     }
 
     public void revertGroupType(final String groupCategory, final String groupID){
-        //Separate full and type of group, should reappear as avaliable.
+        // Separate full and type of group, should reappear as avaliable.
         databaseRef.child("group").child(groupCategory).child(groupID).child("type")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -270,6 +282,7 @@ public class DBConnections {
                         if(type.contains("FULL")) {
                             String[] parts = type.split("FULL_");
                             String groupType = parts[1]; // group type
+                            System.out.println("group type is now " + groupType);
                             //Reverts back type to normal
                             databaseRef.child("group").child(groupCategory).child(groupID).child("type").setValue(groupType);
 

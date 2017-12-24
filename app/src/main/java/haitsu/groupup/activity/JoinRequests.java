@@ -73,7 +73,7 @@ public class JoinRequests extends AppCompatActivity {
         final DatabaseReference groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
         final FirebaseListAdapter<UserRequest> usersAdapter = new FirebaseListAdapter<UserRequest>(this, UserRequest.class, R.layout.group_chat, groupRef) {
             protected void populateView(View view, UserRequest request, int position) {
-                System.out.println("ayy " + request.getGroupName());
+                System.out.println("ayy " + request.getGroupCategory());
                 int age = calculateAge(request.getAge());
                 ((TextView) view.findViewById(R.id.message_user)).setText(request.getGroupName().toString());
                 ((TextView) view.findViewById(R.id.message_text)).setText("User: " + request.getUsername() + " Age: " + age + " City: " + request.getCity() + "/ " + request.getCountry());
@@ -183,6 +183,7 @@ public class JoinRequests extends AppCompatActivity {
 
     public void acceptJoinRequest(String requestId, UserRequest request) {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
+        databaseRef.child("users").child(request.getUserId()).child("groups").child(request.getGroupId()).child("userApproved").setValue(true);
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).setValue(true);
 
         // Need to add groups tree for that user who was accepted to join.

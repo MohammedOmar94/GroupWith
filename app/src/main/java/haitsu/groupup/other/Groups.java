@@ -13,6 +13,7 @@ public class Groups {
     private String category;
     private String name;
     private Boolean admin;
+    private Boolean userApproved;
     private ChatMessage lastMessage;
 
     public Groups(){
@@ -50,5 +51,13 @@ public class Groups {
 
     public void setLastMessage(ChatMessage lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public Boolean getUserApproved() {
+        return userApproved;
+    }
+
+    public void setUserApproved(Boolean userApproved) {
+        this.userApproved = userApproved;
     }
 }

@@ -3,6 +3,7 @@ package haitsu.groupup.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -122,19 +123,20 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         Bundle extras = getActivity().getIntent().getExtras();
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupID = extras.getString("GROUP_ID");
-        groupAdminId = extras.getString("GROUP_ADMIN");
+        // groupAdminId = extras.getString("GROUP_ADMIN");
         System.out.println("group cat" + groupCategory + " " + groupID);
         //mListView = (ListView) view.findViewById(R.id.listview);
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        // System.out.println("Group is " + groupCategory  + " " + groupID);
+        System.out.println("Group is " + groupCategory  + " " + groupID);
         final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 Group groupInfo = snapshot.getValue(Group.class);
                 selectedGroupName = groupInfo.getName();
+                groupAdminId = groupInfo.getAdminID();
                 System.out.println("Ayy " + groupInfo.getMemberLimit());
                 //selectedGroupCategory = InterestsGroupFragment.filteredCategory;
                 ((TextView) view.findViewById(R.id.group_name)).setText(groupInfo.getName());
@@ -216,6 +218,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 getActivity().finish();
                 break;
             case R.id.cancelRequest_button:
+                System.out.println("On exit " + groupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " cancelled", Toast.LENGTH_LONG).show();
                 dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId);
                 getActivity().finish();
