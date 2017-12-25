@@ -55,6 +55,7 @@ import com.google.android.gms.location.LocationCallback;
 import android.location.LocationListener;
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -118,7 +119,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private final static int REQUEST_CHECK_SETTINGS = 2000;
     private Location mLastLocation;
     private LocationRequest mLocationRequest;
-
+    private FusedLocationProviderClient mFusedLocationClient;
 
     /**
      * Callback for Location events.
@@ -140,6 +141,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+    private Boolean mRequestingLocationUpdates;
+    private final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
 
     private Preference pref2;
 
@@ -171,6 +175,26 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);// Load the preferences from an XML resource
+
+        //updateValuesFromBundle(savedInstanceState);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    getAddress();
+                    stopLocationUpdates();
+
+                    // ...
+                }
+            }
+
+            ;
+        };
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -254,6 +278,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         return view;
     }
 
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        // Update the value of mRequestingLocationUpdates from the Bundle.
+        if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+            mRequestingLocationUpdates = savedInstanceState.getBoolean(
+                    REQUESTING_LOCATION_UPDATES_KEY);
+        }
+
+        // ...
+
+        // Update UI to match restored state
+        // updateUI();
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -291,6 +328,30 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Set up a listener whenever a key changes
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+//        if (mRequestingLocationUpdates) {
+//            startLocationUpdates();
+//        }
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+        } else {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback,
+                    null /* Looper */);
+        }
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     @Override
@@ -321,6 +382,43 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         getActivity().finishAffinity();//Works for Android 4.1 and above only.
         // startActivity(new Intent(getContext(), SignInActivity.class));
         //
+    }
+
+    public void lastLocation() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+        } else {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                System.out.println("Hey, we have the Last location");
+                                mLastLocation = location;
+                            } else {
+                                // Pretty busted, added in but not tested properly before. Need to request updates
+                                System.out.println("Hey, we don't so we have to Request location");
+                                requestLocation();
+                            }
+                            // Logic to handle location object
+                        }
+                    });
+        }
+    }
+
+    protected void createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void openDialog() {
@@ -385,18 +483,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     // for ActivityCompat#requestPermissions for more details.
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
                 } else {
-                    mLastLocation = LocationServices.FusedLocationApi
-                            .getLastLocation(mGoogleApiClient);
-
-
-                    if (mLastLocation != null) {
-                        System.out.println("Hey Last location");
-                        updateLocation();
-                    } else {
-                        // Pretty busted, added in but not tested properly before. Need to request updates
-                        System.out.println("Hey Request location");
-                        requestLocation(task);
-                    }
+                    lastLocation();
                 }
 
             }
@@ -428,31 +515,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
     }
-    public void requestLocation(Task<LocationSettingsResponse> task){
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            System.out.println("Hey no permission");
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        } else {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
-            System.out.println("Hey we're in request");
-            updateLocation();
-        }
 
-
-
-
+    public void requestLocation() {
+        startLocationUpdates();
+//        System.out.println("Hey we're in request");
+//        updateLocation();
     }
 
-    public void updateLocation(){
-        System.out.println("Hey we're in update");
+
+    public void updateLocation() {
         latitude = mLastLocation.getLatitude();
         longitude = mLastLocation.getLongitude();
         getAddress();
@@ -481,6 +552,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     public void getAddress() {
+        System.out.println("Hey lat " + latitude + " long " + longitude);
         Address locationAddress = getAddress(latitude, longitude);
 
         if (locationAddress != null) {
