@@ -331,8 +331,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
         } else {
             builder = new AlertDialog.Builder(getActivity());
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
+//            LocationServices.FusedLocationApi.requestLocationUpdates(
+//                    mGoogleApiClient, mLocationRequest, this);
         }
         builder.setTitle("Update Location")
                 .setMessage("Are you sure you want to update your current location?")
@@ -346,9 +346,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             //                                          int[] grantResults)
                             // to handle the case where the user grants the permission. See the documentation
                             // for ActivityCompat#requestPermissions for more details.
-                            return;
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+                        } else {
+                            checkLocationStatus(settingsBuilder);
                         }
-                        checkLocationStatus(settingsBuilder);
 
 
                     }
@@ -375,21 +376,27 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 // ...
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
+                    System.out.println("Hey no permission");
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
                     //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mLastLocation = LocationServices.FusedLocationApi
-                        .getLastLocation(mGoogleApiClient);
-
-                if (mLastLocation != null) {
-                    updateLocation();
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
                 } else {
-                    requestLocation(task);
+                    mLastLocation = LocationServices.FusedLocationApi
+                            .getLastLocation(mGoogleApiClient);
+
+
+                    if (mLastLocation != null) {
+                        System.out.println("Hey Last location");
+                        updateLocation();
+                    } else {
+                        // Pretty busted, added in but not tested properly before. Need to request updates
+                        System.out.println("Hey Request location");
+                        requestLocation(task);
+                    }
                 }
 
             }
@@ -424,17 +431,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void requestLocation(Task<LocationSettingsResponse> task){
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
+            System.out.println("Hey no permission");
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return;
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+        } else {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+            System.out.println("Hey we're in request");
+            updateLocation();
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-        updateLocation();
 
 
 
@@ -442,6 +452,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     public void updateLocation(){
+        System.out.println("Hey we're in update");
         latitude = mLastLocation.getLatitude();
         longitude = mLastLocation.getLongitude();
         getAddress();
