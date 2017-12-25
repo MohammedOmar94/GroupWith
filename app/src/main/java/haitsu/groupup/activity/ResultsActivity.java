@@ -65,6 +65,7 @@ public class ResultsActivity extends AppCompatActivity implements
     private String groupCategory;
     private String groupGender;
     private String groupType;
+    private int memberLimit;
 
 
 
@@ -86,12 +87,13 @@ public class ResultsActivity extends AppCompatActivity implements
         groupGender = extras.getString("GROUP_GENDER");
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupType = extras.getString("GROUP_TYPE");
+        memberLimit = extras.getInt("MEMBER_LIMIT");
 
         mListView = (ListView) findViewById(R.id.listview);
         String title = "Results";
         getSupportActionBar().setTitle(title);
 
-        final Query searchByType = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender").equalTo(groupType + "_" + groupGender);
+        final Query searchByType = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
         searchByType.
                 addListenerForSingleValueEvent(
                         new ValueEventListener() {

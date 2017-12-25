@@ -107,17 +107,28 @@
     <string name="pref_default_display_name">John Smith</string>
 
     <string name="pref_title_gender">Members Gender</string>
+    <string name="pref_title_member_limit">Group size</string>
+
     <string name="pref_summary_gender">Choose which gender you want to join your group.</string>
     <string-array name="pref_gender_list">
         <item>Any</item>
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string-array name="pref_member_limit">
+        <item>5</item>
+        <item>10</item>
+    </string-array>
 
     <string-array name="pref_gender_values">
         <item>-1</item>
         <item>0</item>
         <item>1</item>
+    </string-array>
+
+    <string-array name="pref_member_limit_values">
+        <item>-1</item>
+        <item>0</item>
     </string-array>
 
     <string name="pref_title_category">Group category</string>

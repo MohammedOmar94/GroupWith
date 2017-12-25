@@ -56,6 +56,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     private String genderValue;
     private String categoryValue;
     private String typeValue;
+    private int sizeValue;
 
     private Button mSignOutButton;
     Button button;
@@ -69,6 +70,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     ListPreference listPreference;
     ListPreference listPreference2;
     ListPreference listPreference3;
+    ListPreference listPreference4;
 
 
     private OnFragmentInteractionListener mListener;
@@ -230,24 +232,29 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         listPreference = (ListPreference) findPreference("example_list");
         listPreference2 = (ListPreference) findPreference("example_list2");
         listPreference3 = (ListPreference) findPreference("example_list3");
+        listPreference4 = (ListPreference) findPreference("example_list4");
 
         CharSequence currText = listPreference.getEntry();
         CharSequence currText2 = listPreference2.getEntry();
         CharSequence currText3 = listPreference3.getEntry();
+        CharSequence currText4 = listPreference4.getEntry();
 
         genderValue = currText.toString();
         categoryValue = currText2.toString();
         typeValue = currText3.toString();
+        sizeValue = Integer.parseInt(currText4.toString());
+        // With default values already selected, not sure if this case is even possible...
         if(genderValue == null || categoryValue == null || typeValue == null){
             //
-            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue);
+            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
         } else {
-            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue);
+            System.out.println("THIS IS NOT NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
             Intent intent = new Intent(getActivity(), ResultsActivity.class);
             Bundle extras = new Bundle();
             extras.putString("GROUP_GENDER", genderValue);
             extras.putString("GROUP_CATEGORY", categoryValue);
             extras.putString("GROUP_TYPE", typeValue);
+            extras.putInt("MEMBER_LIMIT", sizeValue);
             intent.putExtras(extras);
             startActivity(intent);
         }

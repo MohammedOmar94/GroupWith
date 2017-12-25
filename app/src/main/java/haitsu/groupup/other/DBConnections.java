@@ -178,7 +178,7 @@ public class DBConnections {
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
-        groupId2.child("type_gender").setValue(groupType + "_" + groupGender);
+        groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memeberCount);
         groupId2.child("latitude").setValue(user.getLatitude());
         groupId2.child("longitude").setValue(user.getLongitude());
 
