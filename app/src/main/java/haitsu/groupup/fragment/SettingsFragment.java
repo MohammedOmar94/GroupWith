@@ -403,6 +403,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             if (location != null) {
                                 System.out.println("Hey, we have the Last location");
                                 mLastLocation = location;
+                                // updateLocation();
+                                 requestLocation();
                             } else {
                                 // Pretty busted, added in but not tested properly before. Need to request updates
                                 System.out.println("Hey, we don't so we have to Request location");
