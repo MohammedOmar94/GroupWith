@@ -165,18 +165,17 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);
                         view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
                         view.findViewById(R.id.cancelRequest_button).setVisibility(View.GONE);
-                        progressSpinner.setVisibility(View.GONE);
-                        view.setVisibility(View.VISIBLE);
                     // Request sent to join group, but not approved.
                     } else if (!snapshot.child("members").child(mFirebaseUser.getUid()).getValue(Boolean.class)) {
                         System.out.println("Type is false");
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);
                         view.findViewById(R.id.leave_button).setVisibility(View.GONE);
                         view.findViewById(R.id.cancelRequest_button).setVisibility(View.VISIBLE);
-                        progressSpinner.setVisibility(View.GONE);
-                        view.setVisibility(View.VISIBLE);
                     }
                 }
+
+                progressSpinner.setVisibility(View.GONE);
+                view.setVisibility(View.VISIBLE);
             }
 
             @Override
