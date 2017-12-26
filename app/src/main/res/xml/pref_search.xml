@@ -51,4 +51,14 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_member_limit" />
 
+    <ListPreference
+        android:defaultValue="-1"
+        android:entries="@array/pref_miles"
+        android:entryValues="@array/pref_miles_values"
+        android:summary="%s"
+        android:key="example_list5"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_miles" />
+
 </PreferenceScreen>

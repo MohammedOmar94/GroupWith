@@ -57,6 +57,8 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     private String categoryValue;
     private String typeValue;
     private int sizeValue;
+    private int milesValue;
+    private double milesConverted;
 
     private Button mSignOutButton;
     Button button;
@@ -71,6 +73,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     ListPreference listPreference2;
     ListPreference listPreference3;
     ListPreference listPreference4;
+    ListPreference listPreference5;
 
 
     private OnFragmentInteractionListener mListener;
@@ -233,16 +236,19 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         listPreference2 = (ListPreference) findPreference("example_list2");
         listPreference3 = (ListPreference) findPreference("example_list3");
         listPreference4 = (ListPreference) findPreference("example_list4");
+        listPreference5 = (ListPreference) findPreference("example_list5");
 
         CharSequence currText = listPreference.getEntry();
         CharSequence currText2 = listPreference2.getEntry();
         CharSequence currText3 = listPreference3.getEntry();
         CharSequence currText4 = listPreference4.getEntry();
+        CharSequence currText5 = listPreference5.getEntry();
 
         genderValue = currText.toString();
         categoryValue = currText2.toString();
         typeValue = currText3.toString();
         sizeValue = Integer.parseInt(currText4.toString());
+        milesConverted = calculateKilometers(currText5.toString());
         // With default values already selected, not sure if this case is even possible...
         if(genderValue == null || categoryValue == null || typeValue == null){
             //
@@ -255,9 +261,17 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
             extras.putString("GROUP_CATEGORY", categoryValue);
             extras.putString("GROUP_TYPE", typeValue);
             extras.putInt("MEMBER_LIMIT", sizeValue);
+            extras.putDouble("MILES_CONVERTED", milesConverted);
             intent.putExtras(extras);
             startActivity(intent);
         }
+    }
+
+    public double calculateKilometers(String milesStr){
+        double miles = Double.parseDouble(milesStr);                     //Note 1
+        //... Compute kilometers.  There are 0.621 miles in a kilometer.
+        return miles / 0.621;
+
     }
 
     /**

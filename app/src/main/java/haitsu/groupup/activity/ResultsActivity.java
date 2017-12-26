@@ -114,6 +114,7 @@ public class ResultsActivity extends AppCompatActivity implements
     private String groupGender;
     private String groupType;
     private int memberLimit;
+    private double kilometers;
 
 
     private FirebaseUser mFirebaseUser;
@@ -158,6 +159,7 @@ public class ResultsActivity extends AppCompatActivity implements
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupType = extras.getString("GROUP_TYPE");
         memberLimit = extras.getInt("MEMBER_LIMIT");
+        kilometers = extras.getDouble("MILES_CONVERTED");
 
         mListView = (ListView) findViewById(R.id.listview);
         String title = "Results";
@@ -179,7 +181,7 @@ public class ResultsActivity extends AppCompatActivity implements
                     longitude = location.getLongitude();
                     getAddress();
                     stopLocationUpdates();
-                    System.out.println("Hey " + city + " " + country);
+                    System.out.println("Hey " + city + " " + country + " " + kilometers);
                     searchTest();
 
                     // ...
@@ -250,7 +252,7 @@ public class ResultsActivity extends AppCompatActivity implements
         GeoFire geoFire = new GeoFire(searchByLocation);
         // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
         // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), 0.6);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), kilometers);
 
 
         final ArrayList<Group> planetList = new ArrayList<Group>();

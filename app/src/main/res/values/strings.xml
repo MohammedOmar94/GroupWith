@@ -107,7 +107,10 @@
     <string name="pref_default_display_name">John Smith</string>
 
     <string name="pref_title_gender">Members Gender</string>
+
     <string name="pref_title_member_limit">Group size</string>
+
+    <string name="pref_title_miles">Distance (in miles)</string>
 
     <string name="pref_summary_gender">Choose which gender you want to join your group.</string>
     <string-array name="pref_gender_list">
@@ -115,9 +118,20 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+
     <string-array name="pref_member_limit">
         <item>5</item>
         <item>10</item>
+    </string-array>
+
+
+    <string-array name="pref_miles">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
     </string-array>
 
     <string-array name="pref_gender_values">
@@ -129,6 +143,15 @@
     <string-array name="pref_member_limit_values">
         <item>-1</item>
         <item>0</item>
+    </string-array>
+
+    <string-array name="pref_miles_values">
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
     </string-array>
 
     <string name="pref_title_category">Group category</string>
