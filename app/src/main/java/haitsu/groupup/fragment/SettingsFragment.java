@@ -199,6 +199,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
         addPreferencesFromResource(R.xml.preferences);
 
         final EditTextPreference editText = (EditTextPreference) findPreference("display_name");
