@@ -20,10 +20,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryDataEventListener;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
@@ -32,6 +38,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.EventsGroupFragment;
@@ -59,6 +68,9 @@ public class ResultsActivity extends AppCompatActivity implements
     private TabLayout tabLayout;
     private ListView mListView;
 
+    private ListView mainListView;
+    private ArrayAdapter<String> listAdapter;
+
     private String selectedGroupID;
     private String selectedGroupName;
 
@@ -67,7 +79,7 @@ public class ResultsActivity extends AppCompatActivity implements
     private String groupType;
     private int memberLimit;
 
-
+    private GeoQuery geoQuery;
 
 
     private FirebaseListAdapter<Group> usersAdapter = null;
@@ -93,98 +105,105 @@ public class ResultsActivity extends AppCompatActivity implements
         String title = "Results";
         getSupportActionBar().setTitle(title);
 
-        final Query searchByType = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
-        searchByType.
-                addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.getValue() != null) {
-                                    usersAdapter = new FirebaseListAdapter<Group>(ResultsActivity.this, Group.class, android.R.layout.two_line_list_item, searchByType) {
-                                        protected void populateView(View view, Group groupInfo, int position) {
-                                            System.out.println("Group name is " + groupInfo.getName());
-                                            ((TextView) view.findViewById(android.R.id.text1)).setText(groupCategory);
-                                            ((TextView) view.findViewById(android.R.id.text2)).setText(groupInfo.getName());
-                                        }
 
-                                        @Override
-                                        public View getView(int position, View convertView, ViewGroup parent) {
-                                            // Get the Item from ListView
-                                            View view = super.getView(position, convertView, parent);
-
-                                            // Initialize a TextView for ListView each Item
-                                            TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                                            TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
-
-                                            // Set the text color of TextView (ListView Item)
-                                            tv.setTextColor(Color.BLACK);
-                                            tv2.setTextColor(Color.BLACK);
-
-                                            // Generate ListView Item using TextView
-                                            return view;
-                                        }
+        // Find the ListView resource.
+        mainListView = (ListView) findViewById(R.id.listview);
 
 
-                                    };
+        // First filter by groups with the key, containing the latitude and longitude
+        // Then in onDataChange, you want to pass the reference for each snapshot (group)
+        searchTest();
 
-                                    mListView.setAdapter(usersAdapter);
-                                } else {
-                                    AlertDialog.Builder builder;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        builder = new AlertDialog.Builder(ResultsActivity.this, R.style.MyAlertDialogStyle);
-                                    } else {
-                                        builder = new AlertDialog.Builder(ResultsActivity.this);
-                                    }
-                                    builder.setTitle("Oops! No matches found")
-                                            .setMessage("Maybe you should be the first to create a group of this kind!")
-                                            .setPositiveButton("OK", null)
-                                            .show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        }
-                );
-
-        searchByType.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                        mListView.setFocusable(true);//HACKS
-                        String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
-                        Group group = ((Group) mListView.getItemAtPosition(position));
-                        selectedGroupID = key;
-                        selectedGroupName = group.getName();
-                        Intent intent = new Intent(ResultsActivity.this, GroupInfoActivity.class);
-                        Bundle extras = new Bundle();
-                        //extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_ID", selectedGroupID);
-                        extras.putString("GROUP_CATEGORY", groupCategory);
-                        intent.putExtras(extras);
-                        startActivity(intent);
-                        System.out.println("Group name is " + group.getName() + " ID is " + groupCategory);
-                    }
-
-
-                });
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-        });
 
     }
 
 
+    public void searchTest() {
+        final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
+        GeoFire geoFire = new GeoFire(searchByLocation);
+        // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
+        // Will be done via the users current location, and the radius they selected.
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(51.5561476, -0.3187798), 0.6);
+
+
+        final ArrayList<String> planetList = new ArrayList<String>();
+
+
+        System.out.println("Hey JUST BEFORE QUERY LISTENER");
+        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+
+            GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    if (error != null) {
+                        System.err.println("There was an error saving the location to GeoFire: " + error);
+                    } else {
+                        System.out.println("Location saved on server successfully!");
+                    }
+                }
+            };
+
+            // Once they've done that on the groups tree
+            @Override
+            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
+                Group group = dataSnapshot.getValue(Group.class);
+                System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
+                System.out.println("hey " + dataSnapshot.getRef());
+                if ((group.getType_gender_memberLimit()).equals(groupType + "_" + groupGender + "_" + memberLimit)) {
+                    // Create ArrayAdapter using the planet list.
+                    listAdapter = new ArrayAdapter<String>(ResultsActivity.this, R.layout.simplerow, planetList);
+                    planetList.addAll(Arrays.asList(group.getName()));
+                    mainListView.setAdapter(listAdapter);
+                }
+
+
+            }
+
+            @Override
+            public void onDataExited(DataSnapshot dataSnapshot) {
+                System.out.println("Hey Nothing to see here buddy");
+            }
+
+            @Override
+            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
+
+                System.out.println("Hey just moved within range");
+            }
+
+            @Override
+            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
+
+                System.out.println("Hey data has changed");
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+                System.out.println("Hey ERROR");
+            }
+
+
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // remove all event listeners to stop updating in the background
+        this.geoQuery.removeAllListeners();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // remove all event listeners to stop updating in the background
+        this.geoQuery.removeAllListeners();
+    }
 
 
     @Override

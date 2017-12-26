@@ -6,8 +6,14 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +35,7 @@ public class DBConnections {
 
     //Can access any child element within the database using this reference.
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    private GeoFire geoFire = new GeoFire(databaseRef);
 
 
     //Firebase details
@@ -45,6 +52,95 @@ public class DBConnections {
     public DBConnections() {
 
     }
+
+    public void geoFireTest() {
+        geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully!");
+                }
+            }
+
+        });
+        geoFire.setLocation("firebase-hq2", new GeoLocation(37.7853889, -122.4056973), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully!");
+                }
+            }
+
+        });
+    }
+
+    public void geoFireTestGet() {
+        geoFire.getLocation("firebase-hq", new LocationCallback() {
+            @Override
+            public void onLocationResult(String key, GeoLocation location) {
+                if (location != null) {
+                    System.out.println(String.format("The location for key %s is [%f,%f]", key, location.latitude, location.longitude));
+                } else {
+                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.err.println("There was an error getting the GeoFire location: " + databaseError);
+            }
+        });
+    }
+
+    public void geoFireTestNearby() {
+        // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(37.7832, -122.4056), 0.6);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                System.out.println(String.format("The Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+            }
+            // Key has left radius of 0.6
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+            // Key has moved but is still within radius of 0.6
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void addGeoToGroups(String groupId, double latitude, double longitude) {
+        geoFire.setLocation(groupId + "-key", new GeoLocation(latitude, -longitude), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully!");
+                }
+            }
+
+        });
+    }
+
 
     public void createUserAccount(EditText username, String gender, String email, TextView age, String city, String country, double latitude, double longitude) {
         User user = new User(username.getText().toString(), gender, email, age.getText().toString(), city, country, null, latitude, longitude);
@@ -99,8 +195,6 @@ public class DBConnections {
         final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
 
 
-
-
         // Adds user requested to be joined in admins tree. Delete also needs a rework to remove from userRequest tree.
         groupRef.child("members").child(request.getUserId()).setValue(false);//Adds Members, need approval from admin before true.
 
@@ -119,7 +213,7 @@ public class DBConnections {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 System.out.println("Count is " + dataSnapshot.child("members").getChildrenCount());
                 Group group = dataSnapshot.getValue(Group.class);
-                if(dataSnapshot.child("members").getChildrenCount() <= 3){ // Can maybe get snapshot of groupref, find member limit there?
+                if (dataSnapshot.child("members").getChildrenCount() <= 3) { // Can maybe get snapshot of groupref, find member limit there?
                     // Change group type to Full, will no longer show in results.
                     // Will also be the case until admin approves or declines member.
                     groupRef.child("type").setValue("FULL_" + group.getType());//Combine Full and type of group, remove if member leaves or gets kicked. Group should then show up in results
@@ -169,6 +263,19 @@ public class DBConnections {
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
         // String notificationId = notifications.getKey();
 
+        GeoFire geoFire = new GeoFire(databaseRef.child("group").child(groupCategory));
+        geoFire.setLocation(groupId, new GeoLocation(user.getLatitude(), user.getLongitude()), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully!");
+                }
+            }
+
+        });
+
         //Adds to group tree
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
         //groupId2.child("category").setValue(groupCategory);
@@ -181,6 +288,9 @@ public class DBConnections {
         groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memeberCount);
         groupId2.child("latitude").setValue(user.getLatitude());
         groupId2.child("longitude").setValue(user.getLongitude());
+
+
+
 
 
         //Adds to users tree
@@ -213,13 +323,13 @@ public class DBConnections {
                     System.out.println("Category is" + groupCategory);
                     deleteRequest(groupID);
                     //Delete from group tree, which contains detail about the name and its members
-                     databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
+                    databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
 
                     //Delete from the users group tree
-                     databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
 
                     //Deletes the chatroom for everyone.
-                     databaseRef.child("chatrooms").child(groupID).removeValue();
+                    databaseRef.child("chatrooms").child(groupID).removeValue();
                 }
             }
 
@@ -268,10 +378,10 @@ public class DBConnections {
         // Delete member from the group tree
         databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
         // Group is no longer full anymore, so revert the type back to normal to reappear in group results.
-        revertGroupType(groupCategory,groupID);
+        revertGroupType(groupCategory, groupID);
     }
 
-    public void revertGroupType(final String groupCategory, final String groupID){
+    public void revertGroupType(final String groupCategory, final String groupID) {
         // Separate full and type of group, should reappear as avaliable.
         databaseRef.child("group").child(groupCategory).child(groupID).child("type")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -279,7 +389,7 @@ public class DBConnections {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String type = dataSnapshot.getValue(String.class);
-                        if(type.contains("FULL")) {
+                        if (type.contains("FULL")) {
                             String[] parts = type.split("FULL_");
                             String groupType = parts[1]; // group type
                             System.out.println("group type is now " + groupType);
@@ -297,15 +407,14 @@ public class DBConnections {
     }
 
 
-
     public void deleteRequest(final String groupID) {
         DatabaseReference requestRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
         requestRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                for (DataSnapshot requestSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
                     UserRequest request = requestSnapshot.getValue(UserRequest.class);
-                    if(request.getGroupId().equals(groupID)) {
+                    if (request.getGroupId().equals(groupID)) {
 //                        System.out.println("Ref is " + request.getGroupId() + " grouo id" + request.getGroupId());
                         System.out.println("Ref is " + requestSnapshot.getRef());
                         requestSnapshot.getRef().removeValue();
