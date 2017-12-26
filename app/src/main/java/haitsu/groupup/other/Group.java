@@ -5,7 +5,7 @@ package haitsu.groupup.other;
  */
 
 public class Group {
-
+    private String groupId;
     private String adminID;
     private String category;
     private String name;
@@ -100,5 +100,13 @@ public class Group {
 
     public void setType_gender_memberLimit(String type_gender_memberLimit) {
         this.type_gender_memberLimit = type_gender_memberLimit;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

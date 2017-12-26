@@ -49,6 +49,7 @@ import haitsu.groupup.other.ChatMessage;
 import haitsu.groupup.other.Group;
 import haitsu.groupup.other.GroupTypePagerAdapter;
 import haitsu.groupup.other.Groups;
+import haitsu.groupup.other.ResultsAdapter;
 
 import static android.graphics.Color.WHITE;
 
@@ -67,9 +68,10 @@ public class ResultsActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private ListView mListView;
+    private ResultsAdapter adapter;
 
     private ListView mainListView;
-    private ArrayAdapter<String> listAdapter;
+    private ArrayAdapter<Group> listAdapter;
 
     private String selectedGroupID;
     private String selectedGroupName;
@@ -112,7 +114,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
         // First filter by groups with the key, containing the latitude and longitude
         // Then in onDataChange, you want to pass the reference for each snapshot (group)
-        searchTest();
+//        searchTest();
 
 
     }
@@ -126,10 +128,9 @@ public class ResultsActivity extends AppCompatActivity implements
         geoQuery = geoFire.queryAtLocation(new GeoLocation(51.5561476, -0.3187798), 0.6);
 
 
-        final ArrayList<String> planetList = new ArrayList<String>();
+        final ArrayList<Group> planetList = new ArrayList<Group>();
 
 
-        System.out.println("Hey JUST BEFORE QUERY LISTENER");
         geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
 
             GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
@@ -147,13 +148,15 @@ public class ResultsActivity extends AppCompatActivity implements
             @Override
             public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
                 Group group = dataSnapshot.getValue(Group.class);
+                group.setGroupId(dataSnapshot.getKey());
+                group.setCategory(groupCategory);
                 System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
                 System.out.println("hey " + dataSnapshot.getRef());
                 if ((group.getType_gender_memberLimit()).equals(groupType + "_" + groupGender + "_" + memberLimit)) {
                     // Create ArrayAdapter using the planet list.
-                    listAdapter = new ArrayAdapter<String>(ResultsActivity.this, R.layout.simplerow, planetList);
-                    planetList.addAll(Arrays.asList(group.getName()));
-                    mainListView.setAdapter(listAdapter);
+                    adapter = new ResultsAdapter(ResultsActivity.this, planetList);
+                    adapter.add(group);
+                    mainListView.setAdapter(adapter);
                 }
 
 
@@ -192,7 +195,15 @@ public class ResultsActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // remove all event listeners to stop updating in the background
+        searchTest();
+    }
+
+    @Override
     protected void onStop() {
+        adapter.clear();
         super.onStop();
         // remove all event listeners to stop updating in the background
         this.geoQuery.removeAllListeners();
@@ -200,6 +211,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
+        adapter.clear();
         super.onDestroy();
         // remove all event listeners to stop updating in the background
         this.geoQuery.removeAllListeners();
