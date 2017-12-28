@@ -1,8 +1,5 @@
 package haitsu.groupup.other;
 
-import android.content.Intent;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -11,9 +8,6 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.geofire.LocationCallback;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,9 +17,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import haitsu.groupup.activity.AccountSetupActivity;
-import haitsu.groupup.activity.MainActivity;
-import haitsu.groupup.activity.SignInActivity;
+import haitsu.groupup.other.Models.Group;
+import haitsu.groupup.other.Models.Notification;
+import haitsu.groupup.other.Models.Report;
+import haitsu.groupup.other.Models.User;
+import haitsu.groupup.other.Models.UserRequest;
 
 /**
  * Created by moham on 17/06/2017.

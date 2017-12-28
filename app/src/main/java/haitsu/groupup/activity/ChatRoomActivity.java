@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,9 +33,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
-import haitsu.groupup.other.ChatMessage;
-import haitsu.groupup.other.Group;
-import haitsu.groupup.other.Groups;
+import haitsu.groupup.activity.Account.ReportActivity;
+import haitsu.groupup.other.Models.ChatMessage;
+import haitsu.groupup.other.Models.Groups;
 
 import static android.graphics.Color.WHITE;
 

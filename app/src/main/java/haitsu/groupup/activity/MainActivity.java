@@ -1,6 +1,5 @@
 package haitsu.groupup.activity;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -42,15 +41,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
-import haitsu.groupup.fragment.CreateGroupFragment;
-import haitsu.groupup.fragment.InterestsGroupFragment;
+import haitsu.groupup.activity.Account.SettingsActivity;
+import haitsu.groupup.activity.Groups.CreateGroupActivity;
+import haitsu.groupup.activity.Groups.tabbedGroupsActivity;
+import haitsu.groupup.activity.Search.SearchActivity;
+import haitsu.groupup.activity.Account.AccountSetupActivity;
+import haitsu.groupup.activity.Account.SignInActivity;
+import haitsu.groupup.fragment.Groups.CreateGroupFragment;
+import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.fragment.HomeFragment;
-import haitsu.groupup.fragment.MyGroupsFragment;
-import haitsu.groupup.fragment.NotificationsFragment;
-import haitsu.groupup.fragment.SettingsFragment;
+import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.Account.NotificationsFragment;
+import haitsu.groupup.fragment.Account.SettingsFragment;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.DBHandler;
-import haitsu.groupup.other.User;
+import haitsu.groupup.other.Models.User;
 import haitsu.groupup.other.CircleTransform;
 
 import static android.graphics.Color.WHITE;

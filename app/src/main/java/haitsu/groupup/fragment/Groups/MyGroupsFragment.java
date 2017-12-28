@@ -1,11 +1,11 @@
-package haitsu.groupup.fragment;
+package haitsu.groupup.fragment.Groups;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,23 +23,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Date;
-
-import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
-import haitsu.groupup.other.Models.ChatMessage;
-import haitsu.groupup.other.DBHandler;
+import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.Models.Groups;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ChatsFragment.OnFragmentInteractionListener} interface
+ * {@link MyGroupsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ChatsFragment#newInstance} factory method to
+ * Use the {@link MyGroupsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatsFragment extends Fragment {
+public class MyGroupsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -61,7 +57,7 @@ public class ChatsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    public ChatsFragment() {
+    public MyGroupsFragment() {
         // Required empty public constructor
     }
 
@@ -74,8 +70,8 @@ public class ChatsFragment extends Fragment {
      * @return A new instance of fragment MyGroupsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChatsFragment newInstance(String param1, String param2) {
-        ChatsFragment fragment = new ChatsFragment();
+    public static MyGroupsFragment newInstance(String param1, String param2) {
+        MyGroupsFragment fragment = new MyGroupsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -104,47 +100,18 @@ public class ChatsFragment extends Fragment {
 
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
-        final DBHandler db = new DBHandler(getActivity());
-        //db.dropTable("MyGroups");
-        // SQLiteDatabase s = getActivity().openOrCreateDatabase("GroupUp",MODE_PRIVATE,null);
-        // db.onCreate(s);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("userApproved").equalTo(true);
+        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         final DatabaseReference group = databaseRef.child("group");
-        final DatabaseReference chats = databaseRef.child("chats");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.group_chat, us) {
+        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
-               // Map<String,String> lastMessage = groupInfo.getLastMessage();
-               // System.out.println("Group name is " + lastMessage);
-                ChatMessage message = groupInfo.getLastMessage();
-                if(message != null) {
-                   // db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
-                }
-                //db.displayMessage();
-
-                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
-                if(groupInfo.getLastMessage() != null){
-                    Date messageDate = new Date(message.getMessageTime());
-                    Date currentDate = new Date();
-                    long diff = currentDate.getTime() - messageDate.getTime();
-                    float days = (diff / (1000*60*60*24));
-                    int daysRounded =  Math.round(days);
-
-                    ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    if(daysRounded == 0) {
-                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
-                    } else if(daysRounded == 1) {
-                        ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
-                    } else {
-                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy HH:mm", messageDate));
-                    }
-                } else {
-                    ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
-                }
-         //  (
+                System.out.println("Frag is MyGroups");
+                System.out.println("Group name is " + groupInfo.getName());
+                ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
+                ((TextView) view.findViewById(android.R.id.text2)).setText("Category: " + groupInfo.getCategory() + " Admin: " + groupInfo.getAdmin());
             }
-/*
+
             @Override
             public View getView(int position, View convertView, ViewGroup parent){
                 // Get the Item from ListView
@@ -161,17 +128,6 @@ public class ChatsFragment extends Fragment {
                 // Generate ListView Item using TextView
                 return view;
             }
-*/
-
-        };
-        final FirebaseListAdapter<Groups> usersAdapter2 = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.messages, us) {
-            protected void populateView(View view, Groups groupInfo, int position) {
-                // Map<String,String> lastMessage = groupInfo.getLastMessage();
-                // System.out.println("Group name is " + lastMessage);
-                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
-                // ((TextView) view.findViewById(R.id.message_text)).setText(groupInfo.getCategory());
-                // ((TextView) view.findViewById(R.id.message_time)).setText("aaa");
-            }
 
 
         };
@@ -187,14 +143,15 @@ public class ChatsFragment extends Fragment {
                         Groups group = ((Groups) mListView.getItemAtPosition(position));
                         selectedGroup = key;
                         selectedGroupName = group.getName();
-                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
                         Bundle extras = new Bundle();
                         extras.putString("GROUP_ID", selectedGroup);
                         extras.putString("GROUP_NAME", selectedGroupName);
+                        extras.putString("GROUP_CATEGORY", group.getCategory());
                         intent.putExtras(extras);
                         startActivity(intent);
                         //User id2 = (User) mListView.getItemAtPosition(position); //
-                        System.out.println("ID IS " + key);
+                        // System.out.println("ID IS " + key);
                     }
 
 

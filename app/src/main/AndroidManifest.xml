@@ -23,11 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SignInActivity" />
+        <activity android:name=".activity.Account.SignInActivity" />
         <activity android:name=".activity.PrivacyPolicyActivity" />
         <activity android:name=".activity.AboutUsActivity" />
         <activity
-            android:name=".activity.SettingsActivity"
+            android:name=".activity.Account.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/Toolbar" />
@@ -36,37 +36,37 @@
             android:label="@string/title_activity_chat_room"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.tabbedGroupsActivity"
+            android:name=".activity.Groups.tabbedGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.CreateGroupActivity"
+            android:name=".activity.Groups.CreateGroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.GroupInfoActivity"
+            android:name=".activity.Groups.GroupInfoActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.AccountSetupActivity"
+            android:name=".activity.Account.AccountSetupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.GroupsActivity"
+            android:name=".activity.Groups.GroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.ResultsActivity"
+            android:name=".activity.Search.ResultsActivity"
             android:label="@string/title_activity_results"
-            android:parentActivityName=".activity.SearchActivity"
+            android:parentActivityName=".activity.Search.SearchActivity"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.SearchActivity"
+            android:name=".activity.Search.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.ReportActivity"
+            android:name=".activity.Account.ReportActivity"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.JoinRequests"
+            android:name=".activity.Account.RequestsActivity"
             android:label="@string/title_activity_join_requests"
             android:theme="@style/Toolbar"></activity>
     </application>

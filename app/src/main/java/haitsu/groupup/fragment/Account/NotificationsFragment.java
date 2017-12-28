@@ -1,35 +1,35 @@
-package haitsu.groupup.fragment;
+package haitsu.groupup.fragment.Account;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.Groups.GroupsActivity;
-import haitsu.groupup.other.Adapters.ImageAdapter;
-
+import haitsu.groupup.other.Models.Notification;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link NotificationsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link NotificationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class NotificationsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -39,12 +39,15 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ListView mListView;
+
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
     private OnFragmentInteractionListener mListener;
 
-    GridView gridView;
-
-
-    public HomeFragment() {
+    public NotificationsFragment() {
         // Required empty public constructor
     }
 
@@ -54,11 +57,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment NotificationsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static NotificationsFragment newInstance(String param1, String param2) {
+        NotificationsFragment fragment = new NotificationsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -79,57 +82,55 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_my_groups, container, false);
 
-        gridView = (GridView) view.findViewById(R.id.gridview);
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.category_arrays)) {
+        mListView = (ListView) view.findViewById(R.id.listview);
+        mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
+
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
+        final Query us2 = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("lastMessage");
+        final DatabaseReference group = databaseRef.child("group");
+        final DatabaseReference chats = databaseRef.child("chats");
+        final DatabaseReference notications = databaseRef.child("notifications").child(mFirebaseUser.getUid());
+        final FirebaseListAdapter<Notification> usersAdapter = new FirebaseListAdapter<Notification>(getActivity(), Notification.class, R.layout.notification, notications) {
+            protected void populateView(View view, Notification notification, int position) {
+                System.out.println("Notification is" + notification.getMessageText());
+                ((TextView) view.findViewById(R.id.message_text)).setText(notification.getMessageText());
+                ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", notification.getMessageTime()));
+                   // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
+                //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
+                }
+
+                //  (
+
+
+/*
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, ViewGroup parent){
                 // Get the Item from ListView
                 View view = super.getView(position, convertView, parent);
 
                 // Initialize a TextView for ListView each Item
                 TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
 
                 // Set the text color of TextView (ListView Item)
                 tv.setTextColor(Color.BLACK);
+                tv2.setTextColor(Color.BLACK);
 
                 // Generate ListView Item using TextView
                 return view;
             }
+*/
+
         };
-
-        //gridView.setAdapter(adapter);
-        gridView.setAdapter(new ImageAdapter(getContext().getApplicationContext(), getResources().getStringArray(R.array.category_arrays)));
-
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                LinearLayout ll = (LinearLayout) v;
-                TextView categoryLabel = (TextView) ll.findViewById(R.id.grid_item_label);
-                Toast.makeText(getActivity(),
-                        categoryLabel.getText(), Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(getActivity(), GroupsActivity.class);
-                Bundle extras = new Bundle();
-                extras.putString("GROUP_CATEGORY",
-                        categoryLabel.getText().toString());
-                intent.putExtras(extras);
-
-                startActivity(intent);
-
-
-                //FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                //transaction.replace(R.id.frame, nextFrag ); // give your fragment container id in first parameter
-                //transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
-                //transaction.commit();
-
-
-            }
-        });
+        mListView.setAdapter(usersAdapter);
         return view;
     }
 
