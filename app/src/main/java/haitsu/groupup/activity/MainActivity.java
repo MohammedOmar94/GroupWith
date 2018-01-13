@@ -116,9 +116,6 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DBHandler db = new DBHandler(this);
-        dbConnections.geoFireTest();
-        dbConnections.geoFireTestGet();
-        dbConnections.geoFireTestNearby();
         // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
         // db.onCreate(s);
         // db.dropTable("MyGroups");

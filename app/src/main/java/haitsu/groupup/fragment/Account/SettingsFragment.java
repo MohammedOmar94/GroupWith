@@ -166,6 +166,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
                     getAddress();
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("city").setValue(city);
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("country").setValue(country);
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("latitude").setValue(latitude);
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("longitude").setValue(longitude);
                     stopLocationUpdates();
 
                     // ...
