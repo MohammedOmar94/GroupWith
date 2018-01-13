@@ -52,7 +52,7 @@ public class ImageAdapter extends BaseAdapter {
                 imageView.setImageResource(R.drawable.icon_restaurant_black);
             } else if (mobile.equals("Gaming")) {
                 imageView.setImageResource(R.drawable.icon_game_black);
-            } else if (mobile.equals("Language\nLearning")) {
+            } else if (mobile.equals("Language Learning")) {
                 imageView.setImageResource(R.drawable.icon_language_black);
             } else if (mobile.equals("Movies")) {
                 imageView.setImageResource(R.drawable.icon_movie_black);

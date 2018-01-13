@@ -3,6 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
+    android:padding="0px"
     android:orientation="vertical">>
 
     <ImageView
@@ -14,7 +15,7 @@
 
     <TextView
         android:id="@+id/grid_item_label"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="@+id/label"
         android:gravity="center"
