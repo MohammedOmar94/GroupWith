@@ -16,6 +16,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,51 +24,68 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Account.SignInActivity" />
-        <activity android:name=".activity.PrivacyPolicyActivity" />
-        <activity android:name=".activity.AboutUsActivity" />
+        <activity
+            android:name=".activity.Account.SignInActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PrivacyPolicyActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AboutUsActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.Account.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.Groups.tabbedGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.Groups.CreateGroupActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.Groups.GroupInfoActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.Account.AccountSetupActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.Groups.GroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.Search.ResultsActivity"
             android:label="@string/title_activity_results"
             android:parentActivityName=".activity.Search.SearchActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.Search.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.Account.ReportActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
             android:name=".activity.Account.RequestsActivity"
             android:label="@string/title_activity_join_requests"
+            android:screenOrientation="portrait"
             android:theme="@style/Toolbar"></activity>
     </application>
 
