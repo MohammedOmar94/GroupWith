@@ -36,6 +36,9 @@
         <item name="actionBarTabTextStyle">@style/TabTextStyle</item>
     </style>
 
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/splashscreen</item>
+    </style>
 
     <style name="ActionBarTabs" parent="@style/Widget.AppCompat.Light.ActionBar.TabView.Inverse">
         <item name="android:background">@drawable/tab_bar_background</item>
