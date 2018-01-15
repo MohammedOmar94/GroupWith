@@ -118,7 +118,6 @@ public class EventsGroupFragment extends Fragment {
             public void onDataChange(final DataSnapshot snapshot) {
                 groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, R.layout.groups_item, groupsFromCategory) {
                     protected void populateView(View view, Group group, int position) {
-                        Object snapObj = snapshot.getValue(Object.class);
                         ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
                         ((TextView) view.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
                             ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
