@@ -21,16 +21,14 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (position ==0) {
-            return new ChatsFragment();
-        } else if (position == 1) {
             return new GroupsJoinedFragment();
-        } else if (position == 2) {
+        } else if (position == 1) {
             return new MyGroupsFragment();
-        } else return new ChatsFragment();
+        } else return new GroupsJoinedFragment();
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 }

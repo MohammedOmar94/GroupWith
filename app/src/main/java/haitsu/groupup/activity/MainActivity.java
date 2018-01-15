@@ -345,6 +345,12 @@ public class MainActivity extends AppCompatActivity
                         startActivity(new Intent(MainActivity.this, tabbedGroupsActivity.class));
                         drawer.closeDrawers();
                         return true;
+                    case R.id.nav_chats:
+                        //navItemIndex = 2;
+                        //CURRENT_TAG = TAG_MY_GROUPS;
+                        startActivity(new Intent(MainActivity.this, ChatsActivity.class));
+                        drawer.closeDrawers();
+                        return true;
                     case R.id.nav_settings:
                         //navItemIndex = 3;
                         // CURRENT_TAG = TAG_SETTINGS;

@@ -42,6 +42,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
+            android:name=".activity.ChatsActivity"
+            android:label="@string/title_activity_chats"
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Toolbar" />
+        <activity
             android:name=".activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
             android:screenOrientation="portrait"
@@ -49,6 +55,7 @@
         <activity
             android:name=".activity.Groups.tabbedGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
+            android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

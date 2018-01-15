@@ -18,6 +18,11 @@
     <item android:title="">
 
         <item
+            android:id="@+id/nav_chats"
+            android:icon="@android:drawable/sym_action_chat"
+            android:title="@string/nav_chats" />
+
+        <item
             android:id="@+id/nav_my_groups"
             android:icon="@drawable/icon_user_black"
             android:title="@string/nav_my_groups" />
