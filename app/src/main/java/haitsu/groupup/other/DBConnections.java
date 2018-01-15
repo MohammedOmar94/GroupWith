@@ -100,11 +100,13 @@ public class DBConnections {
             public void onKeyEntered(String key, GeoLocation location) {
                 System.out.println(String.format("The Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
             }
+
             // Key has left radius of 0.6
             @Override
             public void onKeyExited(String key) {
 
             }
+
             // Key has moved but is still within radius of 0.6
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
@@ -208,8 +210,10 @@ public class DBConnections {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 System.out.println("Count is " + dataSnapshot.child("members").getChildrenCount());
+                long memberCount = dataSnapshot.child("members").getChildrenCount();
+                groupRef.child("memberCount").setValue(memberCount);
                 Group group = dataSnapshot.getValue(Group.class);
-                if (dataSnapshot.child("members").getChildrenCount() <= 3) { // Can maybe get snapshot of groupref, find member limit there?
+                if (dataSnapshot.child("members").getChildrenCount() == 3) { // Can maybe get snapshot of groupref, find member limit there?
                     // Change group type to Full, will no longer show in results.
                     // Will also be the case until admin approves or declines member.
                     groupRef.child("type").setValue("FULL_" + group.getType());//Combine Full and type of group, remove if member leaves or gets kicked. Group should then show up in results
@@ -251,7 +255,7 @@ public class DBConnections {
 
     }
 
-    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender, String memeberCount, User user) {
+    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender, String memberLimit, User user) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).push();
@@ -277,16 +281,14 @@ public class DBConnections {
         //groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
         groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
-        groupId2.child("memberLimit").setValue(Integer.parseInt(memeberCount));
+        groupId2.child("memberLimit").setValue(Integer.parseInt(memberLimit));
+        groupId2.child("memberCount").setValue(1);
         groupId2.child("description").setValue(groupDescription.getText().toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
-        groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memeberCount);
+        groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memberLimit);
         groupId2.child("latitude").setValue(user.getLatitude());
         groupId2.child("longitude").setValue(user.getLongitude());
-
-
-
 
 
         //Adds to users tree
@@ -349,14 +351,29 @@ public class DBConnections {
                     databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid())
                             .removeValue();
 
-                    //Delete from the users group tree
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                    databaseRef.child("group").child(groupCategory).child(groupID).
+                            addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    long memberCount = dataSnapshot.child("members").getChildrenCount();
+                                    databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
+                                }
 
-                    //Change group to not full, so group should reappear again in results
-                    revertGroupType(groupCategory, groupID);
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
+                                }
+                            });
                 }
+
+                //Delete from the users group tree
+                databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+
+                //Change group to not full, so group should reappear again in results
+                revertGroupType(groupCategory, groupID);
+
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -366,13 +383,26 @@ public class DBConnections {
     }
 
     // Done by the user who changes their mind about joining a specific group
-    public void cancelJoinRequest(String groupID, final String groupCategory, String adminId) {
+    public void cancelJoinRequest(final String groupID, final String groupCategory, String adminId) {
         // Deletes request from admin's user tree
         databaseRef.child("users").child(adminId).child("userRequest").removeValue();
         // Deletes group from the user's user tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
         // Delete member from the group tree
         databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
+        // Decrease member count by 1
+        databaseRef.child("group").child(groupCategory).child(groupID).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        long memberCount = dataSnapshot.child("members").getChildrenCount();
+                        databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);   }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
         // Group is no longer full anymore, so revert the type back to normal to reappear in group results.
         revertGroupType(groupCategory, groupID);
     }

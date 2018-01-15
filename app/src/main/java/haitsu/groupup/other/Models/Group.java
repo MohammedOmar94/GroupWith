@@ -13,6 +13,7 @@ public class Group {
     private String genders;
     private String type;
     private int memberLimit;
+    private int memberCount;
     private double latitude;
     private double longitude;
     private String type_gender_memberLimit;
@@ -108,5 +109,13 @@ public class Group {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
     }
 }

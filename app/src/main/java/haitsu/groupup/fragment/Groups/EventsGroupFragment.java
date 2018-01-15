@@ -22,6 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
@@ -114,10 +116,13 @@ public class EventsGroupFragment extends Fragment {
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, android.R.layout.two_line_list_item, groupsFromCategory) {
+                groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, R.layout.groups_item, groupsFromCategory) {
                     protected void populateView(View view, Group group, int position) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(groupCategory);
-                        ((TextView) view.findViewById(android.R.id.text2)).setText(group.getName());
+                        Object snapObj = snapshot.getValue(Object.class);
+                        ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
+                        ((TextView) view.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
+                            ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
+                                    + group.getMemberLimit());
 
                     }
 
@@ -127,8 +132,8 @@ public class EventsGroupFragment extends Fragment {
                         View view = super.getView(position, convertView, parent);
 
                         // Initialize a TextView for ListView each Item
-                        TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                        TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
+                        TextView tv = (TextView) view.findViewById(R.id.group_name);
+                        TextView tv2 = (TextView) view.findViewById(R.id.group_gender);
 
                         // Set the text color of TextView (ListView Item)
                         tv.setTextColor(Color.BLACK);

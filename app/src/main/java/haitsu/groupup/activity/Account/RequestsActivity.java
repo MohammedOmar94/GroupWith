@@ -176,9 +176,23 @@ public class RequestsActivity extends AppCompatActivity {
         // Need to add groups tree for that user who was accepted to join.
     }
 
-    public void declineJoinRequest(String requestId, UserRequest request) {
+    public void declineJoinRequest(String requestId, final UserRequest request) {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).removeValue();
+        // Updates member count
+        databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        long memberCount = dataSnapshot.child("members").getChildrenCount();
+                        databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("memberCount").setValue(memberCount);   }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
         //Removes from users tree if admin declines request
         databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId()).removeValue();
         //Reverts group type from full if already so.
