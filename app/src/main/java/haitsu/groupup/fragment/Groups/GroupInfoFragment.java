@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
@@ -226,6 +227,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 getActivity().finish();
                 break;
             case R.id.leave_button:
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
                 dbConnections.leaveGroup(groupID, groupCategory);
                 getActivity().finish();
                 break;
