@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.ReportActivity;
@@ -84,6 +85,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         groupID = extras.getString("GROUP_ID");
         groupName = extras.getString("GROUP_NAME");
 
+        FirebaseMessaging.getInstance().subscribeToTopic(groupID);
+
         getSupportActionBar().setTitle(groupName);
 
         // Initialize Firebase Auth
@@ -130,7 +133,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
-                        .setValue(new ChatMessage(input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
+                        .setValue(new ChatMessage(groupName, input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
                 //Stores the last message sent.
 
                 //If this isn't Single Value, message updates continously forever.
@@ -145,7 +148,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
                                         .child("groups").child(groupID).child("lastMessage");
                                 Groups groupData = snapshot.getValue(Groups.class);
-                                ChatMessage usersLastMessage = new ChatMessage(message, MainActivity.mUsername, account.getPhotoUrl().toString());
+                                ChatMessage usersLastMessage = new ChatMessage(groupName, message, MainActivity.mUsername, account.getPhotoUrl().toString());
                                 lastMessage.setValue(usersLastMessage);
                                 System.out.println("Snapshot " + snapshot);
                             }
