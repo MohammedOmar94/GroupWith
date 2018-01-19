@@ -88,7 +88,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
       Log.d(TAG, "Message Notification Icon: " + remoteMessage.getNotification().getIcon());
       icon = remoteMessage.getNotification().getIcon();
       System.out.println("Hey " + remoteMessage.getNotification().getIcon());
-//      sendNotification(remoteMessage.getNotification().getBody());
+      if(remoteMessage.getNotification().getTag().equals("joinRequest")) {
+        sendNotification(remoteMessage.getNotification().getBody());
+      }
     }
 
     // Also if you intend on generating your own notifications as a result of a received FCM
@@ -137,26 +139,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
    *
    * @param messageBody FCM message body received.
    */
-//  private void sendNotification(String messageBody) {
-//    Intent intent = new Intent(this, MainActivity.class);
-//    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//            PendingIntent.FLAG_ONE_SHOT);
-//
-//    Bitmap bitmap = getBitmapFromURL(icon);
-//    Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//    NotificationCompat.Builder notificationBuilder =
-//            new NotificationCompat.Builder(this)
-//                    .setSmallIcon(R.drawable.ic_account_circle_black_36dp)
-//                    .setContentTitle("FCM Message")
-//                    .setContentText(messageBody)
-//                    .setAutoCancel(true)
-//                    .setSound(defaultSoundUri)
-//                    .setContentIntent(pendingIntent);
-//
-//    NotificationManager notificationManager =
-//            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//    notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-//  }
+  private void sendNotification(String messageBody) {
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+            PendingIntent.FLAG_ONE_SHOT);
+
+    Bitmap bitmap = getBitmapFromURL(icon);
+    Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    NotificationCompat.Builder notificationBuilder =
+            new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle("Group Up")
+                    .setContentText(messageBody)
+                    .setAutoCancel(true)
+                    .setSound(defaultSoundUri)
+                    .setContentIntent(pendingIntent);
+
+    NotificationManager notificationManager =
+            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+    notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+  }
 }

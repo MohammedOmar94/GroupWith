@@ -39,6 +39,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.SettingsActivity;
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity
             return;
         } else {
             if (mFirebaseUser.getPhotoUrl() != null) {
+                FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
                 mPhotoUrl = account.getPhotoUrl().toString();
 
                 header = navigationView.getHeaderView(0);
