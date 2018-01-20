@@ -50,7 +50,7 @@ import haitsu.groupup.fragment.Account.NotificationsFragment;
 import haitsu.groupup.fragment.Account.SettingsFragment;
 import haitsu.groupup.fragment.Groups.CreateGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
-import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.Groups.GroupsCreatedFragment;
 import haitsu.groupup.fragment.HomeFragment;
 import haitsu.groupup.other.CircleTransform;
 import haitsu.groupup.other.DBConnections;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity
         GoogleApiClient.OnConnectionFailedListener, HomeFragment.OnFragmentInteractionListener,
         InterestsGroupFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener, NotificationsFragment.OnFragmentInteractionListener,
-        MyGroupsFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
+        GroupsCreatedFragment.OnFragmentInteractionListener, CreateGroupFragment.OnFragmentInteractionListener {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseRef = database.getReference();//Can access any child element with this
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity
                 return notificationsFragment;
             // case 2:
             // my groups fragment
-            //   MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+            //   GroupsCreatedFragment myGroupsFragment = new GroupsCreatedFragment();
             //    return myGroupsFragment;
             //case 3:
             // settings fragment

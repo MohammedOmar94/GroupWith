@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
-import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.Groups.GroupsCreatedFragment;
 import haitsu.groupup.fragment.Groups.joinRequestsFragment;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -23,7 +23,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new GroupsJoinedFragment();
         } else if (position == 1) {
-            return new MyGroupsFragment();
+            return new GroupsCreatedFragment();
         } else if (position == 2) {
             return new joinRequestsFragment();
         } else return new GroupsJoinedFragment();

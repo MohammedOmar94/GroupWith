@@ -71,7 +71,7 @@ public class ChatsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MyGroupsFragment.
+     * @return A new instance of fragment GroupsCreatedFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static ChatsFragment newInstance(String param1, String param2) {

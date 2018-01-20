@@ -30,12 +30,12 @@ import haitsu.groupup.other.Models.Groups;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MyGroupsFragment.OnFragmentInteractionListener} interface
+ * {@link GroupsCreatedFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MyGroupsFragment#newInstance} factory method to
+ * Use the {@link GroupsCreatedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyGroupsFragment extends Fragment {
+public class GroupsCreatedFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -57,7 +57,7 @@ public class MyGroupsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    public MyGroupsFragment() {
+    public GroupsCreatedFragment() {
         // Required empty public constructor
     }
 
@@ -67,11 +67,11 @@ public class MyGroupsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MyGroupsFragment.
+     * @return A new instance of fragment GroupsCreatedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyGroupsFragment newInstance(String param1, String param2) {
-        MyGroupsFragment fragment = new MyGroupsFragment();
+    public static GroupsCreatedFragment newInstance(String param1, String param2) {
+        GroupsCreatedFragment fragment = new GroupsCreatedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

@@ -10,13 +10,13 @@ import android.support.v7.widget.Toolbar;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
-import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.Groups.GroupsCreatedFragment;
 import haitsu.groupup.fragment.Groups.joinRequestsFragment;
 import haitsu.groupup.other.Adapters.ViewPagerAdapter;
 
 public class MyGroupsActivity extends AppCompatActivity implements
         GroupsJoinedFragment.OnFragmentInteractionListener,
-        MyGroupsFragment.OnFragmentInteractionListener,
+        GroupsCreatedFragment.OnFragmentInteractionListener,
         joinRequestsFragment.OnFragmentInteractionListener {
 
     /**
