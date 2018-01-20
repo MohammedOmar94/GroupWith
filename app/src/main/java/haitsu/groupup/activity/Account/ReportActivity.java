@@ -60,15 +60,15 @@ public class ReportActivity extends AppCompatActivity implements AdapterView.OnI
 
         Bundle extras = this.getIntent().getExtras();
         String reportType = extras.getString("REPORT_TYPE");
-        if(reportType.equals("group")){
-            ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+        if (reportType.equals("group")) {
+            ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
                     this,
                     R.array.group_report_reasons_arrays, //<!--Your Array -->
                     android.R.layout.simple_spinner_item);
             spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(spinnerArrayAdapter);
-        } else if(reportType.equals("member")){
-            ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+        } else if (reportType.equals("member")) {
+            ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
                     this,
                     R.array.member_report_reasons_arrays, //<!--Your Array -->
                     android.R.layout.simple_spinner_item);

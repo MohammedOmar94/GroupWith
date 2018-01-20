@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -40,7 +39,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
@@ -388,7 +386,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 System.out.println("Hey, we have the Last location");
                                 mLastLocation = location;
                                 // updateLocation();
-                                 requestLocation();
+                                requestLocation();
                             } else {
                                 // Pretty busted, added in but not tested properly before. Need to request updates
                                 System.out.println("Hey, we don't so we have to Request location");

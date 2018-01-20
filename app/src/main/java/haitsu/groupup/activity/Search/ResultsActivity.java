@@ -1,13 +1,8 @@
 package haitsu.groupup.activity.Search;
 
 import android.Manifest;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -23,26 +18,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
-import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.database.FirebaseListAdapter;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
@@ -72,20 +56,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
-import haitsu.groupup.other.Models.ChatMessage;
-import haitsu.groupup.other.Models.Group;
-import haitsu.groupup.other.Adapters.GroupTypePagerAdapter;
-import haitsu.groupup.other.Models.Groups;
 import haitsu.groupup.other.Adapters.ResultsAdapter;
-
-import static android.graphics.Color.WHITE;
+import haitsu.groupup.other.Models.Group;
 
 public class ResultsActivity extends AppCompatActivity implements
         InterestsGroupFragment.OnFragmentInteractionListener,
@@ -212,27 +190,24 @@ public class ResultsActivity extends AppCompatActivity implements
         checkLocationStatus(builder);
 
 
-
-
         // First filter by groups with the key, containing the latitude and longitude
         // Then in onDataChange, you want to pass the reference for each snapshot (group)
 
 
-
     }
 
-    public void showDialog(){
-            AlertDialog.Builder builder;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder = new AlertDialog.Builder(ResultsActivity.this, R.style.MyAlertDialogStyle);
-            } else {
-                builder = new AlertDialog.Builder(ResultsActivity.this);
-            }
-            builder.setTitle("Oops! No matches found")
-                    .setMessage("Maybe you should be the first to create a group of this kind!")
-                    .setPositiveButton("OK", null)
-                    .show();
+    public void showDialog() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(ResultsActivity.this, R.style.MyAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(ResultsActivity.this);
         }
+        builder.setTitle("Oops! No matches found")
+                .setMessage("Maybe you should be the first to create a group of this kind!")
+                .setPositiveButton("OK", null)
+                .show();
+    }
 
     public void searchTest() {
         final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
@@ -351,7 +326,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        if(adapter != null) {
+        if (adapter != null) {
             adapter.clear();
         }
         super.onStop();
@@ -361,7 +336,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
-        if(adapter != null) {
+        if (adapter != null) {
             adapter.clear();
         }
         super.onDestroy();

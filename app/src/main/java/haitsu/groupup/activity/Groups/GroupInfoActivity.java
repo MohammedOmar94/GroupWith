@@ -1,17 +1,17 @@
 package haitsu.groupup.activity.Groups;
 
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.GroupInfoFragment;
 
-public class GroupInfoActivity extends AppCompatActivity  implements GroupInfoFragment.OnFragmentInteractionListener{
+public class GroupInfoActivity extends AppCompatActivity implements GroupInfoFragment.OnFragmentInteractionListener {
 
-    private String activityTitles [];
+    private String activityTitles[];
     private Toolbar toolbar;
 
 
@@ -29,8 +29,6 @@ public class GroupInfoActivity extends AppCompatActivity  implements GroupInfoFr
         getSupportActionBar().setTitle(activityTitles[5]);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-
 
 
         // Display the fragment as the main content.

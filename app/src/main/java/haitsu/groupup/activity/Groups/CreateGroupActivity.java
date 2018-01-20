@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.CreateGroupFragment;
 

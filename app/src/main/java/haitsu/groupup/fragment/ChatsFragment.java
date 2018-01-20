@@ -25,10 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
 
-import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.R;
-import haitsu.groupup.other.Models.ChatMessage;
+import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.other.DBHandler;
+import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Groups;
 
 /**
@@ -115,26 +115,26 @@ public class ChatsFragment extends Fragment {
         final DatabaseReference chats = databaseRef.child("chats");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.group_chat, us) {
             protected void populateView(View view, Groups groupInfo, int position) {
-               // Map<String,String> lastMessage = groupInfo.getLastMessage();
-               // System.out.println("Group name is " + lastMessage);
+                // Map<String,String> lastMessage = groupInfo.getLastMessage();
+                // System.out.println("Group name is " + lastMessage);
                 ChatMessage message = groupInfo.getLastMessage();
-                if(message != null) {
-                   // db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
+                if (message != null) {
+                    // db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
                 }
                 //db.displayMessage();
 
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
-                if(groupInfo.getLastMessage() != null){
+                if (groupInfo.getLastMessage() != null) {
                     Date messageDate = new Date(message.getMessageTime());
                     Date currentDate = new Date();
                     long diff = currentDate.getTime() - messageDate.getTime();
-                    float days = (diff / (1000*60*60*24));
-                    int daysRounded =  Math.round(days);
+                    float days = (diff / (1000 * 60 * 60 * 24));
+                    int daysRounded = Math.round(days);
 
                     ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    if(daysRounded == 0) {
+                    if (daysRounded == 0) {
                         ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
-                    } else if(daysRounded == 1) {
+                    } else if (daysRounded == 1) {
                         ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
                     } else {
                         ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy HH:mm", messageDate));
@@ -142,7 +142,7 @@ public class ChatsFragment extends Fragment {
                 } else {
                     ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
                 }
-         //  (
+                //  (
             }
 /*
             @Override
@@ -208,7 +208,6 @@ public class ChatsFragment extends Fragment {
             }
 
         });
-
 
 
         return view;

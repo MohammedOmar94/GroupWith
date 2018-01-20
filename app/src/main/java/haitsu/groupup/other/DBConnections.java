@@ -396,7 +396,8 @@ public class DBConnections {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);   }
+                        databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
+                    }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {

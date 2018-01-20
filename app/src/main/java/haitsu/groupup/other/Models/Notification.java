@@ -18,7 +18,7 @@ public class Notification {
         messageTime = new Date().getTime();
     }
 
-    public Notification(){
+    public Notification() {
 
     }
 

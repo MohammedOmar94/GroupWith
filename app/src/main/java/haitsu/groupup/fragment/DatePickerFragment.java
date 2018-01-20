@@ -2,18 +2,17 @@ package haitsu.groupup.fragment;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.widget.DatePicker;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import haitsu.groupup.R;
 
@@ -41,11 +40,10 @@ public class DatePickerFragment extends DialogFragment
     public void onDateSet(DatePicker view, int year, int month, int day) {
         this.month = month + 1;
 
-        if(day != 0) {
+        if (day != 0) {
             String selectedDate = day + "/" + this.month + "/" + year;
             Calendar c = Calendar.getInstance();
             Calendar past = Calendar.getInstance();
-
 
 
             DateFormat originalFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -72,7 +70,7 @@ public class DatePickerFragment extends DialogFragment
             }
 
             //Users age
-            if(diff >= 18) {
+            if (diff >= 18) {
                 TextView birthdayLabel = (TextView) getActivity().findViewById(R.id.birthday_label);
                 birthdayLabel.setText(selectedDate);
             } else {

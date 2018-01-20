@@ -21,7 +21,7 @@ import haitsu.groupup.fragment.ChatsFragment;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class ChatsActivity extends AppCompatActivity implements ChatsFragment.OnFragmentInteractionListener{
+public class ChatsActivity extends AppCompatActivity implements ChatsFragment.OnFragmentInteractionListener {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -40,8 +40,6 @@ public class ChatsActivity extends AppCompatActivity implements ChatsFragment.On
                 .commit();
 
     }
-
-
 
 
     @Override

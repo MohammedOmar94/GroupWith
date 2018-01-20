@@ -1,7 +1,5 @@
 package haitsu.groupup.other.Models;
 
-import haitsu.groupup.other.Models.ChatMessage;
-
 /**
  * Created by moham on 20/06/2017.
  */
@@ -14,7 +12,7 @@ public class Groups {
     private Boolean userApproved;
     private ChatMessage lastMessage;
 
-    public Groups(){
+    public Groups() {
 
     }
 

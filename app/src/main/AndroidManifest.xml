@@ -127,11 +127,6 @@
             android:name=".activity.Account.ReportActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
-        <activity
-            android:name=".activity.Account.RequestsActivity"
-            android:label="@string/title_activity_join_requests"
-            android:screenOrientation="portrait"
-            android:theme="@style/Toolbar"></activity>
     </application>
 
 </manifest>

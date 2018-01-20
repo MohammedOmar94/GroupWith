@@ -266,7 +266,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                 break;
 
 
-
         }
 
         return super.onOptionsItemSelected(item);

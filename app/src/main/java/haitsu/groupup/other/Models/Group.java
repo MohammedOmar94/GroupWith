@@ -18,7 +18,7 @@ public class Group {
     private double longitude;
     private String type_gender_memberLimit;
 
-    public Group(){
+    public Group() {
 
     }
 

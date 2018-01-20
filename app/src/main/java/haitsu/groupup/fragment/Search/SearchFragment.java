@@ -23,11 +23,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Search.ResultsActivity;
@@ -106,9 +103,6 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         addPreferencesFromResource(R.xml.pref_search);
 
 
-
-
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -123,7 +117,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
         // calculate margins
-    //    button = (Button) view.findViewById(R.id.as);
+        //    button = (Button) view.findViewById(R.id.as);
 //        button.setOnClickListener(this);
         return view;
     }
@@ -155,8 +149,8 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     @Override
     public void onDestroy() {
         super.onDestroy();
-         mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
-         mGoogleApiClient.disconnect();
+        mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
+        mGoogleApiClient.disconnect();
     }
 
     @Override
@@ -179,10 +173,10 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-        //    case R.id.sign:
-       //         System.out.println("Dat press tho");
-      //          break;
-       //     //case R.id.sign_out:
+            //    case R.id.sign:
+            //         System.out.println("Dat press tho");
+            //          break;
+            //     //case R.id.sign_out:
             //    signOut();
             //    break;
         }
@@ -226,7 +220,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         return super.onOptionsItemSelected(item);
     }
 
-    public void search(){
+    public void search() {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         listPreference = (ListPreference) findPreference("example_list");
         listPreference2 = (ListPreference) findPreference("example_list2");
@@ -246,7 +240,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         sizeValue = Integer.parseInt(currText4.toString());
         milesConverted = calculateKilometers(currText5.toString());
         // With default values already selected, not sure if this case is even possible...
-        if(genderValue == null || categoryValue == null || typeValue == null){
+        if (genderValue == null || categoryValue == null || typeValue == null) {
             //
             System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
         } else {
@@ -263,7 +257,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         }
     }
 
-    public double calculateKilometers(String milesStr){
+    public double calculateKilometers(String milesStr) {
         double miles = Double.parseDouble(milesStr);                     //Note 1
         //... Compute kilometers.  There are 0.621 miles in a kilometer.
         return miles / 0.621;

@@ -25,7 +25,7 @@ public class UserRequest {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public UserRequest(String username, String gender, String groupname, String age, String city, String country, double latitude, double longitude){
+    public UserRequest(String username, String gender, String groupname, String age, String city, String country, double latitude, double longitude) {
         this.username = username;
         this.gender = gender;
         this.groupname = groupname;

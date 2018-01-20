@@ -8,8 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
+import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 
 public class GroupTypePagerAdapter extends FragmentPagerAdapter {
 
@@ -19,7 +19,7 @@ public class GroupTypePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position ==0) {
+        if (position == 0) {
             return new EventsGroupFragment();
         } else if (position == 1) {
             return new EventsGroupFragment();

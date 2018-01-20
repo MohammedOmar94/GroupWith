@@ -1,9 +1,9 @@
 package haitsu.groupup.fragment.Groups;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +25,7 @@ import haitsu.groupup.other.DBConnections;
  * Use the {@link CreateGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CreateGroupFragment extends Fragment implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+public class CreateGroupFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -39,7 +39,6 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     private String selectedGender;
     private String selectedGroupType;
     private String selectedMemberCount;
-
 
 
     private OnFragmentInteractionListener mListener;
@@ -85,7 +84,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_create_group, container, false);
+        View view = inflater.inflate(R.layout.fragment_create_group, container, false);
 
         mSubmitButton = (Button) view.findViewById(R.id.submit_button);
 
@@ -144,15 +143,15 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         Spinner spinner = (Spinner) parent;
         if (spinner.getId() == R.id.spinner) {
             selectedCategory = (String) parent.getItemAtPosition(pos);
-            if(selectedCategory.equals("Gaming")){
-                ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+            if (selectedCategory.equals("Gaming")) {
+                ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
                         getActivity(),
                         R.array.games_type_arrays, //<!--Your Array -->
                         android.R.layout.simple_spinner_item);
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner3.setAdapter(spinnerArrayAdapter);
             } else {
-                ArrayAdapter<CharSequence> spinnerArrayAdapter= ArrayAdapter.createFromResource(
+                ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
                         getActivity(),
                         R.array.group_type_arrays, //<!--Your Array -->
                         android.R.layout.simple_spinner_item);

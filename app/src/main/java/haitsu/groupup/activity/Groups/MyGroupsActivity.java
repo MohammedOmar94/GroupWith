@@ -1,27 +1,18 @@
 package haitsu.groupup.activity.Groups;
 
-import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-
 import haitsu.groupup.R;
-import haitsu.groupup.activity.Account.RequestsActivity;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
+import haitsu.groupup.fragment.Groups.MyGroupsFragment;
 import haitsu.groupup.fragment.Groups.joinRequestsFragment;
 import haitsu.groupup.other.Adapters.ViewPagerAdapter;
-import haitsu.groupup.fragment.Groups.MyGroupsFragment;
-
-import static android.graphics.Color.WHITE;
 
 public class MyGroupsActivity extends AppCompatActivity implements
         GroupsJoinedFragment.OnFragmentInteractionListener,
@@ -50,7 +41,7 @@ public class MyGroupsActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups);
-        viewPager = (ViewPager)findViewById(R.id.view_pager);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("My Groups");

@@ -113,7 +113,7 @@ public class GroupsJoinedFragment extends Fragment {
             }
 
             @Override
-            public View getView(int position, View convertView, ViewGroup parent){
+            public View getView(int position, View convertView, ViewGroup parent) {
                 // Get the Item from ListView
                 View view = super.getView(position, convertView, parent);
 
@@ -165,7 +165,6 @@ public class GroupsJoinedFragment extends Fragment {
             }
 
         });
-
 
 
         return view;

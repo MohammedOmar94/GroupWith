@@ -22,8 +22,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.List;
-
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
@@ -120,8 +118,8 @@ public class EventsGroupFragment extends Fragment {
                     protected void populateView(View view, Group group, int position) {
                         ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
                         ((TextView) view.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
-                            ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
-                                    + group.getMemberLimit());
+                        ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
+                                + group.getMemberLimit());
 
                     }
 

@@ -1,26 +1,24 @@
 package haitsu.groupup.activity;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
-
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,22 +40,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.Account.AccountSetupActivity;
 import haitsu.groupup.activity.Account.SettingsActivity;
+import haitsu.groupup.activity.Account.SignInActivity;
 import haitsu.groupup.activity.Groups.CreateGroupActivity;
 import haitsu.groupup.activity.Groups.MyGroupsActivity;
 import haitsu.groupup.activity.Search.SearchActivity;
-import haitsu.groupup.activity.Account.AccountSetupActivity;
-import haitsu.groupup.activity.Account.SignInActivity;
-import haitsu.groupup.fragment.Groups.CreateGroupFragment;
-import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
-import haitsu.groupup.fragment.HomeFragment;
-import haitsu.groupup.fragment.Groups.MyGroupsFragment;
 import haitsu.groupup.fragment.Account.NotificationsFragment;
 import haitsu.groupup.fragment.Account.SettingsFragment;
+import haitsu.groupup.fragment.Groups.CreateGroupFragment;
+import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
+import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.HomeFragment;
+import haitsu.groupup.other.CircleTransform;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.DBHandler;
 import haitsu.groupup.other.Models.User;
-import haitsu.groupup.other.CircleTransform;
 
 import static android.graphics.Color.WHITE;
 
@@ -182,8 +180,8 @@ public class MainActivity extends AppCompatActivity
                     mUsername = userInfo.getUsername();
                     // load nav menu header data
                     loadNavHeader(imgvw);
-                    }
                 }
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -209,7 +207,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
@@ -219,7 +216,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //Reloads any changes to user details in the nav drawer.
         getUser();

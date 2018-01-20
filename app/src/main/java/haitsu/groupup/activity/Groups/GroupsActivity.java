@@ -14,15 +14,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import haitsu.groupup.R;
-import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
+import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.other.Adapters.GroupTypePagerAdapter;
 
 import static android.graphics.Color.WHITE;
 
 public class GroupsActivity extends AppCompatActivity implements
         InterestsGroupFragment.OnFragmentInteractionListener,
-        EventsGroupFragment.OnFragmentInteractionListener{
+        EventsGroupFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -48,7 +48,7 @@ public class GroupsActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_my_groups);
         Bundle extras = getIntent().getExtras();
         String groupCategory = extras.getString("GROUP_CATEGORY");
-        viewPager = (ViewPager)findViewById(R.id.view_pager);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(groupCategory);

@@ -1,7 +1,5 @@
 package haitsu.groupup.other.Models;
 
-import haitsu.groupup.other.Models.Groups;
-
 /**
  * Created by moham on 04/06/2017.
  */
@@ -22,7 +20,7 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String gender, String email, String age, String city, String country, Groups group, double latitude, double longitude){
+    public User(String username, String gender, String email, String age, String city, String country, Groups group, double latitude, double longitude) {
         this.username = username;
         this.gender = gender;
         this.email = email;

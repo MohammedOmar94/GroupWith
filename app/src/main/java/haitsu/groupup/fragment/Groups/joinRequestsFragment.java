@@ -2,8 +2,6 @@ package haitsu.groupup.fragment.Groups;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,17 +23,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.Account.RequestsActivity;
-import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
-import haitsu.groupup.other.Models.Groups;
 import haitsu.groupup.other.Models.UserRequest;
 
 /**
@@ -186,7 +180,6 @@ public class joinRequestsFragment extends Fragment {
         });
 
 
-
         return view;
     }
 
@@ -228,7 +221,8 @@ public class joinRequestsFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("memberCount").setValue(memberCount);   }
+                        databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("memberCount").setValue(memberCount);
+                    }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {

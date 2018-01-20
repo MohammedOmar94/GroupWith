@@ -12,11 +12,11 @@ public class Report {
     private String reportedMember;
     private String comments;
 
-    public Report(){
+    public Report() {
 
     }
 
-    public Report(String groupID, String reason, String reportedMember, String reportingMember, String comments){
+    public Report(String groupID, String reason, String reportedMember, String reportingMember, String comments) {
         this.groupID = groupID;
         this.reason = reason;
         this.reportingMember = reportingMember;

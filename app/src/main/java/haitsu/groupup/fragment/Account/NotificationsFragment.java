@@ -103,11 +103,11 @@ public class NotificationsFragment extends Fragment {
                 System.out.println("Notification is" + notification.getMessageText());
                 ((TextView) view.findViewById(R.id.message_text)).setText(notification.getMessageText());
                 ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", notification.getMessageTime()));
-                   // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
+                // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
                 //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
-                }
+            }
 
-                //  (
+            //  (
 
 
 /*

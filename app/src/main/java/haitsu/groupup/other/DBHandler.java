@@ -83,7 +83,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return CREATE_LEITNER_SYSTEM_TABLE;
     }
 
-    public List<ChatMessage> getData(){
+    public List<ChatMessage> getData() {
         String selectQuery = "SELECT * FROM MyGroups";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -110,24 +110,24 @@ public class DBHandler extends SQLiteOpenHelper {
             Date messageDate = new Date(message.getMessageTime());
             String log = "message: " + message.getMessageText()
                     + " ,time: " + android.text.format.DateFormat.format("HH:mm", messageDate)
-                    + " ,sent by: " +  message.getMessageUser();
+                    + " ,sent by: " + message.getMessageUser();
             Log.d("My Groups: ", log);
         }
     }
 
-    public void addData(){
+    public void addData() {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("Userid","12");
-        values.put("[Name]","testName");
-        values.put("lastMessage","abc");
-        values.put("messageDate","01/01/1979");
-        values.put("sentBy","Simon");
+        values.put("Userid", "12");
+        values.put("[Name]", "testName");
+        values.put("lastMessage", "abc");
+        values.put("messageDate", "01/01/1979");
+        values.put("sentBy", "Simon");
         db.insert("MyGroups", null, values);
         db.close(); // Closing database connection
     }
 
-    public void addMessage(String userid, String message, long messageTime, String sentBy){
+    public void addMessage(String userid, String message, long messageTime, String sentBy) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 //        db.delete("MyGroups",null, null);

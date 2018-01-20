@@ -61,7 +61,7 @@ public class ImageAdapter extends BaseAdapter {
             } else if (mobile.equals("Sports")) {
                 imageView.setImageResource(R.drawable.icon_soccer_black);
             } else {
-               //imageView.setImageResource(R.drawable.ic_settings_black_24dp);
+                //imageView.setImageResource(R.drawable.ic_settings_black_24dp);
             }
             /*
             <item>Sports</item>

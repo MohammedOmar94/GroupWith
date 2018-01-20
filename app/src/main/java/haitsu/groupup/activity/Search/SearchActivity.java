@@ -1,38 +1,18 @@
 package haitsu.groupup.activity.Search;
 
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.app.ActionBar;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Search.SearchFragment;
-import haitsu.groupup.fragment.Account.SettingsFragment;
-
-import java.util.List;
 
 import static android.graphics.Color.WHITE;
 
@@ -47,7 +27,7 @@ import static android.graphics.Color.WHITE;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SearchActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener{
+public class SearchActivity extends AppCompatActivity implements SearchFragment.OnFragmentInteractionListener {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -80,9 +60,6 @@ public class SearchActivity extends AppCompatActivity implements SearchFragment.
         }
         return true;
     }
-
-
-
 
 
     @Override

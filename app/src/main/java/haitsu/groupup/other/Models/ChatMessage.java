@@ -24,7 +24,7 @@ public class ChatMessage {
         this.imageUrl = imageUrl;
     }
 
-    public ChatMessage(){
+    public ChatMessage() {
 
     }
 

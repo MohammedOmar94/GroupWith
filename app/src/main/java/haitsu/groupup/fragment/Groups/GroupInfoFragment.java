@@ -3,7 +3,6 @@ package haitsu.groupup.fragment.Groups;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -109,7 +108,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_group_info, container, false);
-        progressSpinner = (ProgressBar)view.findViewById(R.id.progressBar1);
+        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
         view.setVisibility(View.GONE);
         progressSpinner.setVisibility(View.VISIBLE);
 
@@ -121,7 +120,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mLeaveButton = (Button) view.findViewById(R.id.leave_button);
         mCancelButton = (Button) view.findViewById(R.id.cancelRequest_button);
-        progressSpinner = (ProgressBar)view.findViewById(R.id.progressBar1);
+        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
         mJoinButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
         mLeaveButton.setOnClickListener(this);
@@ -136,7 +135,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         //mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        System.out.println("Group is " + groupCategory  + " " + groupID);
+        System.out.println("Group is " + groupCategory + " " + groupID);
         final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -167,7 +166,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);
                         view.findViewById(R.id.leave_button).setVisibility(View.VISIBLE);
                         view.findViewById(R.id.cancelRequest_button).setVisibility(View.GONE);
-                    // Request sent to join group, but not approved.
+                        // Request sent to join group, but not approved.
                     } else if (!snapshot.child("members").child(mFirebaseUser.getUid()).getValue(Boolean.class)) {
                         System.out.println("Type is false");
                         view.findViewById(R.id.join_button).setVisibility(View.GONE);

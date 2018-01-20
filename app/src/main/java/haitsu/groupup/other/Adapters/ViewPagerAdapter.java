@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
 import haitsu.groupup.fragment.Groups.MyGroupsFragment;
 import haitsu.groupup.fragment.Groups.joinRequestsFragment;
@@ -21,7 +20,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (position ==0) {
+        if (position == 0) {
             return new GroupsJoinedFragment();
         } else if (position == 1) {
             return new MyGroupsFragment();
