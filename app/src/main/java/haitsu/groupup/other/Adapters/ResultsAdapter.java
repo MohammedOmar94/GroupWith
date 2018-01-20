@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.Models.Group;
 
@@ -29,23 +30,14 @@ public class ResultsAdapter extends ArrayAdapter<Group> {
         final Group group = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.two_line_list_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.groups_item, parent, false);
         }
 
-        // Initialize a TextView for ListView each Item
-        TextView tv = (TextView) convertView.findViewById(android.R.id.text1);
-        TextView tv2 = (TextView) convertView.findViewById(android.R.id.text2);
-
-        // Set the text color of TextView (ListView Item)
-//        tv.setTextColor(Color.BLACK);
-//        tv2.setTextColor(Color.BLACK);
-
-        tv.setText(group.getCategory());
-        tv2.setText(group.getName());
-
-
-//        convertView.setTag(position);
-
+        ((TextView) convertView.findViewById(R.id.group_name)).setText(group.getName());
+        ((TextView) convertView.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
+        ((TextView) convertView.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
+                + group.getMemberLimit());
+        
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
