@@ -149,8 +149,8 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
                 ((TextView) view.findViewById(R.id.member_count)).setText(Integer.toString(groupInfo.getMemberCount()) + "/" +
                         Integer.toString(groupInfo.getMemberLimit()));
-                ((TextView) view.findViewById(R.id.further_comments)).setText(groupInfo.getDescription());
-                ((TextView) view.findViewById(R.id.further_comments)).setMovementMethod(new ScrollingMovementMethod());
+                ((TextView) view.findViewById(R.id.group_description)).setText(groupInfo.getDescription());
+                ((TextView) view.findViewById(R.id.group_description)).setMovementMethod(new ScrollingMovementMethod());
                 if (groupInfo.getAdminID().equals(mFirebaseUser.getUid())) {//If group admin, delete button should be visible.
                     view.findViewById(R.id.join_button).setVisibility(View.GONE);
                     view.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);

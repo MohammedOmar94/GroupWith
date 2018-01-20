@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:weightSum="1"
-        android:id="@+id/group_name_layout"
+        android:id="@+id/info_layout"
         tools:layout_editor_absoluteY="0dp"
         tools:layout_editor_absoluteX="8dp">
 
@@ -41,7 +41,7 @@
         android:text="Group count"
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/group_name_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/info_layout" />
 
 
     <TextView
@@ -55,10 +55,10 @@
         android:text="Group gender"
         android:textSize="18sp"
         app:layout_constraintLeft_toRightOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/group_name_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/info_layout" />
 
     <TextView
-        android:id="@+id/further_comments"
+        android:id="@+id/group_description"
         android:layout_width="269dp"
         android:layout_height="238dp"
         android:layout_marginLeft="36dp"
@@ -77,7 +77,7 @@
         android:layout_marginTop="13dp"
         android:text="Join group"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/further_comments"
+        app:layout_constraintTop_toBottomOf="@+id/group_description"
         android:layout_marginStart="36dp" />
 
     <TextView
@@ -90,7 +90,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/group_name_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/info_layout" />
 
     <TextView
         android:id="@+id/textView8"
@@ -102,7 +102,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/group_name_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/info_layout" />
 
     <Button
         android:id="@+id/delete_button"
@@ -113,7 +113,7 @@
         android:text="Delete group"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/further_comments"
+        app:layout_constraintTop_toBottomOf="@+id/group_description"
         android:layout_marginStart="36dp"/>
 
     <Button
@@ -126,7 +126,7 @@
         android:text="Leave group"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/further_comments" />
+        app:layout_constraintTop_toBottomOf="@+id/group_description" />
 
     <Button
         android:id="@+id/cancelRequest_button"
@@ -138,14 +138,14 @@
         android:text="Cancel request"
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/further_comments" />
+        app:layout_constraintTop_toBottomOf="@+id/group_description" />
 
     <ProgressBar
         android:id="@+id/progressBar1"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/group_name_layout"
+        app:layout_constraintTop_toTopOf="@+id/info_layout"
         android:layout_marginTop="205dp"
         android:layout_marginRight="154dp"
         app:layout_constraintRight_toRightOf="parent"

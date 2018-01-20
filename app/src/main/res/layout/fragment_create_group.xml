@@ -1,8 +1,10 @@
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     tools:context="haitsu.groupup.fragment.Groups.CreateGroupFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -41,43 +43,52 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="0dp"
-        app:layout_constraintLeft_toLeftOf="@+id/further_comments"
+        app:layout_constraintLeft_toLeftOf="@+id/group_description_layout"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
-    <EditText
-        android:id="@+id/group_name"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/group_name_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:ems="10"
-        android:hint="Enter Group name"
-        android:inputType="textPersonName"
-        android:textColorHint="@android:color/darker_gray"
-        android:textCursorDrawable="@null"
-        android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.2"
-        android:layout_marginEnd="8dp"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="42dp" />
+        android:layout_marginTop="42dp" >
 
-    <EditText
-        android:id="@+id/further_comments"
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:hint="Group name" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/group_description_layout"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="9dp"
+        android:layout_height="wrap_content"
         android:ems="10"
-        android:gravity="top"
-        android:hint="Group description"
-        android:inputType="textMultiLine"
-        app:layout_constraintHorizontal_bias="0.474"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/group_name" />
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintTop_toBottomOf="@+id/group_name_layout"
+        android:layout_marginTop="9dp" >
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/group_description"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:gravity="top"
+            android:hint="Group description"
+            android:inputType="textMultiLine" />
+
+    </android.support.design.widget.TextInputLayout>
 
     <TextView
         android:id="@+id/textView4"
@@ -112,7 +123,7 @@
         android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="@+id/group_gender"
-        app:layout_constraintTop_toBottomOf="@+id/further_comments" />
+        app:layout_constraintTop_toBottomOf="@+id/group_description_layout" />
 
     <Spinner
         android:id="@+id/group_gender"
@@ -123,7 +134,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        app:layout_constraintLeft_toLeftOf="@+id/further_comments" />
+        app:layout_constraintLeft_toLeftOf="@+id/group_description_layout" />
 
     <Spinner
         android:id="@+id/member_count"
@@ -132,7 +143,7 @@
         android:entries="@array/group_member_arrays"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        app:layout_constraintLeft_toLeftOf="@+id/further_comments"
+        app:layout_constraintLeft_toLeftOf="@+id/group_description_layout"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <Spinner
@@ -143,7 +154,7 @@
         android:layout_marginRight="50dp"
         android:layout_marginTop="7dp"
         android:entries="@array/group_type_arrays"
-        app:layout_constraintLeft_toLeftOf="@+id/further_comments"
+        app:layout_constraintLeft_toLeftOf="@+id/group_description_layout"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
 

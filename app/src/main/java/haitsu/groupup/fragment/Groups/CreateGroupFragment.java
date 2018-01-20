@@ -130,7 +130,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         switch (v.getId()) {
             case R.id.submit_button:
-                dbConnections.newGroupRequest(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.further_comments), selectedGender, selectedMemberCount);
+                dbConnections.newGroupRequest(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.group_description), selectedGender, selectedMemberCount);
                 Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
                 getActivity().finish();
                 break;
