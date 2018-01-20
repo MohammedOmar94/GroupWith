@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
 import haitsu.groupup.fragment.Groups.MyGroupsFragment;
+import haitsu.groupup.fragment.Groups.joinRequestsFragment;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -24,11 +25,13 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
             return new GroupsJoinedFragment();
         } else if (position == 1) {
             return new MyGroupsFragment();
+        } else if (position == 2) {
+            return new joinRequestsFragment();
         } else return new GroupsJoinedFragment();
     }
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 }

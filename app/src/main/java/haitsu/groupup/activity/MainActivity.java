@@ -44,7 +44,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.SettingsActivity;
 import haitsu.groupup.activity.Groups.CreateGroupActivity;
-import haitsu.groupup.activity.Groups.tabbedGroupsActivity;
+import haitsu.groupup.activity.Groups.MyGroupsActivity;
 import haitsu.groupup.activity.Search.SearchActivity;
 import haitsu.groupup.activity.Account.AccountSetupActivity;
 import haitsu.groupup.activity.Account.SignInActivity;
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity
                     case R.id.nav_my_groups:
                         //navItemIndex = 2;
                         //CURRENT_TAG = TAG_MY_GROUPS;
-                        startActivity(new Intent(MainActivity.this, tabbedGroupsActivity.class));
+                        startActivity(new Intent(MainActivity.this, MyGroupsActivity.class));
                         drawer.closeDrawers();
                         return true;
                     case R.id.nav_chats:

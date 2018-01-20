@@ -45,7 +45,7 @@ public class GroupsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tabbed_groups);
+        setContentView(R.layout.activity_my_groups);
         Bundle extras = getIntent().getExtras();
         String groupCategory = extras.getString("GROUP_CATEGORY");
         viewPager = (ViewPager)findViewById(R.id.view_pager);

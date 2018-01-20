@@ -89,7 +89,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.Groups.tabbedGroupsActivity"
+            android:name=".activity.Groups.MyGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"

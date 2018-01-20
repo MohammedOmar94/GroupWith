@@ -17,15 +17,16 @@ import android.view.MenuItem;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.RequestsActivity;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
+import haitsu.groupup.fragment.Groups.joinRequestsFragment;
 import haitsu.groupup.other.Adapters.ViewPagerAdapter;
-import haitsu.groupup.fragment.ChatsFragment;
 import haitsu.groupup.fragment.Groups.MyGroupsFragment;
 
 import static android.graphics.Color.WHITE;
 
-public class tabbedGroupsActivity extends AppCompatActivity implements
+public class MyGroupsActivity extends AppCompatActivity implements
         GroupsJoinedFragment.OnFragmentInteractionListener,
-        MyGroupsFragment.OnFragmentInteractionListener {
+        MyGroupsFragment.OnFragmentInteractionListener,
+        joinRequestsFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -37,7 +38,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
      */
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private String[] pageTitle = {"Joined", "Created"};
+    private String[] pageTitle = {"Joined", "Created", "Join Requests"};
 
 
     /**
@@ -48,7 +49,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tabbed_groups);
+        setContentView(R.layout.activity_my_groups);
         viewPager = (ViewPager)findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -56,7 +57,7 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(pageTitle[i]));
         }
 
@@ -85,35 +86,6 @@ public class tabbedGroupsActivity extends AppCompatActivity implements
 
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.group_requests, menu);
-        for (int i = 0; i < menu.size(); i++) {
-            Drawable drawable = menu.getItem(i).getIcon();
-            if (drawable != null) {
-                drawable.mutate();
-                drawable.setColorFilter(WHITE, PorterDuff.Mode.SRC_ATOP);
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_mark_all_read) {
-            startActivity(new Intent(tabbedGroupsActivity.this, RequestsActivity.class));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
