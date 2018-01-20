@@ -22,12 +22,12 @@ public class GroupTypePagerAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new EventsGroupFragment();
         } else if (position == 1) {
-            return new EventsGroupFragment();
-        } else return new InterestsGroupFragment();
+            return new InterestsGroupFragment();
+        } else return new EventsGroupFragment();
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 }

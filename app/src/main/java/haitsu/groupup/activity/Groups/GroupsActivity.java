@@ -34,7 +34,7 @@ public class GroupsActivity extends AppCompatActivity implements
      */
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private String[] pageTitle = {"Today", "Upcoming Events", "Interests"};
+    private String[] pageTitle = {"Events", "Interests"};
 
 
     /**
@@ -55,7 +55,7 @@ public class GroupsActivity extends AppCompatActivity implements
 
         //setting Tab layout (number of Tabs = number of ViewPager pages)
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(pageTitle[i]));
         }
 
