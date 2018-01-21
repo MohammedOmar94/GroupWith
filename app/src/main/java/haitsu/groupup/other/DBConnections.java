@@ -203,6 +203,8 @@ public class DBConnections {
         usersGroupsTree.child("admin").setValue(false);
         usersGroupsTree.child("userApproved").setValue(false);
 
+        databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
+
 
         // Checks if member count has now exceeded after this new member has joined
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {

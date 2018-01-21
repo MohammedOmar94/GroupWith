@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
+import haitsu.groupup.other.Models.Group;
 import haitsu.groupup.other.Models.Groups;
 
 /**
@@ -92,7 +93,7 @@ public class GroupsCreatedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_my_groups, container, false);
+        View view = inflater.inflate(R.layout.fragment_groups, container, false);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -104,12 +105,13 @@ public class GroupsCreatedFragment extends Fragment {
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         final DatabaseReference group = databaseRef.child("group");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, android.R.layout.two_line_list_item, us) {
-            protected void populateView(View view, Groups groupInfo, int position) {
-                System.out.println("Frag is MyGroups");
-                System.out.println("Group name is " + groupInfo.getName());
-                ((TextView) view.findViewById(android.R.id.text1)).setText(groupInfo.getName());
-                ((TextView) view.findViewById(android.R.id.text2)).setText("Category: " + groupInfo.getCategory() + " Admin: " + groupInfo.getAdmin());
+        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.groups_item, us) {
+            protected void populateView(View view, Groups group, int position) {
+                ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
+                ((TextView) view.findViewById(R.id.group_gender)).setText("Category: " + group.getCategory());
+                ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
+                        + group.getMemberLimit());
+
             }
 
             @Override
@@ -118,8 +120,8 @@ public class GroupsCreatedFragment extends Fragment {
                 View view = super.getView(position, convertView, parent);
 
                 // Initialize a TextView for ListView each Item
-                TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
+                TextView tv = (TextView) view.findViewById(R.id.group_name);
+                TextView tv2 = (TextView) view.findViewById(R.id.group_gender);
 
                 // Set the text color of TextView (ListView Item)
                 tv.setTextColor(Color.BLACK);
