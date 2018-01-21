@@ -16,6 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupsActivity;
 import haitsu.groupup.other.Adapters.ImageAdapter;
@@ -42,6 +45,8 @@ public class HomeFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     GridView gridView;
+
+    private AdView mAdView;
 
 
     public HomeFragment() {
@@ -73,6 +78,7 @@ public class HomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -80,6 +86,10 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        mAdView = (AdView) view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         gridView = (GridView) view.findViewById(R.id.gridview);
 
