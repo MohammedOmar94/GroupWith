@@ -14,6 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 
@@ -48,6 +51,9 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
 
     private DBConnections dbConnections = new DBConnections();
+
+
+    private InterstitialAd mInterstitialAd;
 
     public CreateGroupFragment() {
         // Required empty public constructor
@@ -88,6 +94,10 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         mSubmitButton = (Button) view.findViewById(R.id.submit_button);
 
+        mInterstitialAd = new InterstitialAd(getActivity());
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
         Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
@@ -97,6 +107,8 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         spinner2.setOnItemSelectedListener(this);
         spinner3.setOnItemSelectedListener(this);
         memberCount.setOnItemSelectedListener(this);
+
+
 
         return view;
     }
@@ -132,6 +144,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
             case R.id.submit_button:
                 dbConnections.newGroupRequest(selectedCategory, selectedGroupType, (EditText) getView().findViewById(R.id.group_name), (EditText) getView().findViewById(R.id.group_description), selectedGender, selectedMemberCount);
                 Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+                mInterstitialAd.show();
                 getActivity().finish();
                 break;
         }
