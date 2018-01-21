@@ -8,6 +8,8 @@ public class Groups {
 
     private String category;
     private String name;
+    private int memberCount;
+    private int memberLimit;
     private Boolean admin;
     private Boolean userApproved;
     private ChatMessage lastMessage;
@@ -55,5 +57,21 @@ public class Groups {
 
     public void setUserApproved(Boolean userApproved) {
         this.userApproved = userApproved;
+    }
+
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public int getMemberLimit() {
+        return memberLimit;
+    }
+
+    public void setMemberLimit(int memberLimit) {
+        this.memberLimit = memberLimit;
     }
 }

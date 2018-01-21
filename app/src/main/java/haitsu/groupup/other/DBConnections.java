@@ -188,7 +188,7 @@ public class DBConnections {
     }
 
 
-    public void joinGroup(String groupID, String groupName, String groupCategory, String groupAdminId, UserRequest request) {
+    public void joinGroup(final String groupID, String groupName, String groupCategory, final String groupAdminId, UserRequest request) {
         //String userid = databaseRef.child("Group").push().getKey();
         final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
 
@@ -203,7 +203,6 @@ public class DBConnections {
         usersGroupsTree.child("admin").setValue(false);
         usersGroupsTree.child("userApproved").setValue(false);
 
-        databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
 
         // Checks if member count has now exceeded after this new member has joined
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -212,6 +211,7 @@ public class DBConnections {
                 System.out.println("Count is " + dataSnapshot.child("members").getChildrenCount());
                 long memberCount = dataSnapshot.child("members").getChildrenCount();
                 groupRef.child("memberCount").setValue(memberCount);
+                databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
                 Group group = dataSnapshot.getValue(Group.class);
                 if (dataSnapshot.child("members").getChildrenCount() == 3) { // Can maybe get snapshot of groupref, find member limit there?
                     // Change group type to Full, will no longer show in results.
@@ -296,6 +296,8 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.getText().toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("userApproved").setValue(true);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("memberCount").setValue(1);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("memberLimit").setValue(Integer.parseInt(memberLimit));
 
 
         //Add to notifications
@@ -339,7 +341,7 @@ public class DBConnections {
     }
 
     // If an Approved user wants to leave the group they're in
-    public void leaveGroup(final String groupID, final String groupCategory) {
+    public void leaveGroup(final String groupID, final String groupAdminId, final String groupCategory) {
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -356,6 +358,7 @@ public class DBConnections {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     long memberCount = dataSnapshot.child("members").getChildrenCount();
+                                    databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
                                     databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
                                 }
 
@@ -383,9 +386,9 @@ public class DBConnections {
     }
 
     // Done by the user who changes their mind about joining a specific group
-    public void cancelJoinRequest(final String groupID, final String groupCategory, String adminId) {
+    public void cancelJoinRequest(final String groupID, final String groupCategory, final String groupAdminId) {
         // Deletes request from admin's user tree
-        databaseRef.child("users").child(adminId).child("userRequest").removeValue();
+        databaseRef.child("users").child(groupAdminId).child("userRequest").removeValue();
         // Deletes group from the user's user tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
         // Delete member from the group tree
@@ -396,6 +399,7 @@ public class DBConnections {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
+                        databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
                         databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
                     }
 

@@ -227,7 +227,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.leave_button:
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
-                dbConnections.leaveGroup(groupID, groupCategory);
+                dbConnections.leaveGroup(groupID, groupAdminId, groupCategory);
                 getActivity().finish();
                 break;
             case R.id.cancelRequest_button:
