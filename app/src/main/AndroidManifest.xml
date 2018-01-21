@@ -64,7 +64,9 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activity.Account.SignInActivity"
-            android:screenOrientation="portrait" />
+            android:label="@string/title_activity_signin"
+            android:screenOrientation="portrait"
+            android:theme="@style/Toolbar"/>
         <activity
             android:name=".activity.PrivacyPolicyActivity"
             android:screenOrientation="portrait" />
