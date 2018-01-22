@@ -108,9 +108,9 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_group_info, container, false);
-        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
+//        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
         view.setVisibility(View.GONE);
-        progressSpinner.setVisibility(View.VISIBLE);
+//        progressSpinner.setVisibility(View.VISIBLE);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -120,7 +120,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         mDeleteButton = (Button) view.findViewById(R.id.delete_button);
         mLeaveButton = (Button) view.findViewById(R.id.leave_button);
         mCancelButton = (Button) view.findViewById(R.id.cancelRequest_button);
-        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
+//        progressSpinner = (ProgressBar) view.findViewById(R.id.progressBar1);
         mJoinButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
         mLeaveButton.setOnClickListener(this);
@@ -155,7 +155,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 if (groupInfo.getAdminID().equals(mFirebaseUser.getUid())) {//If group admin, delete button should be visible.
                     view.findViewById(R.id.join_button).setVisibility(View.GONE);
                     view.findViewById(R.id.delete_button).setVisibility(View.VISIBLE);
-                    progressSpinner.setVisibility(View.GONE);
+//                    progressSpinner.setVisibility(View.GONE);
                     view.setVisibility(View.VISIBLE);
                     //Not group admin but are a group member, show leave button.
                 } else if (!groupInfo.getAdminID().equals(mFirebaseUser.getUid()) &&
@@ -176,7 +176,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                     }
                 }
 
-                progressSpinner.setVisibility(View.GONE);
+//                progressSpinner.setVisibility(View.GONE);
                 view.setVisibility(View.VISIBLE);
             }
 
