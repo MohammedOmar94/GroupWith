@@ -108,6 +108,7 @@ public class InterestsGroupFragment extends Fragment {
         groupCategory = extras.getString("GROUP_CATEGORY");
 
         groupsFromCategory = databaseRef.child("group").child(groupCategory).orderByChild("type").equalTo("Interests");
+        groupsFromCategory.keepSynced(true);
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {

@@ -112,6 +112,7 @@ public class joinRequestsFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
+        groupRef.keepSynced(true);
         final FirebaseListAdapter<UserRequest> usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.group_chat, groupRef) {
             protected void populateView(View view, UserRequest request, int position) {
                 System.out.println("ayy " + request.getGroupCategory());

@@ -111,6 +111,7 @@ public class ChatsFragment extends Fragment {
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("userApproved").equalTo(true);
+        us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.group_chat, us) {

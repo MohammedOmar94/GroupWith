@@ -137,6 +137,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         System.out.println("Group is " + groupCategory + " " + groupID);
         final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
+        groups2.keepSynced(true);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {

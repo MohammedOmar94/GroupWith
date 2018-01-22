@@ -103,6 +103,7 @@ public class GroupsJoinedFragment extends Fragment {
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
+        us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.groups_item, us) {
             protected void populateView(View view, Groups group, int position) {

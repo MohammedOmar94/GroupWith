@@ -109,6 +109,7 @@ public class EventsGroupFragment extends Fragment {
         groupCategory = extras.getString("GROUP_CATEGORY");
 
         groupsFromCategory = databaseRef.child("group").child(groupCategory).orderByChild("type").equalTo("Events");
+        groupsFromCategory.keepSynced(true);
 
 
         groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {

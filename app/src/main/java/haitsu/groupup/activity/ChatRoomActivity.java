@@ -96,8 +96,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         //Creates a reference to the chatrooms node from the JSON tree.
         //Location: https://group-up-34ab2.firebaseio.com/chatrooms
         chatrooms = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
+        chatrooms.keepSynced(true);
         //Creates a reference to the lastMessage node from the JSON tree.
         queryStuff = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
+        queryStuff.keepSynced(true);
 
         /*queryStuff.addValueEventListener(new ValueEventListener()
                 {

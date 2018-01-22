@@ -211,8 +211,9 @@ public class ResultsActivity extends AppCompatActivity implements
 
     public void searchTest() {
         final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
+        searchByLocation.keepSynced(true);
         final Query searchByFilters = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
-
+        searchByFilters.keepSynced(true);
         searchByFilters.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

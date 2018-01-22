@@ -99,8 +99,9 @@ public class NotificationsFragment extends Fragment {
         final Query us2 = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("lastMessage");
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
-        final DatabaseReference notications = databaseRef.child("notifications").child(mFirebaseUser.getUid());
-        final FirebaseListAdapter<Notification> usersAdapter = new FirebaseListAdapter<Notification>(getActivity(), Notification.class, R.layout.notification, notications) {
+        final DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid());
+        notifications.keepSynced(true);
+        final FirebaseListAdapter<Notification> usersAdapter = new FirebaseListAdapter<Notification>(getActivity(), Notification.class, R.layout.notification, notifications) {
             protected void populateView(View view, Notification notification, int position) {
                 System.out.println("Notification is" + notification.getMessageText());
                 ((TextView) view.findViewById(R.id.message_text)).setText(notification.getMessageText());
