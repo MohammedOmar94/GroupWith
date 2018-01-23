@@ -17,7 +17,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import haitsu.groupup.activity.MainActivity;
+import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Group;
+import haitsu.groupup.other.Models.Groups;
 import haitsu.groupup.other.Models.Notification;
 import haitsu.groupup.other.Models.Report;
 import haitsu.groupup.other.Models.User;
@@ -205,7 +208,6 @@ public class DBConnections {
 
         databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
 
-
         // Checks if member count has now exceeded after this new member has joined
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -213,7 +215,7 @@ public class DBConnections {
                 System.out.println("Count is " + dataSnapshot.child("members").getChildrenCount());
                 long memberCount = dataSnapshot.child("members").getChildrenCount();
                 groupRef.child("memberCount").setValue(memberCount);
-                databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
+                getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
                 Group group = dataSnapshot.getValue(Group.class);
                 if (dataSnapshot.child("members").getChildrenCount() == 3) { // Can maybe get snapshot of groupref, find member limit there?
                     // Change group type to Full, will no longer show in results.
@@ -236,6 +238,29 @@ public class DBConnections {
 //
 //        notifications.child("messageText").setValue("You joined the group " + groupName + "!");
 
+    }
+
+    public void getUserByGroup(final String groupAdminId, final String groupID, final long memberCount, final long memberLimit){
+        Query allUsersFromGroup = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
+
+        //If this isn't Single Value, message updates continously forever.
+        allUsersFromGroup.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (snapshot.child("groups").hasChild(groupID)) {
+                        //Path: users/userid/groups/groupid/
+                        databaseRef.child("users").child(snapshot.getKey()).child("groups").child(groupID).child("memberCount").setValue(memberCount);
+                        databaseRef.child("users").child(snapshot.getKey()).child("groups").child(groupID).child("memberLimit").setValue(memberLimit);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void approveMember(String groupID, String groupName, String groupCategory, String userId) {
@@ -360,7 +385,7 @@ public class DBConnections {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     long memberCount = dataSnapshot.child("members").getChildrenCount();
-                                    databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
+                                    getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
                                     databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
                                 }
 
@@ -401,7 +426,7 @@ public class DBConnections {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("users").child(groupAdminId).child("groups").child(groupID).child("memberCount").setValue(memberCount);
+                        getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
                         databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
                     }
 
