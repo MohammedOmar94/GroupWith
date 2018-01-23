@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.MainActivity;
+import haitsu.groupup.activity.SplashActivity;
 import haitsu.groupup.other.DBConnections;
 
 public class SignInActivity extends AppCompatActivity implements
@@ -85,6 +86,29 @@ public class SignInActivity extends AppCompatActivity implements
         // Initialize FirebaseAuth
     }
 
+    public void checkUsersDetails() {
+        DatabaseReference usersNodeRef = FirebaseDatabase.getInstance().getReference().child("users");
+        usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+                // If the user hasn't setup their account details like Username and DoB...
+                if (!snapshot.hasChild((mFirebaseUser.getUid()))) {
+                    startActivity(new Intent(SignInActivity.this, AccountSetupActivity.class));
+                    finish();
+                } else {
+                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -98,26 +122,6 @@ public class SignInActivity extends AppCompatActivity implements
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
         //Adds new user to database.
-    }
-
-    private void addUser(final String userId) {
-        //final User user = new User(name, email);
-        DatabaseReference users = databaseRef.child("users");
-        users.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.hasChild(userId)) {//If new user, set up account
-                    startActivity(new Intent(SignInActivity.this, AccountSetupActivity.class));
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        //Use push() for auto generated id node.
     }
 
     @Override
@@ -156,8 +160,7 @@ public class SignInActivity extends AppCompatActivity implements
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
-                            addUser(mFirebaseUser.getUid());
-                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                            checkUsersDetails();
                             finish();
                         }
                     }

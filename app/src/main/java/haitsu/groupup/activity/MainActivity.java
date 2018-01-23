@@ -174,8 +174,8 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(final DataSnapshot snapshot) {
                 userInfo = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);//ISSUE IF USER LEAVES APP ON ACCOUNT CREATION, CAN STILL USE APP USING FIREBASE.
                 if (!snapshot.hasChild((mFirebaseUser.getUid()))) {//User not saved account details then setup account.
-                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
-                    finish();
+//                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
+//                    finish();
                 } else {
                     mUsername = userInfo.getUsername();
                     // load nav menu header data

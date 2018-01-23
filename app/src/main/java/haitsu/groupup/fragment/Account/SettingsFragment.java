@@ -232,7 +232,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 new DBConnections().deleteAccount();
-//                                signOut();
+                                signOut();
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
