@@ -49,7 +49,7 @@ public class DBConnections {
     //String groupId;
 
     public DBConnections() {
-
+        databaseRef.keepSynced(true);
     }
 
     public void geoFireTest() {
@@ -336,8 +336,37 @@ public class DBConnections {
         chatRooms.child(groupId).child("admin").setValue(mFirebaseUser.getUid());
     }
 
-    public void deleteGroup(String groupID) {
+    public void deleteAccount() {
+        final String userId = mFirebaseUser.getUid();
+        databaseRef.child("users").child(userId).removeValue();
+        Query findGroupsWithUserId = databaseRef.child("group").orderByChild(userId);
+        findGroupsWithUserId.keepSynced(true);
+        findGroupsWithUserId.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
+                        String adminID = groupSnapshot.child("adminID").getValue(String.class);
+                        if (adminID.equals(userId)) {
+                            System.out.println("group created " + groupSnapshot.getRef());
+                            groupSnapshot.getRef().removeValue();
+                        } else if(groupSnapshot.child("members").hasChild(userId)) {
+                            System.out.println("group joined " +
+                                    groupSnapshot.child("members").child(userId).getRef());;
+                            groupSnapshot.child("members").child(userId).getRef().removeValue();
+                        }
+                    }
+                }
 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        // Need the ability to kick members too
+        // Need to delete firebase instance too.
     }
 
     public void checkGroup(final String groupID, final String groupCategory) {

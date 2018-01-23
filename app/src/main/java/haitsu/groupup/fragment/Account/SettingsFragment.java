@@ -65,6 +65,7 @@ import java.util.Locale;
 import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.SignInActivity;
+import haitsu.groupup.other.DBConnections;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -213,6 +214,39 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 return true;
             }
         });
+
+        Preference delete_pref = findPreference("delete_account");
+        delete_pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                final AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
+                } else {
+                    builder = new AlertDialog.Builder(getActivity());
+                }
+                // TODO Auto-generated method stub
+                builder.setTitle("Delete account")
+                        .setMessage("Are you sure you want to completely delete your account?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                new DBConnections().deleteAccount();
+//                                signOut();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .show();
+                //finish();
+                // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
 
 
         if (getArguments() != null) {
@@ -403,6 +437,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void openDeleteDialog(){
+
     }
 
     private void openDialog() {
