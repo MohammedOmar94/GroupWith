@@ -111,6 +111,9 @@ public class GroupsJoinedFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.group_gender)).setText("Category: " + group.getCategory());
                 ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
                         + group.getMemberLimit());
+                if(!group.getUserApproved()){
+                    ((TextView) view.findViewById(R.id.awaiting_approval)).setText("Awaiting approval");
+                }
 
             }
 
