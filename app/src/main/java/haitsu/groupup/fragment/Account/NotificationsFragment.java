@@ -14,13 +14,23 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.Search.ResultsActivity;
+import haitsu.groupup.other.Adapters.NotificationAdapter;
+import haitsu.groupup.other.Adapters.ResultsAdapter;
+import haitsu.groupup.other.Models.Group;
 import haitsu.groupup.other.Models.Notification;
 
 /**
@@ -42,6 +52,8 @@ public class NotificationsFragment extends Fragment {
     private String mParam2;
 
     private ListView mListView;
+    private NotificationAdapter adapter;
+    private Notification [] notificationArr;
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -94,6 +106,9 @@ public class NotificationsFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
+
+        final ArrayList<Notification> planetList = new ArrayList<Notification>();
+
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         final DatabaseReference us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
         final Query us2 = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("lastMessage");
@@ -101,26 +116,23 @@ public class NotificationsFragment extends Fragment {
         final DatabaseReference chats = databaseRef.child("chats");
         final DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid());
         notifications.keepSynced(true);
-        final FirebaseListAdapter<Notification> usersAdapter = new FirebaseListAdapter<Notification>(getActivity(), Notification.class, R.layout.notification, notifications) {
-            protected void populateView(View view, Notification notification, int position) {
-                System.out.println("Notification is" + notification.getMessageText());
-                ((TextView) view.findViewById(R.id.message_text)).setText(notification.getMessageText());
-                Date messageDate = new Date(notification.getMessageTime());
-                Date currentDate = new Date();
-                long diff = currentDate.getTime() - messageDate.getTime();
-                float days = (diff / (1000 * 60 * 60 * 24));
-                int daysRounded = Math.round(days);
-                if (daysRounded == 0) {
-                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
-                } else if (daysRounded == 1) {
-                    ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
-                } else {
-                    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy", messageDate));
+        notifications.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Notification notification = snapshot.getValue(Notification.class);
+                    planetList.add(notification);
                 }
-
-                // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
-                //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
+                Collections.reverse(planetList);
+                adapter = new NotificationAdapter(getContext(), planetList);
+                mListView.setAdapter(adapter);
             }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
             //  (
 
@@ -144,8 +156,6 @@ public class NotificationsFragment extends Fragment {
             }
 */
 
-        };
-        mListView.setAdapter(usersAdapter);
         return view;
     }
 
