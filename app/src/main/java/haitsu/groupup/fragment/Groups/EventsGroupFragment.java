@@ -22,10 +22,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
+import haitsu.groupup.other.Adapters.GroupsAdapter;
+import haitsu.groupup.other.Adapters.NotificationAdapter;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Models.Group;
+import haitsu.groupup.other.Models.Notification;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,6 +69,7 @@ public class EventsGroupFragment extends Fragment {
     private Query groupsFromCategory;
 
     FirebaseListAdapter<Group> groupAdapter;
+    private GroupsAdapter adapter;
 
     public EventsGroupFragment() {
         // Required empty public constructor
@@ -112,82 +119,29 @@ public class EventsGroupFragment extends Fragment {
         groupsFromCategory.keepSynced(true);
 
 
-        groupsFromCategory.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                groupAdapter = new FirebaseListAdapter<Group>(getActivity(), Group.class, R.layout.groups_item, groupsFromCategory) {
-                    protected void populateView(View view, Group group, int position) {
-                        ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
-                        ((TextView) view.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
-                        ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
-                                + group.getMemberLimit());
-
-                    }
-
-                    @Override
-                    public View getView(int position, View convertView, ViewGroup parent) {
-                        // Get the Item from ListView
-                        View view = super.getView(position, convertView, parent);
-
-                        // Initialize a TextView for ListView each Item
-                        TextView tv = (TextView) view.findViewById(R.id.group_name);
-                        TextView tv2 = (TextView) view.findViewById(R.id.group_gender);
-
-                        // Set the text color of TextView (ListView Item)
-                        tv.setTextColor(Color.BLACK);
-                        tv2.setTextColor(Color.BLACK);
-
-                        // Generate ListView Item using TextView
-                        return view;
-                    }
-
-
-                };
-            }
-            //   }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
         groupsFromCategory.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                mListView.setAdapter(groupAdapter);
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                        mListView.setFocusable(true);//HACKS
-                        String key = groupAdapter.getRef(position).getKey();//Gets key of listview item
-                        Group group = ((Group) mListView.getItemAtPosition(position));
-                        selectedGroupID = key;
-                        selectedGroupName = group.getName();
-                        selectedAdminId = group.getAdminID();
-                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
-                        Bundle extras = new Bundle();
-                        //extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_ID", selectedGroupID);
-                        extras.putString("GROUP_CATEGORY", groupCategory);
-                        extras.putString("GROUP_ADMIN", selectedAdminId);
-                        intent.putExtras(extras);
-                        startActivity(intent);
-                        // System.out.println("Group name is " + group.getName() + " ID is " + key);
-                    }
-
-
-                });
-            }
-
+                final ArrayList<Group> planetList = new ArrayList<Group>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Group group = snapshot.getValue(Group.class);
+                    group.setGroupId(snapshot.getKey());
+                    group.setCategory(groupCategory);
+                    planetList.add(group);
+                    System.out.println("group " + group.getName());
+                }
+                // Orders groups in descending order according to when they were created.
+                Collections.reverse(planetList);
+                adapter = new GroupsAdapter(getContext(), planetList);
+                mListView.setAdapter(adapter);
+            };
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-
         });
+
         return view;
     }
 
