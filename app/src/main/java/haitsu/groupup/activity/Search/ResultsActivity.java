@@ -257,8 +257,8 @@ public class ResultsActivity extends AppCompatActivity implements
                 System.out.println("hey " + dataSnapshot.getRef());
                 if ((group.getType_gender_memberLimit()).equals(groupType + "_" + groupGender + "_" + memberLimit)) {
                     // Create ArrayAdapter using the planet list.
+                    planetList.add(group);
                     adapter = new ResultsAdapter(ResultsActivity.this, planetList);
-                    adapter.add(group);
                     mainListView.setAdapter(adapter);
                 }
 

@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class ResultsAdapter extends ArrayAdapter<Group> {
     public View getView(final int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
         final Group group = getItem(position);
+        final ListView mListView = (ListView) parent.findViewById(R.id.listview);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.groups_item, parent, false);
@@ -37,24 +40,22 @@ public class ResultsAdapter extends ArrayAdapter<Group> {
         ((TextView) convertView.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
         ((TextView) convertView.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
                 + group.getMemberLimit());
-        
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                int position = (Integer) view.getTag();
-                // Access the row position here to get the correct data item
-                Group group1 = getItem(position);
-                System.out.println("Hey! " + group.getName());
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                mListView.setFocusable(true);//HACKS
+                Group group = ((Group) mListView.getItemAtPosition(position));
                 Intent intent = new Intent(getContext(), GroupInfoActivity.class);
                 Bundle extras = new Bundle();
-                //extras.putString("GROUP_ID", selectedGroup);
                 extras.putString("GROUP_ID", group.getGroupId());
                 extras.putString("GROUP_CATEGORY", group.getCategory());
+                extras.putString("GROUP_ADMIN", group.getAdminID());
                 intent.putExtras(extras);
                 getContext().startActivity(intent);
-                System.out.println("Group name is " + group.getName() + " ID is " + group.getCategory());
-                // Do what you want here...
             }
+
+
         });
         // Return the completed view to render on screen
         return convertView;
