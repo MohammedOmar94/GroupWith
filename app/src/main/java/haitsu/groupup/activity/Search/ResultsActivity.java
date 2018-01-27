@@ -148,7 +148,7 @@ public class ResultsActivity extends AppCompatActivity implements
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     locationManager.storeLocationData(location);
-                    searchTest();
+                    getSearchResults();
                 }
             }
         };
@@ -177,23 +177,11 @@ public class ResultsActivity extends AppCompatActivity implements
 
     }
 
-
-    public void searchTest() {
+    public void getSearchResults() {
         final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
         searchByLocation.keepSynced(true);
         final Query searchByFilters = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
         searchByFilters.keepSynced(true);
-        searchByFilters.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         GeoFire geoFire = new GeoFire(searchByLocation);
         // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
         // Will be done via the users current location, and the radius they selected.
@@ -268,7 +256,7 @@ public class ResultsActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         // remove all event listeners to stop updating in the background
-        searchTest();
+        getSearchResults();
     }
 
     @Override
