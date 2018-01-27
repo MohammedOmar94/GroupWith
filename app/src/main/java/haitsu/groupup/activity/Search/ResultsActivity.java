@@ -63,6 +63,7 @@ import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.other.Adapters.ResultsAdapter;
+import haitsu.groupup.other.LocationManager;
 import haitsu.groupup.other.Models.Group;
 
 public class ResultsActivity extends AppCompatActivity implements
@@ -111,20 +112,13 @@ public class ResultsActivity extends AppCompatActivity implements
 
     private LocationCallback mLocationCallback;
 
-    double latitude;
-    double longitude;
-
-
-    private String city;
-    private String country;
-
-
     private FirebaseListAdapter<Group> usersAdapter = null;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private LocationManager locationManager = new LocationManager();
 
     private DatabaseReference groupResults = FirebaseDatabase.getInstance().getReference();
 
@@ -147,27 +141,19 @@ public class ResultsActivity extends AppCompatActivity implements
         // Find the ListView resource.
         mainListView = (ListView) findViewById(R.id.listview);
 
-
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                    getAddress();
-                    stopLocationUpdates();
-                    System.out.println("Hey " + city + " " + country + " " + kilometers);
+                    locationManager.storeLocationData(location);
                     searchTest();
-
-                    // ...
                 }
             }
-
-            ;
         };
+
+        locationManager.setmLocationCallback(mLocationCallback);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -180,14 +166,9 @@ public class ResultsActivity extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API).build();
 
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        final LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
-        checkLocationStatus(builder);
+        // Handles all location logic
+        locationManager.setmFusedLocationClient(mFusedLocationClient);
+        locationManager.initialiseLocationRequest(ResultsActivity.this);
 
 
         // First filter by groups with the key, containing the latitude and longitude
@@ -196,18 +177,6 @@ public class ResultsActivity extends AppCompatActivity implements
 
     }
 
-    public void showDialog() {
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(ResultsActivity.this, R.style.MyAlertDialogStyle);
-        } else {
-            builder = new AlertDialog.Builder(ResultsActivity.this);
-        }
-        builder.setTitle("Oops! No matches found")
-                .setMessage("Maybe you should be the first to create a group of this kind!")
-                .setPositiveButton("OK", null)
-                .show();
-    }
 
     public void searchTest() {
         final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
@@ -228,7 +197,7 @@ public class ResultsActivity extends AppCompatActivity implements
         GeoFire geoFire = new GeoFire(searchByLocation);
         // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
         // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), kilometers);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(locationManager.getLatitude(), locationManager.getLongitude()), kilometers);
 
 
         final ArrayList<Group> planetList = new ArrayList<Group>();
@@ -292,30 +261,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
                 System.out.println("Hey ERROR");
             }
-
-
         });
-    }
-
-    private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        } else {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mLocationCallback,
-                    null /* Looper */);
-        }
-    }
-
-    private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     @Override
@@ -346,145 +292,6 @@ public class ResultsActivity extends AppCompatActivity implements
         mGoogleApiClient.stopAutoManage(this);
         mGoogleApiClient.disconnect();
     }
-
-    public void lastLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                System.out.println("Hey, we have the Last location");
-                                mLastLocation = location;
-                                // updateLocation();
-                                requestLocation();
-                            } else {
-                                // Pretty busted, added in but not tested properly before. Need to request updates
-                                System.out.println("Hey, we don't so we have to Request location");
-                                requestLocation();
-                            }
-                            // Logic to handle location object
-                        }
-                    });
-        }
-    }
-
-    public void checkLocationStatus(LocationSettingsRequest.Builder settingsBuilder) {
-        SettingsClient client = LocationServices.getSettingsClient(this);
-        final Task<LocationSettingsResponse> task = client.checkLocationSettings(settingsBuilder.build());
-
-        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                // All location settings are satisfied. The client can initialize
-                // location requests here.
-                // ...
-                if (ActivityCompat.checkSelfPermission(ResultsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(ResultsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    System.out.println("Hey no permission");
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    ActivityCompat.requestPermissions(ResultsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-                } else {
-                    lastLocation();
-                }
-
-            }
-        });
-
-        task.addOnFailureListener(this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                int statusCode = ((ApiException) e).getStatusCode();
-                switch (statusCode) {
-                    case CommonStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            ResolvableApiException resolvable = (ResolvableApiException) e;
-                            resolvable.startResolutionForResult(ResultsActivity.this,
-                                    REQUEST_CHECK_SETTINGS);
-                            lastLocation();
-                        } catch (IntentSender.SendIntentException sendEx) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-    }
-
-    public void requestLocation() {
-        startLocationUpdates();
-//        System.out.println("Hey we're in request");
-//        updateLocation();
-    }
-
-    public Address getAddress(double latitude, double longitude) {
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(this, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-    public void getAddress() {
-        System.out.println("Hey lat " + latitude + " long " + longitude);
-        Address locationAddress = getAddress(latitude, longitude);
-
-        if (locationAddress != null) {
-            city = locationAddress.getLocality();
-            country = locationAddress.getCountryName();
-
-            String currentLocation;
-
-            if (!TextUtils.isEmpty(city)) {
-                currentLocation = city;
-
-                if (!TextUtils.isEmpty(country))
-                    currentLocation += "\n" + country;
-
-
-//                Toast.makeText(this,
-//                        "Location has been updated to " + currentLocation, Toast.LENGTH_LONG)
-//                        .show();
-
-
-            }
-
-        }
-
-    }
-
 
     @Override
     public void onFragmentInteraction(Uri uri) {
