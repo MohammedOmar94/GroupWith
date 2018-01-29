@@ -212,8 +212,21 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 mainContent.setVisibility(View.GONE);
                 progressSpinner.setVisibility(View.VISIBLE);
+                mNoGroupsText.setVisibility(View.GONE);
                 // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                getSearchResults();
+                if (getActivity() != null) {
+                    getSearchResults();
+                } else {
+                    new CountDownTimer(1, 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+                            getSearchResults();
+                        }
+                    };
+                }
             }
 
             @Override
@@ -224,8 +237,21 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 mainContent.setVisibility(View.GONE);
                 progressSpinner.setVisibility(View.VISIBLE);
+                mNoGroupsText.setVisibility(View.GONE);
                 // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                getSearchResults();
+                if (getActivity() != null) {
+                    getSearchResults();
+                } else {
+                    new CountDownTimer(1, 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+                            getSearchResults();
+                        }
+                    };
+                }
             }
 
             @Override

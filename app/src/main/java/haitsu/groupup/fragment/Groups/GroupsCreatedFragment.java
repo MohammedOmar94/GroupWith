@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -53,6 +54,7 @@ public class GroupsCreatedFragment extends Fragment {
 
 
     private ListView mListView;
+    private ProgressBar progressSpinner;
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -98,6 +100,9 @@ public class GroupsCreatedFragment extends Fragment {
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
+        progressSpinner.setVisibility(View.GONE);
 
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE

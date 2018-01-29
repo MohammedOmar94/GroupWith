@@ -205,8 +205,21 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
                 mainContent.setVisibility(View.GONE);
                 progressSpinner.setVisibility(View.VISIBLE);
+                mNoGroupsText.setVisibility(View.GONE);
                 // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                getSearchResults();
+                if (getActivity() != null) {
+                    getSearchResults();
+                } else {
+                    new CountDownTimer(1, 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+                            getSearchResults();
+                        }
+                    };
+                }
             }
 
             @Override
@@ -217,8 +230,21 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 mainContent.setVisibility(View.GONE);
                 progressSpinner.setVisibility(View.VISIBLE);
+                mNoGroupsText.setVisibility(View.GONE);
                 // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                getSearchResults();
+                if (getActivity() != null) {
+                    getSearchResults();
+                } else {
+                    new CountDownTimer(1, 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+                            getSearchResults();
+                        }
+                    };
+                }
             }
 
             @Override
@@ -298,7 +324,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                     }
 
                     public void onFinish() {
-                        if(!foundData) {
+                        if (!foundData) {
                             mNoGroupsText.setAlpha(0f);
                             mNoGroupsText.setVisibility(View.VISIBLE);
 
