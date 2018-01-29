@@ -6,6 +6,7 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -39,7 +41,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupsActivity;
@@ -70,6 +76,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     private Button mDeleteButton;
     private ListView mListView;
     private View mainContent;
+    private TextView mNoGroupsText;
     private ProgressBar progressSpinner;
 
 
@@ -106,6 +113,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     private LocationManager locationManager;
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
+    private boolean foundData;
 
     public EventsGroupFragment() {
         // Required empty public constructor
@@ -150,6 +158,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
         mainContent = view.findViewById(R.id.content);
         progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
+        mNoGroupsText = (TextView) view.findViewById(R.id.no_groups);
         mainContent.setVisibility(View.GONE);
         // Retrieve and cache the system's default "short" animation time.
         mShortAnimationDuration = getResources().getInteger(
@@ -266,6 +275,8 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
                     adapter = new GroupsAdapter(getContext(), planetList);
                     mListView.setAdapter(adapter);
+                    crossfade(mainContent);
+                    foundData = true;
                 }
             }
 
@@ -288,7 +299,36 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
             @Override
             public void onGeoQueryReady() {
-                crossfade(mainContent);
+                new CountDownTimer(15000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+                    }
+
+                    public void onFinish() {
+                        if(!foundData) {
+                            mNoGroupsText.setAlpha(0f);
+                            mNoGroupsText.setVisibility(View.VISIBLE);
+
+                            progressSpinner.animate()
+                                    .alpha(0f)
+                                    .setDuration(mShortAnimationDuration)
+                                    .setListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            progressSpinner.setVisibility(View.GONE);
+                                            // Animate the content view to 100% opacity, and clear any animation
+                                            // listener set on the view.
+                                            mNoGroupsText.animate()
+                                                    .alpha(1f)
+                                                    // 1000ms used so the transition happens after the activity's transition on start up.
+                                                    .setDuration(mShortAnimationDuration)
+                                                    .setListener(null);
+                                        }
+                                    });
+                        }
+                    }
+                }.start();
+
 
             }
 

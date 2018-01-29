@@ -6,23 +6,23 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,7 +37,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -70,6 +69,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private Button mDeleteButton;
     private ListView mListView;
     private View mainContent;
+    private TextView mNoGroupsText;
     private ProgressBar progressSpinner;
 
 
@@ -106,6 +106,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private LocationManager locationManager;
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
+    private boolean foundData;
 
     public InterestsGroupFragment() {
         // Required empty public constructor
@@ -150,6 +151,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
 
         mainContent = view.findViewById(R.id.content);
         progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
+        mNoGroupsText = (TextView) view.findViewById(R.id.no_groups);
         mainContent.setVisibility(View.GONE);
         // Retrieve and cache the system's default "short" animation time.
         mShortAnimationDuration = getResources().getInteger(
@@ -182,7 +184,6 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-
         // Handles all location logic
         lm.setmFusedLocationClient(mFusedLocationClient);
 
@@ -194,7 +195,6 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         }
 
         lm.initialiseLocationRequest(getActivity());
-
 
         eventsByLocation = databaseRef.child("group").child(groupCategory);
         eventsByLocation.keepSynced(true);
@@ -210,22 +210,25 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {}
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+            }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 mainContent.setVisibility(View.GONE);
                 progressSpinner.setVisibility(View.VISIBLE);
                 // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                getSearchResults();}
+                getSearchResults();
+            }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
+            }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
-
 
         return view;
     }
@@ -235,9 +238,8 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
         // Will be done via the users current location, and the radius they selected.
         geoQuery = geoFire.queryAtLocation(new GeoLocation(lm.getLatitude(), lm.getLongitude()), 24);
-
-
         final ArrayList<Group> planetList = new ArrayList<Group>();
+
 
         geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
 
@@ -260,12 +262,14 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                 group.setCategory(groupCategory);
                 if ((group.getType()).equals("Interests")) {
                     System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
-                    System.out.println("hey interests " + dataSnapshot.getRef());
+                    System.out.println("hey events " + dataSnapshot.getRef());
                     // Create ArrayAdapter using the planet list.
                     planetList.add(group);
 
                     adapter = new GroupsAdapter(getContext(), planetList);
                     mListView.setAdapter(adapter);
+                    crossfade(mainContent);
+                    foundData = true;
                 }
             }
 
@@ -288,7 +292,36 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
 
             @Override
             public void onGeoQueryReady() {
-                crossfade(mainContent);
+                new CountDownTimer(15000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+                    }
+
+                    public void onFinish() {
+                        if(!foundData) {
+                            mNoGroupsText.setAlpha(0f);
+                            mNoGroupsText.setVisibility(View.VISIBLE);
+
+                            progressSpinner.animate()
+                                    .alpha(0f)
+                                    .setDuration(mShortAnimationDuration)
+                                    .setListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            progressSpinner.setVisibility(View.GONE);
+                                            // Animate the content view to 100% opacity, and clear any animation
+                                            // listener set on the view.
+                                            mNoGroupsText.animate()
+                                                    .alpha(1f)
+                                                    // 1000ms used so the transition happens after the activity's transition on start up.
+                                                    .setDuration(mShortAnimationDuration)
+                                                    .setListener(null);
+                                        }
+                                    });
+                        }
+                    }
+                }.start();
+
 
             }
 
@@ -298,7 +331,6 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                 System.out.println("Hey ERROR");
             }
         });
-
     }
 
     private void crossfade(final View contentView) {
