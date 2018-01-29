@@ -1,10 +1,15 @@
 package haitsu.groupup.fragment;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +23,18 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupsActivity;
@@ -43,6 +60,9 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+
+    private final static int REQUEST_CHECK_SETTINGS = 2000;
 
     GridView gridView;
 
@@ -118,18 +138,7 @@ public class HomeFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                LinearLayout ll = (LinearLayout) v;
-                TextView categoryLabel = (TextView) ll.findViewById(R.id.grid_item_label);
-                Toast.makeText(getActivity(),
-                        categoryLabel.getText(), Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(getActivity(), GroupsActivity.class);
-                Bundle extras = new Bundle();
-                extras.putString("GROUP_CATEGORY",
-                        categoryLabel.getText().toString());
-                intent.putExtras(extras);
-
-                startActivity(intent);
+                checkLocationStatus(v);
 
 
                 //FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -141,6 +150,79 @@ public class HomeFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void checkLocationStatus(final View v) {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder settingsBuilder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(getActivity());
+        final Task<LocationSettingsResponse> task = client.checkLocationSettings(settingsBuilder.build());
+
+        task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    System.out.println("Hey no permission");
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+                } else {
+                    LinearLayout ll = (LinearLayout) v;
+                    TextView categoryLabel = (TextView) ll.findViewById(R.id.grid_item_label);
+                    Toast.makeText(getActivity(),
+                            categoryLabel.getText(), Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(getActivity(), GroupsActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("GROUP_CATEGORY",
+                            categoryLabel.getText().toString());
+                    intent.putExtras(extras);
+
+                    startActivity(intent);
+                }
+
+            }
+        });
+
+        task.addOnFailureListener(getActivity(), new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                int statusCode = ((ApiException) e).getStatusCode();
+                switch (statusCode) {
+                    case CommonStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied, but this can be fixed
+                        // by showing the user a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            ResolvableApiException resolvable = (ResolvableApiException) e;
+                            resolvable.startResolutionForResult(getActivity(),
+                                    REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException sendEx) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
     }
 
     // TODO: Rename method, update argument and hook method into UI event

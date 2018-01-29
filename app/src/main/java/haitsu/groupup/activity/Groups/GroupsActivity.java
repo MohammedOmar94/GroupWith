@@ -17,6 +17,7 @@ import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
 import haitsu.groupup.other.Adapters.GroupTypePagerAdapter;
+import haitsu.groupup.other.LocationManager;
 
 import static android.graphics.Color.WHITE;
 
@@ -35,6 +36,7 @@ public class GroupsActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private String[] pageTitle = {"Events", "Interests"};
+    public  LocationManager locationManager = new LocationManager();
 
 
     /**

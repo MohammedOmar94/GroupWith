@@ -1,8 +1,8 @@
 package haitsu.groupup.fragment.Groups;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,10 +13,9 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -33,26 +32,21 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.Groups.GroupInfoActivity;
-import haitsu.groupup.activity.Search.ResultsActivity;
+import haitsu.groupup.activity.Groups.GroupsActivity;
 import haitsu.groupup.other.Adapters.GroupsAdapter;
-import haitsu.groupup.other.Adapters.NotificationAdapter;
-import haitsu.groupup.other.Adapters.ResultsAdapter;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.LocationManager;
 import haitsu.groupup.other.Models.Group;
-import haitsu.groupup.other.Models.Notification;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,6 +69,11 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     private Button mJoinButton;
     private Button mDeleteButton;
     private ListView mListView;
+    private View mainContent;
+    private ProgressBar progressSpinner;
+
+
+    private int mShortAnimationDuration;
 
 
     private String selectedGroupCategory;
@@ -104,7 +103,8 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     private LocationCallback mLocationCallback;
 
     FirebaseListAdapter<Group> groupAdapter;
-    private LocationManager locationManager = new LocationManager();
+    private LocationManager locationManager;
+    private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
 
     public EventsGroupFragment() {
@@ -144,6 +144,17 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
+        GroupsActivity groupsActivity = (GroupsActivity) getActivity();
+        // So both Events and Interest fragments use the same reference.
+        locationManager = groupsActivity.locationManager;
+
+        mainContent = view.findViewById(R.id.content);
+        progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
+        mainContent.setVisibility(View.GONE);
+        // Retrieve and cache the system's default "short" animation time.
+        mShortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
@@ -155,45 +166,76 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
 
-
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
-                    locationManager.storeLocationData(location);
+                    lm.storeLocationData(location);
                     getSearchResults();
                 }
             }
         };
 
-        locationManager.setmLocationCallback(mLocationCallback);
+        lm.setmLocationCallback(mLocationCallback);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage((FragmentActivity) getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-
         // Handles all location logic
-        locationManager.setmFusedLocationClient(mFusedLocationClient);
+        lm.setmFusedLocationClient(mFusedLocationClient);
+
+        if (locationManager.getmGoogleApiClient() == null) {
+            locationManager.connectToGoogleApiClient(getActivity());
+            mGoogleApiClient = locationManager.getmGoogleApiClient();
+        } else {
+            mGoogleApiClient = locationManager.getmGoogleApiClient();
+        }
+
+        lm.initialiseLocationRequest(getActivity());
+
+        eventsByLocation = databaseRef.child("group").child(groupCategory);
+        eventsByLocation.keepSynced(true);
+
+
+        eventsByLocation.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                mainContent.setVisibility(View.GONE);
+                progressSpinner.setVisibility(View.VISIBLE);
+                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
+                getSearchResults();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                mainContent.setVisibility(View.GONE);
+                progressSpinner.setVisibility(View.VISIBLE);
+                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
+                getSearchResults();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
         return view;
     }
 
     public void getSearchResults() {
-        eventsByLocation = databaseRef.child("group").child(groupCategory);
-        eventsByLocation.keepSynced(true);
         GeoFire geoFire = new GeoFire(eventsByLocation);
         // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
         // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(locationManager.getLatitude(), locationManager.getLongitude()), 24);
-
-
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(lm.getLatitude(), lm.getLongitude()), 24);
         final ArrayList<Group> planetList = new ArrayList<Group>();
 
 
@@ -216,9 +258,9 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                 Group group = dataSnapshot.getValue(Group.class);
                 group.setGroupId(dataSnapshot.getKey());
                 group.setCategory(groupCategory);
-                System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
-                System.out.println("hey " + dataSnapshot.getRef());
                 if ((group.getType()).equals("Events")) {
+                    System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
+                    System.out.println("hey events " + dataSnapshot.getRef());
                     // Create ArrayAdapter using the planet list.
                     planetList.add(group);
 
@@ -246,6 +288,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
             @Override
             public void onGeoQueryReady() {
+                crossfade(mainContent);
 
             }
 
@@ -257,6 +300,35 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         });
     }
 
+    private void crossfade(final View contentView) {
+
+        // Set the content view to 0% opacity but visible, so that it is visible
+        // (but fully transparent) during the animation.
+        contentView.setAlpha(0f);
+        contentView.setVisibility(View.VISIBLE);
+
+        // Animate the loading view to 0% opacity. After the animation ends,
+        // set its visibility to GONE as an optimization step (it won't
+        // participate in layout passes, etc.)
+        progressSpinner.animate()
+                .alpha(0f)
+                // Used so the transition doesn't interfere with the activity's transition on start up.
+                .setDuration(mShortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        progressSpinner.setVisibility(View.GONE);
+                        // Animate the content view to 100% opacity, and clear any animation
+                        // listener set on the view.
+                        contentView.animate()
+                                .alpha(1f)
+                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                .setDuration(mShortAnimationDuration)
+                                .setListener(null);
+                    }
+                });
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -265,16 +337,14 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        locationManager.initialiseLocationRequest(getActivity());
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
+//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.stopAutoManage(getActivity());
+//            mGoogleApiClient.disconnect();
+//        }
         // remove all event listeners to stop updating in the background
-        if(geoQuery != null) {
+        if (geoQuery != null) {
             this.geoQuery.removeAllListeners();
         }
     }
@@ -282,8 +352,12 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     @Override
     public void onStop() {
         super.onStop();
+//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.stopAutoManage(getActivity());
+//            mGoogleApiClient.disconnect();
+//        }
         // remove all event listeners to stop updating in the background
-        if(geoQuery != null) {
+        if (geoQuery != null) {
             this.geoQuery.removeAllListeners();
         }
     }
