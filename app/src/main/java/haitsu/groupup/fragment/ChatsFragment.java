@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import haitsu.groupup.R;
@@ -125,20 +126,31 @@ public class ChatsFragment extends Fragment {
                 //db.displayMessage();
 
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
+                ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
                 if (groupInfo.getLastMessage() != null) {
                     Date messageDate = new Date(message.getMessageTime());
                     Date currentDate = new Date();
-                    long diff = currentDate.getTime() - messageDate.getTime();
-                    float days = (diff / (1000 * 60 * 60 * 24));
-                    int daysRounded = Math.round(days);
+                    Calendar cal1 = Calendar.getInstance();
+                    Calendar cal2 = Calendar.getInstance();
 
-                    ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    if (daysRounded == 0) {
+                    cal1.setTime(currentDate);
+                    cal2.setTime(messageDate);
+
+                    int today = cal1.get(Calendar.DAY_OF_WEEK);
+                    int notificationDay = cal2.get(Calendar.DAY_OF_WEEK);
+
+                    int daysFromWeek = today - notificationDay;
+
+                    long diff = currentDate.getTime() - messageDate.getTime();
+                    float daysFromTime = (diff / (1000 * 60 * 60 * 24));
+                    int daysRounded = Math.round(daysFromTime);
+
+                    if (daysFromWeek == 0 && daysRounded == 0) {
                         ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
-                    } else if (daysRounded == 1) {
+                    } else if (daysRounded == 1 || (daysFromWeek == 1 && daysRounded == 0)) {
                         ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
                     } else {
-                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy HH:mm", messageDate));
+                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy", messageDate));
                     }
                 } else {
                     ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
