@@ -98,7 +98,7 @@ public class dbConnectionsTest extends ActivityUnitTestCase<SignInActivity> {
         super.tearDown();
         if (mFirebaseAuth != null) {
             // Delete user instance.
-//            userRef.removeValue();
+            userRef.removeValue();
             mFirebaseAuth.getCurrentUser().delete();
             mFirebaseAuth = null;
         }
