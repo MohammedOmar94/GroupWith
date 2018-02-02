@@ -23,10 +23,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +47,8 @@ import haitsu.groupup.R;
 import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.fragment.DatePickerFragment;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.LocationManager;
+import haitsu.groupup.other.Models.Group;
 
 public class AccountSetupActivity extends AppCompatActivity
         implements View.OnClickListener, AdapterView.OnItemSelectedListener,
@@ -55,19 +61,20 @@ public class AccountSetupActivity extends AppCompatActivity
     private String country;
 
     private Button mfinishSetup;
-    GoogleApiClient mGoogleApiClient;
     private Toolbar toolbar;
     private Spinner spinner;
+    private TextView birthdayLabel;
+    private TextView locationLabel;
 
     //Access to methods dealing with Firebase.
     private DBConnections dbConnections = new DBConnections();
 
-    private final static int PLAY_SERVICES_REQUEST = 1000;
-    private final static int REQUEST_CHECK_SETTINGS = 2000;
-    private Location mLastLocation;
 
-    double latitude;
-    double longitude;
+    private FusedLocationProviderClient mFusedLocationClient;
+
+
+    private LocationCallback mLocationCallback;
+    private LocationManager locationManager = new LocationManager();
 
     FirebaseAuth mFirebaseAuth;
     FirebaseUser mFirebaseUser;
@@ -76,6 +83,22 @@ public class AccountSetupActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_setup);
+
+
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        mfinishSetup = (Button) findViewById(R.id.finish_setup);
+        spinner = (Spinner) findViewById(R.id.gender_spinner);
+        birthdayLabel = (TextView) findViewById(R.id.birthday_label);
+        locationLabel = (TextView) findViewById(R.id.location_label);
+        mfinishSetup.setOnClickListener(this);
+        spinner.setOnItemSelectedListener(this);
 
 
         ArrayList<String> permissions = new ArrayList<>();
@@ -89,75 +112,51 @@ public class AccountSetupActivity extends AppCompatActivity
         permissionUtils.check_permission(permissions, "Need GPS permission for getting your location", 1);
 
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-
-        mGoogleApiClient.connect();
-
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    locationManager.storeLocationData(location);
+                    locationLabel.setText(locationManager.getCity() + "/" + locationManager.getCountry());
+                    locationManager.stopLocationUpdates();
+                }
+            }
+        };
 
-        // Initialize Firebase Auth
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        mfinishSetup = (Button) findViewById(R.id.finish_setup);
-        spinner = (Spinner) findViewById(R.id.gender_spinner);
-        TextView txt = (TextView) findViewById(R.id.location_label);
-        txt.setOnClickListener(this);
-        mfinishSetup.setOnClickListener(this);
-        spinner.setOnItemSelectedListener(this);
+        locationManager.setmLocationCallback(mLocationCallback);
+
+        // Handles all location logic
+        locationManager.setmFusedLocationClient(mFusedLocationClient);
+
+        locationManager.initialiseLocationRequest(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.finish_setup:
-                //Passes the users details (Username, Email, Age) and stores them in the database.
-                if (city == null || country == null) {
+                if(((EditText) findViewById(R.id.username)).getText().toString().equals("")){
                     Toast.makeText(getApplicationContext(),
-                            "Please retrieve your location.", Toast.LENGTH_LONG)
+                            "Please enter a username.", Toast.LENGTH_LONG)
+                            .show();
+                }
+                else if(birthdayLabel.getText().equals("Add birthday")){
+                    Toast.makeText(getApplicationContext(),
+                            "Please enter your date of birth.", Toast.LENGTH_LONG)
+                            .show();
+                } else if (locationManager.getCountry() == null || locationManager.getCity() == null) {
+                    Toast.makeText(getApplicationContext(),
+                            "Please turn on your location.", Toast.LENGTH_LONG)
                             .show();
                 } else {
-                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), (TextView) findViewById(R.id.birthday_label), city, country, latitude, longitude);
+                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel, city, country, locationManager.getLatitude(), locationManager.getLongitude());
                     //Redirects user to the Home screen.
                     startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));
                     finish();
-                }
-                break;
-            case R.id.location_label:
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mLastLocation = LocationServices.FusedLocationApi
-                        .getLastLocation(mGoogleApiClient);
-
-                if (mLastLocation != null) {
-                    latitude = mLastLocation.getLatitude();
-                    longitude = mLastLocation.getLongitude();
-                    getAddress();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Please turn on your Location.", Toast.LENGTH_LONG)
-                            .show();
                 }
                 break;
         }
@@ -169,74 +168,6 @@ public class AccountSetupActivity extends AppCompatActivity
 
 
     }
-
-    private boolean checkPlayServices() {
-        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
-
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (googleApiAvailability.isUserResolvableError(resultCode)) {
-                googleApiAvailability.getErrorDialog(this, resultCode,
-                        PLAY_SERVICES_REQUEST).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public Address getAddress(double latitude, double longitude) {
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(this, Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-
-    public void getAddress() {
-        Address locationAddress = getAddress(latitude, longitude);
-
-        if (locationAddress != null) {
-            city = locationAddress.getLocality();
-            country = locationAddress.getCountryName();
-
-            String currentLocation;
-
-            if (!TextUtils.isEmpty(city)) {
-                currentLocation = city;
-
-                if (!TextUtils.isEmpty(country))
-                    currentLocation += "\n" + country;
-
-
-                TextView txt = (TextView) findViewById(R.id.location_label);
-                txt.setText(currentLocation);
-
-
-                Toast.makeText(getApplicationContext(),
-                        "Location is " + currentLocation, Toast.LENGTH_LONG)
-                        .show();
-
-
-            }
-
-        }
-
-    }
-
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Spinner spinner = (Spinner) parent;
