@@ -81,6 +81,7 @@ public class dbConnectionsTest extends ActivityUnitTestCase<SignInActivity> {
                             Log.d(TAG, "createUserWithEmail:success");
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             databaseRef = FirebaseDatabase.getInstance().getReference();
+                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue("test bro");
                             userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
 
                             lock2.countDown();
@@ -126,7 +127,6 @@ public class dbConnectionsTest extends ActivityUnitTestCase<SignInActivity> {
 
     @Test
     public void writeToDatabase() throws ExecutionException, InterruptedException {
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue("test bro");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
