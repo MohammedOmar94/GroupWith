@@ -171,7 +171,7 @@ public class DBConnections {
         });
     }
 
-    public void newGroupRequest(final String groupCategory, final String groupType, final EditText groupName, final EditText groupDescription, final String groupGender, final String memberCount) {
+    public void newGroupRequest(final String groupCategory, final String groupType, final String groupName, final String groupDescription, final String groupGender, final String memberCount) {
         DatabaseReference userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -282,7 +282,7 @@ public class DBConnections {
 
     }
 
-    public void submitNewGroup(String groupCategory, String groupType, EditText groupName, EditText groupDescription, String groupGender, String memberLimit, User user) {
+    public void submitNewGroup(String groupCategory, String groupType, String groupName, String groupDescription, String groupGender, String memberLimit, User user) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).push();
@@ -307,10 +307,10 @@ public class DBConnections {
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
         //groupId2.child("category").setValue(groupCategory);
         groupId2.child("adminID").setValue(mFirebaseUser.getUid());//Adds AdminID
-        groupId2.child("name").setValue(groupName.getText().toString());//Adds Category to Group
+        groupId2.child("name").setValue(groupName.toString());//Adds Category to Group
         groupId2.child("memberLimit").setValue(Integer.parseInt(memberLimit));
         groupId2.child("memberCount").setValue(1);
-        groupId2.child("description").setValue(groupDescription.getText().toString());
+        groupId2.child("description").setValue(groupDescription.toString());
         groupId2.child("genders").setValue(groupGender);
         groupId2.child("type").setValue(groupType);
         groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memberLimit);
@@ -320,7 +320,7 @@ public class DBConnections {
 
         //Adds to users tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.getText().toString());
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("userApproved").setValue(true);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("memberCount").setValue(1);
@@ -328,7 +328,7 @@ public class DBConnections {
 
 
         //Add to notifications
-        notifications.setValue(new Notification("You created the group " + groupName.getText().toString() + "!"));
+        notifications.setValue(new Notification("You created the group " + groupName.toString() + "!"));
     }
 
     public void createChatRoom(String groupId) {
