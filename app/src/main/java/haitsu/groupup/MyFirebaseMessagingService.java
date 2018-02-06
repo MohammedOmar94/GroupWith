@@ -30,6 +30,7 @@ import android.util.Log;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -38,6 +39,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import haitsu.groupup.activity.ChatsActivity;
+import haitsu.groupup.activity.Groups.MyGroupsActivity;
 import haitsu.groupup.activity.MainActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -87,9 +90,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Icon: " + remoteMessage.getNotification().getIcon());
             icon = remoteMessage.getNotification().getIcon();
             System.out.println("Hey " + remoteMessage.getNotification().getIcon());
-            if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
-                sendNotification(remoteMessage.getNotification().getBody());
-            }
+//            if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
+                    Intent intent = new Intent(this, MyGroupsActivity.class);
+                    sendNotification(remoteMessage.getNotification().getBody(), intent);
+                } else {
+                    Intent intent = new Intent(this, ChatsActivity.class);
+                    sendNotification(remoteMessage.getNotification().getBody(), intent);
+                }
+//            }
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -138,8 +147,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      *
      * @param messageBody FCM message body received.
      */
-    private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void sendNotification(String messageBody, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -148,7 +156,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.app_icon)
                         .setContentTitle("Group Up")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
