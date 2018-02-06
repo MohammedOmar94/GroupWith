@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.activity.ChatsActivity;
 import haitsu.groupup.activity.Groups.MyGroupsActivity;
 import haitsu.groupup.activity.MainActivity;
@@ -95,7 +96,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     Intent intent = new Intent(this, MyGroupsActivity.class);
                     sendNotification(remoteMessage.getNotification().getBody(), intent);
                 } else {
-                    Intent intent = new Intent(this, ChatsActivity.class);
+                    Intent intent = new Intent(this, ChatRoomActivity.class);
                     sendNotification(remoteMessage.getNotification().getBody(), intent);
                 }
 //            }
@@ -156,7 +157,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.app_icon)
+                        .setSmallIcon(R.drawable.app_icon_transparent)
                         .setContentTitle("Group Up")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
