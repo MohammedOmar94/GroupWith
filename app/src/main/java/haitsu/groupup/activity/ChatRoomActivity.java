@@ -135,7 +135,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
-                        .setValue(new ChatMessage(groupName, input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
+                        .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(),input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
                 //Stores the last message sent.
 
                 //If this isn't Single Value, message updates continously forever.
@@ -150,7 +150,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
                                         .child("groups").child(groupID).child("lastMessage");
                                 Groups groupData = snapshot.getValue(Groups.class);
-                                ChatMessage usersLastMessage = new ChatMessage(groupName, message, MainActivity.mUsername, account.getPhotoUrl().toString());
+                                ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, MainActivity.mUsername, account.getPhotoUrl().toString());
                                 lastMessage.setValue(usersLastMessage);
                                 System.out.println("Snapshot " + snapshot);
                             }

@@ -9,13 +9,15 @@ import java.util.Date;
 public class ChatMessage {
 
     private String groupName;
+    private String userId;
     private String messageText;
     private String messageUser;
     private long messageTime;
     private String imageUrl;
 
-    public ChatMessage(String groupName, String messageText, String messageUser, String imageUrl) {
+    public ChatMessage(String groupName, String userId, String messageText, String messageUser, String imageUrl) {
         this.groupName = groupName;
+        this.userId = userId;
         this.messageText = messageText;
         this.messageUser = messageUser;
 
@@ -66,5 +68,13 @@ public class ChatMessage {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

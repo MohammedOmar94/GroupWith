@@ -84,22 +84,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
 
         }
-
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             Log.d(TAG, "Message Notification Icon: " + remoteMessage.getNotification().getIcon());
             icon = remoteMessage.getNotification().getIcon();
             System.out.println("Hey " + remoteMessage.getNotification().getIcon());
-//            if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-                if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
-                    Intent intent = new Intent(this, MyGroupsActivity.class);
-                    sendNotification(remoteMessage.getNotification().getBody(), intent);
-                } else {
+            if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
+                Intent intent = new Intent(this, MyGroupsActivity.class);
+                sendNotification(remoteMessage.getNotification().getBody(), intent);
+            } else {
+                // User id from the chat message received
+                String userId = remoteMessage.getData().get("userid");
+                // Prevents user from receiving a push notification from the message they sent
+                if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
                     Intent intent = new Intent(this, ChatRoomActivity.class);
                     sendNotification(remoteMessage.getNotification().getBody(), intent);
                 }
-//            }
+            }
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
