@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textColor="@color/colorPrimary"
+            android:maxLength="2500"
             android:layout_weight="1" />
 
         <android.support.design.widget.FloatingActionButton

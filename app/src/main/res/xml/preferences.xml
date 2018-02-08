@@ -14,6 +14,7 @@
         android:inputType="textCapWords"
         android:key="display_name"
         android:maxLines="1"
+        android:maxLength="20"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_title_display_name" />
