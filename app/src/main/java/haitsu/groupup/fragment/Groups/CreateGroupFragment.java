@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
+import java.util.regex.Pattern;
+
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 
@@ -48,6 +50,8 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
     private Button mSubmitButton;
     private Spinner spinner3;
+    private EditText groupName;
+    private EditText groupDescription;
 
 
     private DBConnections dbConnections = new DBConnections();
@@ -103,6 +107,9 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
         Spinner memberCount = (Spinner) view.findViewById(R.id.member_count);
         spinner3 = (Spinner) view.findViewById(R.id.spinner3);
+        groupName = ((EditText) view.findViewById(R.id.group_name));
+        groupDescription = ((EditText) view.findViewById(R.id.group_description));
+
         spinner.setOnItemSelectedListener(this);
         spinner2.setOnItemSelectedListener(this);
         spinner3.setOnItemSelectedListener(this);
@@ -142,10 +149,17 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         switch (v.getId()) {
             case R.id.submit_button:
-                dbConnections.newGroupRequest(selectedCategory, selectedGroupType, ((EditText) getView().findViewById(R.id.group_name)).getText().toString(), ((EditText) getView().findViewById(R.id.group_description)).getText().toString(), selectedGender, selectedMemberCount);
-                Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
-                mInterstitialAd.show();
-                getActivity().finish();
+                String groupNameText = groupName.getText().toString();
+                String groupDescriptionText = groupDescription.getText().toString();
+                // Regexp ensures that at least one non-blank character is used.
+                if(Pattern.compile("\\S").matcher(groupNameText).find() && Pattern.compile("\\S").matcher(groupDescriptionText).find()) {
+                    dbConnections.newGroupRequest(selectedCategory, selectedGroupType, groupNameText, groupDescriptionText, selectedGender, selectedMemberCount);
+                    Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
+                    mInterstitialAd.show();
+                    getActivity().finish();
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), "All fields must be filled in.", Toast.LENGTH_LONG).show();
+                }
                 break;
         }
     }
@@ -156,21 +170,21 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         Spinner spinner = (Spinner) parent;
         if (spinner.getId() == R.id.spinner) {
             selectedCategory = (String) parent.getItemAtPosition(pos);
-            if (selectedCategory.equals("Gaming")) {
-                ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
-                        getActivity(),
-                        R.array.games_type_arrays, //<!--Your Array -->
-                        android.R.layout.simple_spinner_item);
-                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner3.setAdapter(spinnerArrayAdapter);
-            } else {
+//            if (selectedCategory.equals("Gaming")) {
+//                ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
+//                        getActivity(),
+//                        R.array.games_type_arrays, //<!--Your Array -->
+//                        android.R.layout.simple_spinner_item);
+//                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                spinner3.setAdapter(spinnerArrayAdapter);
+//            } else {
                 ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(
                         getActivity(),
                         R.array.group_type_arrays, //<!--Your Array -->
                         android.R.layout.simple_spinner_item);
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner3.setAdapter(spinnerArrayAdapter);
-            }
+//            }
             //do this
         } else if (spinner.getId() == R.id.group_gender) {
             selectedGender = (String) parent.getItemAtPosition(pos);
