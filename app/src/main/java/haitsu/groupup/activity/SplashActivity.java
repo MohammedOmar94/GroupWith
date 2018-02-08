@@ -58,7 +58,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 // If the user hasn't setup their account details like Username and DoB...
-              if (!snapshot.hasChild((mFirebaseUser.getUid()))) {
+              if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
                     startActivity(new Intent(SplashActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
