@@ -37,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -200,61 +201,61 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         eventsByLocation.keepSynced(true);
 
 
-        eventsByLocation.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-                mainContent.setVisibility(View.GONE);
-                progressSpinner.setVisibility(View.VISIBLE);
-                mNoGroupsText.setVisibility(View.GONE);
-                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                if (getActivity() != null) {
-                    getSearchResults();
-                } else {
-                    new CountDownTimer(1, 1000) {
-
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        public void onFinish() {
-                            getSearchResults();
-                        }
-                    };
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                mainContent.setVisibility(View.GONE);
-                progressSpinner.setVisibility(View.VISIBLE);
-                mNoGroupsText.setVisibility(View.GONE);
-                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-                if (getActivity() != null) {
-                    getSearchResults();
-                } else {
-                    new CountDownTimer(1, 1000) {
-
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        public void onFinish() {
-                            getSearchResults();
-                        }
-                    };
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+//        eventsByLocation.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+//                mainContent.setVisibility(View.GONE);
+//                progressSpinner.setVisibility(View.VISIBLE);
+//                mNoGroupsText.setVisibility(View.GONE);
+//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
+//                if (getActivity() != null) {
+//                    getSearchResults();
+//                } else {
+//                    new CountDownTimer(1, 1000) {
+//
+//                        public void onTick(long millisUntilFinished) {
+//                        }
+//
+//                        public void onFinish() {
+//                            getSearchResults();
+//                        }
+//                    };
+//                }
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                mainContent.setVisibility(View.GONE);
+//                progressSpinner.setVisibility(View.VISIBLE);
+//                mNoGroupsText.setVisibility(View.GONE);
+//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
+//                if (getActivity() != null) {
+//                    getSearchResults();
+//                } else {
+//                    new CountDownTimer(1, 1000) {
+//
+//                        public void onTick(long millisUntilFinished) {
+//                        }
+//
+//                        public void onFinish() {
+//                            getSearchResults();
+//                        }
+//                    };
+//                }
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//            }
+//        });
 
         return view;
     }
@@ -393,6 +394,24 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    public void onResume(){
+        super.onResume();
+        eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mainContent.setVisibility(View.GONE);
+                progressSpinner.setVisibility(View.VISIBLE);
+                mNoGroupsText.setVisibility(View.GONE);
+                getSearchResults();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
