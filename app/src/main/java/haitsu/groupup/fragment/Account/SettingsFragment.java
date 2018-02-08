@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
@@ -337,9 +338,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (pref instanceof EditTextPreference) {
             EditTextPreference listPref = (EditTextPreference) pref;
-            databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
-            pref.setSummary(listPref.getText().toString());
-            ((EditTextPreference) pref).setText(listPref.getText().toString());
+            // Regexp ensures that at least one non-blank character is used.
+            if(Pattern.compile("\\S").matcher(listPref.getText().toString()).find()) {
+                databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
+                pref.setSummary(listPref.getText().toString());
+                ((EditTextPreference) pref).setText(listPref.getText().toString());
+            } else {
+                Toast.makeText(getActivity().getApplicationContext(), "Username can't be left blank.", Toast.LENGTH_LONG).show();
+            }
         }
 
 
