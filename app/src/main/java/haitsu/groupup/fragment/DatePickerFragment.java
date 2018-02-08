@@ -2,8 +2,10 @@ package haitsu.groupup.fragment;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +29,20 @@ public class DatePickerFragment extends DialogFragment
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(getActivity());
+        }
+        // TODO Auto-generated method stub
+        builder.setTitle("Disclaimer")
+                .setMessage("Users can see your age when you request to join a group, so it's important that the info you've added" +
+                        " here is correct.")
+                .setPositiveButton(android.R.string.yes, null)
+                .show();
+
+
         // Use the current date as the default date in the picker
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
