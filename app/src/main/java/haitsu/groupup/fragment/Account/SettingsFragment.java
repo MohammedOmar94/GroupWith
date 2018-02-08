@@ -154,37 +154,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);// Load the preferences from an XML resource
 
-        //updateValuesFromBundle(savedInstanceState);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    // Update UI with location data
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                    getAddress();
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("city").setValue(city);
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("country").setValue(country);
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("latitude").setValue(latitude);
-                    databaseRef.child("users").child(mFirebaseUser.getUid()).child("longitude").setValue(longitude);
-                    stopLocationUpdates();
-
-                    // ...
-                }
-            }
-
-            ;
-        };
-
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         addPreferencesFromResource(R.xml.preferences);
 
-        final EditTextPreference editText = (EditTextPreference) findPreference("display_name");
+        final EditTextPreference editText = (EditTextPreference) findPreference("username");
         DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid());
         user.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -266,45 +242,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API).build();
 
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
-        // calculate margins
-        //    button = (Button) view.findViewById(R.id.as);
-//        button.setOnClickListener(this);
-
-
-        pref2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // TODO Auto-generated method stub
-                openDialog();
-                //finish();
-                // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
 
 
         return view;
-    }
-
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        // Update the value of mRequestingLocationUpdates from the Bundle.
-        if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
-            mRequestingLocationUpdates = savedInstanceState.getBoolean(
-                    REQUESTING_LOCATION_UPDATES_KEY);
-        }
-
-        // ...
-
-        // Update UI to match restored state
-        // updateUI();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -349,27 +291,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 //        }
     }
 
-    private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        } else {
-            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                    mLocationCallback,
-                    null /* Looper */);
-        }
-    }
-
-    private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
-    }
-
     @Override
     public void onPause() {
         super.onPause();
@@ -398,211 +319,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         getActivity().finishAffinity();//Works for Android 4.1 and above only.
         // startActivity(new Intent(getContext(), SignInActivity.class));
         //
-    }
-
-    public void lastLocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-        } else {
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                System.out.println("Hey, we have the Last location");
-                                mLastLocation = location;
-                                // updateLocation();
-                                requestLocation();
-                            } else {
-                                // Pretty busted, added in but not tested properly before. Need to request updates
-                                System.out.println("Hey, we don't so we have to Request location");
-                                requestLocation();
-                            }
-                            // Logic to handle location object
-                        }
-                    });
-        }
-    }
-
-    protected void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    public void openDeleteDialog(){
-
-    }
-
-    private void openDialog() {
-        final AlertDialog.Builder builder;
-        final LocationSettingsRequest.Builder settingsBuilder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(mLocationRequest);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-//            LocationServices.FusedLocationApi.requestLocationUpdates(
-//                    mGoogleApiClient, mLocationRequest, this);
-        }
-        builder.setTitle("Update Location")
-                .setMessage("Are you sure you want to update your current location?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-                        } else {
-                            checkLocationStatus(settingsBuilder);
-                        }
-
-
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .show();
-
-
-    }
-
-    public void checkLocationStatus(LocationSettingsRequest.Builder settingsBuilder) {
-        SettingsClient client = LocationServices.getSettingsClient(getActivity());
-        final Task<LocationSettingsResponse> task = client.checkLocationSettings(settingsBuilder.build());
-
-        task.addOnSuccessListener(getActivity(), new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                // All location settings are satisfied. The client can initialize
-                // location requests here.
-                // ...
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    System.out.println("Hey no permission");
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-                } else {
-                    lastLocation();
-                }
-
-            }
-        });
-
-        task.addOnFailureListener(getActivity(), new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                int statusCode = ((ApiException) e).getStatusCode();
-                switch (statusCode) {
-                    case CommonStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied, but this can be fixed
-                        // by showing the user a dialog.
-                        try {
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            ResolvableApiException resolvable = (ResolvableApiException) e;
-                            resolvable.startResolutionForResult(getActivity(),
-                                    REQUEST_CHECK_SETTINGS);
-                        } catch (IntentSender.SendIntentException sendEx) {
-                            // Ignore the error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way
-                        // to fix the settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-    }
-
-    public void requestLocation() {
-        startLocationUpdates();
-//        System.out.println("Hey we're in request");
-//        updateLocation();
-    }
-
-
-    public void updateLocation() {
-        latitude = mLastLocation.getLatitude();
-        longitude = mLastLocation.getLongitude();
-        getAddress();
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("city").setValue(city);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("country").setValue(country);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("latitude").setValue(latitude);
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("longitude").setValue(longitude);
-    }
-
-
-    public Address getAddress(double latitude, double longitude) {
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(getActivity(), Locale.getDefault());
-
-        try {
-            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            return addresses.get(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-    public void getAddress() {
-        System.out.println("Hey lat " + latitude + " long " + longitude);
-        Address locationAddress = getAddress(latitude, longitude);
-
-        if (locationAddress != null) {
-            city = locationAddress.getLocality();
-            country = locationAddress.getCountryName();
-
-            String currentLocation;
-
-            if (!TextUtils.isEmpty(city)) {
-                currentLocation = city;
-
-                if (!TextUtils.isEmpty(country))
-                    currentLocation += "\n" + country;
-
-
-                TextView txt = (TextView) getActivity().findViewById(R.id.location_label);
-//                txt.setText(currentLocation);
-
-                pref2.setSummary(currentLocation);
-                Toast.makeText(getActivity().getApplicationContext(),
-                        "Location has been updated to " + currentLocation, Toast.LENGTH_LONG)
-                        .show();
-
-
-            }
-
-        }
-
     }
 
     @Override

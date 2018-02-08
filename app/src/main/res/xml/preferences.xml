@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="example_switch2"
-        android:title="@string/pref_title_enable_push_notifications" />
+    <!-- For a later date... -->
+    <!--<SwitchPreference-->
+        <!--android:defaultValue="true"-->
+        <!--android:key="example_switch2"-->
+        <!--android:title="@string/pref_title_enable_push_notifications" />-->
 
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
@@ -12,16 +13,16 @@
         android:textColor="@android:color/black"
         android:capitalize="words"
         android:inputType="textCapWords"
-        android:key="display_name"
+        android:key="username"
         android:maxLines="1"
         android:maxLength="20"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_display_name" />
+        android:title="@string/pref_title_username" />
 
     <Preference
         android:key="update_location"
-        android:title="Update Location"></Preference>
+        android:title="Location"></Preference>
 
     <Preference
         android:key="sign_out"

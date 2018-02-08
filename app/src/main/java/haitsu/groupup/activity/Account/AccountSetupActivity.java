@@ -153,7 +153,7 @@ public class AccountSetupActivity extends AppCompatActivity
                             "Please turn on your location.", Toast.LENGTH_LONG)
                             .show();
                 } else {
-                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel, city, country, locationManager.getLatitude(), locationManager.getLongitude());
+                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel, locationManager.getCity(), locationManager.getCountry(), locationManager.getLatitude(), locationManager.getLongitude());
                     //Redirects user to the Home screen.
                     startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));
                     finish();

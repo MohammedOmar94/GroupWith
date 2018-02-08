@@ -30,6 +30,9 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
@@ -183,6 +186,12 @@ public class LocationManager implements GoogleApiClient.OnConnectionFailedListen
         if (locationAddress != null) {
             city = locationAddress.getLocality();
             country = locationAddress.getCountryName();
+            DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            databaseRef.child("users").child(userId).child("city").setValue(city);
+            databaseRef.child("users").child(userId).child("country").setValue(country);
+            databaseRef.child("users").child(userId).child("latitude").setValue(latitude);
+            databaseRef.child("users").child(userId).child("longitude").setValue(longitude);
         }
     }
 
