@@ -200,6 +200,8 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         eventsByLocation = databaseRef.child("group").child(groupCategory);
         eventsByLocation.keepSynced(true);
 
+        getSearchResults();
+
 
 //        eventsByLocation.addChildEventListener(new ChildEventListener() {
 //            @Override
@@ -394,24 +396,6 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
-    }
-
-    public void onResume(){
-        super.onResume();
-        eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mainContent.setVisibility(View.GONE);
-                progressSpinner.setVisibility(View.VISIBLE);
-                mNoGroupsText.setVisibility(View.GONE);
-                getSearchResults();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
