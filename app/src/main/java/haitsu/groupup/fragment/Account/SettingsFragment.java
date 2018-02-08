@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -67,6 +68,7 @@ import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.SignInActivity;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.Models.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -125,6 +127,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
 
     private Preference pref2;
+    private Preference pref3;
 
 
     private OnFragmentInteractionListener mListener;
@@ -166,10 +169,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         user.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                editText.setSummary(snapshot.child("username").getValue(String.class));
-                editText.setText(snapshot.child("username").getValue(String.class));
-                pref2.setSummary(snapshot.child("city").getValue(String.class) + ", "
-                        + snapshot.child("country").getValue(String.class));
+                User user = snapshot.getValue(User.class);
+                editText.setSummary(user.getUsername());
+                editText.setText(user.getUsername());
+                pref3.setSummary(user.getAge());
+                pref2.setSummary(user.getCity() + ", " + user.getCountry());
             }
 
             @Override
@@ -235,6 +239,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        pref3 = findPreference("date_of_birth");
         pref2 = findPreference("update_location");
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .enableAutoManage((FragmentActivity) getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)

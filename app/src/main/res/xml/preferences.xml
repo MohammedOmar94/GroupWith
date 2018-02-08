@@ -21,6 +21,10 @@
         android:title="@string/pref_title_username" />
 
     <Preference
+        android:key="date_of_birth"
+        android:title="Date of birth"></Preference>
+
+    <Preference
         android:key="update_location"
         android:title="Location"></Preference>
 
