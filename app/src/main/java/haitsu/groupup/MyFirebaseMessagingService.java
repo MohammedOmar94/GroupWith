@@ -84,12 +84,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 handleNow();
             }
             String userId = remoteMessage.getData().get("userid");
+            icon = remoteMessage.getData().get("icon");
             // Prevents user from receiving a push notification from the message they sent
             if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
                 Intent intent = new Intent(this, ChatRoomActivity.class);
                 intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
                 intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
-                sendChatNotification(remoteMessage.getData().get("body"), intent);
+                sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
             }
 
         }
@@ -189,7 +190,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
-    private void sendChatNotification(String messageBody,Intent intent) {
+    private void sendChatNotification(String messageBody,String groupId, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -204,7 +205,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
 
+        Log.d(TAG, "Message Notification Icon: " + icon);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setLargeIcon(getBitmapFromURL(icon));
             notificationBuilder.setSmallIcon(R.drawable.app_icon_transparent);
             notificationBuilder.setColor(getResources().getColor(R.color.colorPrimaryDark));
         } else {

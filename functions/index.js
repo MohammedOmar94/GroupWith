@@ -23,6 +23,7 @@ console.log('event params ' + valueObject.imageUrl);
             title: valueObject.groupName,
             body: valueObject.messageUser + ": " + valueObject.messageText,
             tag: event.params.groupId,
+            icon: valueObject.imageUrl,
             sound: "default"
         }
     };
