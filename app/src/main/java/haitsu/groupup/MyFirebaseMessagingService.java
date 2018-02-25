@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -82,6 +83,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 // Handle message within 10 seconds
                 handleNow();
             }
+            String userId = remoteMessage.getData().get("userid");
+            // Prevents user from receiving a push notification from the message they sent
+            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
+                Intent intent = new Intent(this, ChatRoomActivity.class);
+                intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
+                intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
+                sendChatNotification(remoteMessage.getData().get("body"), intent);
+            }
 
         }
         // Check if message contains a notification payload.
@@ -95,12 +104,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 sendNotification(remoteMessage.getNotification().getBody(), intent);
             } else {
                 // User id from the chat message received
-                String userId = remoteMessage.getData().get("userid");
-                // Prevents user from receiving a push notification from the message they sent
-                if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
-                    Intent intent = new Intent(this, ChatRoomActivity.class);
-                    sendNotification(remoteMessage.getNotification().getBody(), intent);
-                }
+//                String userId = remoteMessage.getData().get("userid");
+//                // Prevents user from receiving a push notification from the message they sent
+//                if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
+//                    Intent intent = new Intent(this, ChatRoomActivity.class);
+//                    intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
+//                    intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
+//                    sendNotification(remoteMessage.getNotification().getBody(), intent);
+//                }
             }
         }
 
@@ -159,12 +170,46 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.app_icon_transparent)
                         .setContentTitle("Group Up")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setSmallIcon(R.drawable.app_icon_transparent);
+            notificationBuilder.setColor(getResources().getColor(R.color.colorPrimaryDark));
+        } else {
+            notificationBuilder.setSmallIcon(R.drawable.app_icon);
+        }
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+
+    private void sendChatNotification(String messageBody,Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Bitmap bitmap = getBitmapFromURL(icon);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this)
+                        .setContentTitle("Group Up")
+                        .setContentText(messageBody)
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setSmallIcon(R.drawable.app_icon_transparent);
+            notificationBuilder.setColor(getResources().getColor(R.color.colorPrimaryDark));
+        } else {
+            notificationBuilder.setSmallIcon(R.drawable.app_icon);
+        }
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

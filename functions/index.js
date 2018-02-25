@@ -18,14 +18,12 @@ console.log('value Object is ' + JSON.stringify(valueObject));
 console.log('event params ' + valueObject.imageUrl);
 /* Create a notification and data payload. They contain the notification information, and message to be sent respectively */ 
     const payload = {
-        notification: {
+        data : {
+            userid: valueObject.userId,
             title: valueObject.groupName,
             body: valueObject.messageUser + ": " + valueObject.messageText,
             tag: event.params.groupId,
             sound: "default"
-        },
-        data : {
-            userid: valueObject.userId
         }
     };
 /* Create an options object that contains the time to live for the notification and the priority. */
