@@ -41,7 +41,7 @@ console.log('Push notification event triggered ');
     var valueObject = event.data.val();
 /* Create a notification and data payload. They contain the notification information, and message to be sent respectively */ 
     const payload = {
-        notification: {
+        data: {
             title: "Group Up",
             body: valueObject.username + " wants to join your group " + valueObject.groupName,
             tag: "joinRequest",

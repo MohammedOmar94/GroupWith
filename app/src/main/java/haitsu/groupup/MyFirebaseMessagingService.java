@@ -85,25 +85,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
             String userId = remoteMessage.getData().get("userid");
             icon = remoteMessage.getData().get("icon");
-            // Prevents user from receiving a push notification from the message they sent
-            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
-                Intent intent = new Intent(this, ChatRoomActivity.class);
-                intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
-                intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
-                sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
+            Log.d(TAG, "Tag is : " + remoteMessage.getData().get("tag"));
+            if ((remoteMessage.getData().get("tag")).equals("joinRequest")) {
+                Intent intent = new Intent(this, MyGroupsActivity.class);
+                sendNotification(remoteMessage.getData().get("body"), intent);
+            } else {
+                // Prevents user from receiving a push notification from the message they sent
+                if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
+                    Intent intent = new Intent(this, ChatRoomActivity.class);
+                    intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
+                    intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
+                    sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
+                }
             }
 
         }
         // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            Log.d(TAG, "Message Notification Icon: " + remoteMessage.getNotification().getIcon());
-            icon = remoteMessage.getNotification().getIcon();
-            System.out.println("Hey " + remoteMessage.getNotification().getIcon());
-            if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
-                Intent intent = new Intent(this, MyGroupsActivity.class);
-                sendNotification(remoteMessage.getNotification().getBody(), intent);
-            } else {
+//        if (remoteMessage.getNotification() != null) {
+//            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+//            Log.d(TAG, "Message Notification Icon: " + remoteMessage.getNotification().getIcon());
+//            icon = remoteMessage.getNotification().getIcon();
+//            System.out.println("Hey " + remoteMessage.getNotification().getIcon());
+//            if (remoteMessage.getNotification().getTag().equals("joinRequest")) {
+//                Intent intent = new Intent(this, MyGroupsActivity.class);
+//                sendNotification(remoteMessage.getNotification().getBody(), intent);
+//            } else {
                 // User id from the chat message received
 //                String userId = remoteMessage.getData().get("userid");
 //                // Prevents user from receiving a push notification from the message they sent
@@ -113,8 +119,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //                    intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
 //                    sendNotification(remoteMessage.getNotification().getBody(), intent);
 //                }
-            }
-        }
+//            }
+//        }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
@@ -187,10 +193,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(1 /* ID of notification */, notificationBuilder.build());
     }
 
-    private void sendChatNotification(String messageBody,String groupId, Intent intent) {
+    private void sendChatNotification(String messageBody, String groupId, Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
