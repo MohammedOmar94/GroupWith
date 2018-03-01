@@ -35,6 +35,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.ReportActivity;
+import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Groups;
 
@@ -51,6 +52,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private String groupID;
     private String groupName;
+    private String username;
 
 
     private ImageView mAddMessageImageView;
@@ -93,6 +95,19 @@ public class ChatRoomActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("username");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                username = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         //Creates a reference to the chatrooms node from the JSON tree.
         //Location: https://group-up-34ab2.firebaseio.com/chatrooms
         chatrooms = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
@@ -101,6 +116,18 @@ public class ChatRoomActivity extends AppCompatActivity {
         queryStuff = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
         queryStuff.keepSynced(true);
 
+        FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("lastMessage")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        dataSnapshot.child("messageCount").getRef().removeValue();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
         /*queryStuff.addValueEventListener(new ValueEventListener()
                 {
                     @Override
@@ -135,24 +162,52 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
-                        .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(),input.getText().toString(), MainActivity.mUsername, account.getPhotoUrl().toString()));
+                        .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(), input.getText().toString(), username, account.getPhotoUrl().toString()));
                 //Stores the last message sent.
 
                 //If this isn't Single Value, message updates continously forever.
                 queryStuff.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             //System.out.println("Snapshot " + snapshot);
                             if (snapshot
                                     .child("groups").hasChild(groupID)) {
                                 //Path: users/userid/groups/groupid/lastMessage
                                 lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
                                         .child("groups").child(groupID).child("lastMessage");
+                                System.out.println("user id " + snapshot.getKey());
+                                lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        // Do this with all lastMessage in groups, count total unread messages
+                                        // Can add all unread messages this way in a single notification.
+                                        // Makes sure doesn't add count if admin is sending.
+//                                        System.out.println("this is datasnap " + dataSnapshot.child("userId").getValue(String.class));
+                                        // Each user vs message id.
+                                        if(!snapshot.getKey().equals(dataSnapshot.child("userId").getValue(String.class))) {
+                                            if (!dataSnapshot.hasChild("messageCount")) {
+                                                System.out.println("this is uid " + snapshot.getKey());
+                                                dataSnapshot.child("messageCount").getRef().setValue(1);
+                                            } else {
+                                                int messageCount = dataSnapshot.child("messageCount").getValue(Integer.class);
+                                                System.out.println("this is " + messageCount);
+                                                dataSnapshot.child("messageCount").getRef().setValue(messageCount + 1);
+                                            }
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
                                 Groups groupData = snapshot.getValue(Groups.class);
-                                ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, MainActivity.mUsername, account.getPhotoUrl().toString());
+                                ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, username, account.getPhotoUrl().toString());
                                 lastMessage.setValue(usersLastMessage);
-                                System.out.println("Snapshot " + snapshot);
+//                                System.out.println("Snapshot " + snapshot);
                             }
                         }
                     }
