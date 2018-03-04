@@ -14,6 +14,7 @@ public class ChatMessage {
     private String messageUser;
     private long messageTime;
     private String imageUrl;
+    private int messageCount;
 
     public ChatMessage(String groupName, String userId, String messageText, String messageUser, String imageUrl) {
         this.groupName = groupName;
@@ -76,5 +77,13 @@ public class ChatMessage {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getMessageCount() {
+        return messageCount;
+    }
+
+    public void setMessageCount(int messageCount) {
+        this.messageCount = messageCount;
     }
 }

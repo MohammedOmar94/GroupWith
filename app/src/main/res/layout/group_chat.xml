@@ -62,6 +62,18 @@
             android:maxLines="1"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/message_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:layout_marginLeft="5dp"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:textSize="14sp"/>
+
     </LinearLayout>
 
 </LinearLayout>

@@ -128,6 +128,7 @@ public class ChatsFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
                 if (groupInfo.getLastMessage() != null) {
                     ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
+                    ((TextView) view.findViewById(R.id.message_count)).setText(Integer.toString(message.getMessageCount()));
                     Date messageDate = new Date(message.getMessageTime());
                     Date currentDate = new Date();
                     Calendar cal1 = Calendar.getInstance();

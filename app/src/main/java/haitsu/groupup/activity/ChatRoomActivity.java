@@ -48,12 +48,14 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private DatabaseReference chatrooms;
     private DatabaseReference lastMessage;
+    private DatabaseReference messageReceived;
     private Query queryStuff;
 
     private String groupID;
     private String groupName;
     private String username;
 
+    private ValueEventListener mListener;
 
     private ImageView mAddMessageImageView;
     private static final int REQUEST_IMAGE = 2;
@@ -116,8 +118,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         queryStuff = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
         queryStuff.keepSynced(true);
 
-        FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("lastMessage")
-                .addValueEventListener(new ValueEventListener() {
+        messageReceived = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("lastMessage");
+        mListener = messageReceived.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         dataSnapshot.child("messageCount").getRef().removeValue();
@@ -163,9 +165,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // of ChatMessage to the Firebase database
                 chatrooms.push()
                         .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(), input.getText().toString(), username, account.getPhotoUrl().toString()));
-                //Stores the last message sent.
 
-                //If this isn't Single Value, message updates continously forever.
+                // When added in Firebase using the ChatMessage model, messageCount is set to 0 by default;
+                final ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, username, account.getPhotoUrl().toString());
+
+                // All users that have are apart of this group.
                 queryStuff.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -185,15 +189,25 @@ public class ChatRoomActivity extends AppCompatActivity {
                                         // Makes sure doesn't add count if admin is sending.
 //                                        System.out.println("this is datasnap " + dataSnapshot.child("userId").getValue(String.class));
                                         // Each user vs message id.
-                                        if(!snapshot.getKey().equals(dataSnapshot.child("userId").getValue(String.class))) {
+
+                                        //snapshot.getKey == current user in group (loop). Useless otherwise.
+                                        //dataSnapshot.child("userid") == last person who sent message.
+                                        if(!mFirebaseUser.getUid().equals(snapshot.getKey())) {
                                             if (!dataSnapshot.hasChild("messageCount")) {
                                                 System.out.println("this is uid " + snapshot.getKey());
                                                 dataSnapshot.child("messageCount").getRef().setValue(1);
+                                                usersLastMessage.setMessageCount(1);
                                             } else {
                                                 int messageCount = dataSnapshot.child("messageCount").getValue(Integer.class);
-                                                System.out.println("this is " + messageCount);
+                                                System.out.println("this is " + (messageCount + 1) + " " + snapshot.getKey());
                                                 dataSnapshot.child("messageCount").getRef().setValue(messageCount + 1);
+                                                usersLastMessage.setMessageCount(messageCount + 1);
                                             }
+                                            lastMessage.setValue(usersLastMessage);
+                                        } else {
+                                            usersLastMessage.setMessageCount(0);
+                                            lastMessage.setValue(usersLastMessage);
+                                            System.out.println("this was sent from your id " + snapshot.getKey());
                                         }
 
                                     }
@@ -205,8 +219,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 });
 
                                 Groups groupData = snapshot.getValue(Groups.class);
-                                ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, username, account.getPhotoUrl().toString());
-                                lastMessage.setValue(usersLastMessage);
 //                                System.out.println("Snapshot " + snapshot);
                             }
                         }
@@ -340,5 +352,11 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        messageReceived.removeEventListener(mListener);
     }
 }
