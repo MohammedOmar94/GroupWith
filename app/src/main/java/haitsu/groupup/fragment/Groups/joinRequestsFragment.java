@@ -117,6 +117,7 @@ public class joinRequestsFragment extends Fragment {
             protected void populateView(View view, UserRequest request, int position) {
                 System.out.println("ayy " + request.getGroupCategory());
                 int age = calculateAge(request.getAge());
+                view.findViewById(R.id.message_count).setVisibility(View.GONE);
                 ((TextView) view.findViewById(R.id.message_user)).setText(request.getGroupName().toString());
                 ((TextView) view.findViewById(R.id.message_text)).setText("User: " + request.getUsername() + " Age: " + age + " City: " + request.getCity() + "/ " + request.getCountry());
                 ((TextView) view.findViewById(R.id.message_time)).setText((DateFormat.format("dd-MM-yyyy", request.getTimeOfRequest())));

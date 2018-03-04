@@ -161,6 +161,7 @@ public class ChatsFragment extends Fragment {
                         ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy", messageDate));
                     }
                 } else {
+                    view.findViewById(R.id.message_count).setVisibility(View.GONE);
                     ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
                 }
                 //  (
