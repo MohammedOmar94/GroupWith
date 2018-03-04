@@ -217,7 +217,7 @@ public class DBConnections {
                 groupRef.child("memberCount").setValue(memberCount);
                 getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
                 Group group = dataSnapshot.getValue(Group.class);
-                if (dataSnapshot.child("members").getChildrenCount() == 3) { // Can maybe get snapshot of groupref, find member limit there?
+                if (dataSnapshot.child("members").getChildrenCount() == group.getMemberLimit()) { // Can maybe get snapshot of groupref, find member limit there?
                     // Change group type to Full, will no longer show in results.
                     // Will also be the case until admin approves or declines member.
                     groupRef.child("type").setValue("FULL_" + group.getType());//Combine Full and type of group, remove if member leaves or gets kicked. Group should then show up in results
