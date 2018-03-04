@@ -3,9 +3,12 @@ package haitsu.groupup.fragment.Groups;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
+import haitsu.groupup.activity.Groups.GroupInfoActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Models.Group;
 
@@ -252,26 +256,86 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
+        final AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getContext(), R.style.MyAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(getContext());
+        }
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
         switch (v.getId()) {
             case R.id.join_button:
-                dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId);
-                Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
-                getActivity().finish();
+                groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        boolean groupIsFull = dataSnapshot.child(groupID).child("type").getValue(String.class).contains("FULL");
+                        if (!dataSnapshot.hasChild(groupID)) {
+                            // Group doesn't exist anymore
+                            getActivity().finish();
+                        } else if (groupIsFull) {
+                            builder.setTitle("Group is now full")
+                                    .setMessage("Uh-oh! Someone else may have taken that last spot.")
+                                    .setPositiveButton(android.R.string.yes, null)
+                                    .show();
+                        } else {
+                            dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId);
+                            Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
+                            getActivity().finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
             case R.id.delete_button:
                 dbConnections.checkGroup(groupID, groupCategory);
                 getActivity().finish();
                 break;
             case R.id.leave_button:
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
-                dbConnections.leaveGroup(groupID, groupAdminId, groupCategory);
-                getActivity().finish();
+                groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.hasChild(groupID)) {
+                            // Group doesn't exist anymore
+                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                            getActivity().finish();
+                        } else {
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
+                            dbConnections.leaveGroup(groupID, groupAdminId, groupCategory);
+                            getActivity().finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
             case R.id.cancelRequest_button:
                 System.out.println("On exit " + groupCategory);
                 Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " cancelled", Toast.LENGTH_LONG).show();
-                dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId);
-                getActivity().finish();
+                groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.hasChild(groupID)) {
+                            // Group doesn't exist anymore
+                            databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
+                            getActivity().finish();
+                        } else {
+                            dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId);
+                            getActivity().finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
                 break;
         }
     }

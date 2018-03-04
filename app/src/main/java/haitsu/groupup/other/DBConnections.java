@@ -240,7 +240,7 @@ public class DBConnections {
 
     }
 
-    public void getUserByGroup(final String groupAdminId, final String groupID, final long memberCount, final long memberLimit){
+    public void getUserByGroup(final String groupAdminId, final String groupID, final long memberCount, final long memberLimit) {
         Query allUsersFromGroup = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
 
         //If this isn't Single Value, message updates continously forever.
@@ -350,9 +350,10 @@ public class DBConnections {
                         if (adminID.equals(userId)) {
                             System.out.println("group created " + groupSnapshot.getRef());
                             groupSnapshot.getRef().removeValue();
-                        } else if(groupSnapshot.child("members").hasChild(userId)) {
+                        } else if (groupSnapshot.child("members").hasChild(userId)) {
                             System.out.println("group joined " +
-                                    groupSnapshot.child("members").child(userId).getRef());;
+                                    groupSnapshot.child("members").child(userId).getRef());
+                            ;
                             groupSnapshot.child("members").child(userId).getRef().removeValue();
                         }
                     }
@@ -378,6 +379,7 @@ public class DBConnections {
                 if (dataSnapshot.getValue() != null) {
                     System.out.println("Category is" + groupCategory);
                     deleteRequest(groupID);
+                    deleteGroupFromUsers(groupID);
                     //Delete from group tree, which contains detail about the name and its members
                     databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
 
@@ -386,6 +388,27 @@ public class DBConnections {
 
                     //Deletes the chatroom for everyone.
                     databaseRef.child("chatrooms").child(groupID).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void deleteGroupFromUsers(final String groupID) {
+        Query groupMembers = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
+        groupMembers.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //System.out.println("Snapshot " + snapshot);
+                    if (snapshot.child("groups").hasChild(groupID)) {
+                        //Path: users/userid/groups/groupid/lastMessage
+                        snapshot.child("groups").child(groupID).getRef().removeValue();
+                    }
                 }
             }
 
