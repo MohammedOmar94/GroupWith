@@ -6,7 +6,6 @@ import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,10 +17,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryDataEventListener;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,7 +28,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -107,7 +102,6 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private LocationManager locationManager;
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
-    private boolean foundData;
 
     public InterestsGroupFragment() {
         // Required empty public constructor
@@ -174,7 +168,45 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    getSearchResults();
+                    eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            final ArrayList<Group> groupsList = new ArrayList<>();
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Group group = snapshot.getValue(Group.class);
+                                Location groupsLocation = new Location("Groups location");
+                                groupsLocation.setLatitude(group.getLatitude());
+                                groupsLocation.setLongitude(group.getLongitude());
+
+                                Location currentLocation = new Location("Current location");
+                                currentLocation.setLatitude(lm.getLatitude());
+                                currentLocation.setLongitude(lm.getLongitude());
+
+                                System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
+                                System.out.println("Lang " + lm.getLongitude());
+                                System.out.println("Lang " + lm.getLatitude());
+
+                                double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+
+                                group.setGroupId(snapshot.getKey());
+                                group.setCategory(groupCategory);
+                                if ((group.getType()).equals("Interests")) {
+                                    if (distanceInMiles < 15) {
+                                        groupsList.add(group);
+                                        adapter = new GroupsAdapter(getContext(), groupsList);
+                                        mListView.setAdapter(adapter);
+                                    }
+                                }
+                            }
+                            crossfade(mainContent, dataSnapshot);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
         };
@@ -199,175 +231,19 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
 
         eventsByLocation = databaseRef.child("group").child(groupCategory);
         eventsByLocation.keepSynced(true);
-
-        getSearchResults();
-
-
-//        eventsByLocation.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-//                mainContent.setVisibility(View.GONE);
-//                progressSpinner.setVisibility(View.VISIBLE);
-//                mNoGroupsText.setVisibility(View.GONE);
-//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-//                if (getActivity() != null) {
-//                    getSearchResults();
-//                } else {
-//                    new CountDownTimer(1, 1000) {
-//
-//                        public void onTick(long millisUntilFinished) {
-//                        }
-//
-//                        public void onFinish() {
-//                            getSearchResults();
-//                        }
-//                    };
-//                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                mainContent.setVisibility(View.GONE);
-//                progressSpinner.setVisibility(View.VISIBLE);
-//                mNoGroupsText.setVisibility(View.GONE);
-//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-//                if (getActivity() != null) {
-//                    getSearchResults();
-//                } else {
-//                    new CountDownTimer(1, 1000) {
-//
-//                        public void onTick(long millisUntilFinished) {
-//                        }
-//
-//                        public void onFinish() {
-//                            getSearchResults();
-//                        }
-//                    };
-//                }
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-
         return view;
     }
 
-    public void getSearchResults() {
-        GeoFire geoFire = new GeoFire(eventsByLocation);
-        // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
-        // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(lm.getLatitude(), lm.getLongitude()), 24);
-        final ArrayList<Group> planetList = new ArrayList<Group>();
-
-
-        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-
-            GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
-                @Override
-                public void onComplete(String key, DatabaseError error) {
-                    if (error != null) {
-                        System.err.println("There was an error saving the location to GeoFire: " + error);
-                    } else {
-                        System.out.println("Location saved on server successfully!");
-                    }
-                }
-            };
-
-            // Once they've done that on the groups tree
-            @Override
-            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                Group group = dataSnapshot.getValue(Group.class);
-                group.setGroupId(dataSnapshot.getKey());
-                group.setCategory(groupCategory);
-                if ((group.getType()).equals("Interests")) {
-                    System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
-                    System.out.println("hey events " + dataSnapshot.getRef());
-                    // Create ArrayAdapter using the planet list.
-                    planetList.add(group);
-
-                    adapter = new GroupsAdapter(getContext(), planetList);
-                    mListView.setAdapter(adapter);
-                    crossfade(mainContent);
-                    foundData = true;
-                }
-            }
-
-            @Override
-            public void onDataExited(DataSnapshot dataSnapshot) {
-                System.out.println("Hey Nothing to see here buddy");
-            }
-
-            @Override
-            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey just moved within range");
-            }
-
-            @Override
-            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey data has changed");
-            }
-
-            @Override
-            public void onGeoQueryReady() {
-                new CountDownTimer(15000, 1000) {
-
-                    public void onTick(long millisUntilFinished) {
-                    }
-
-                    public void onFinish() {
-                        if (!foundData) {
-                            mNoGroupsText.setAlpha(0f);
-                            mNoGroupsText.setVisibility(View.VISIBLE);
-
-                            progressSpinner.animate()
-                                    .alpha(0f)
-                                    .setDuration(mShortAnimationDuration)
-                                    .setListener(new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            progressSpinner.setVisibility(View.GONE);
-                                            // Animate the content view to 100% opacity, and clear any animation
-                                            // listener set on the view.
-                                            mNoGroupsText.animate()
-                                                    .alpha(1f)
-                                                    // 1000ms used so the transition happens after the activity's transition on start up.
-                                                    .setDuration(mShortAnimationDuration)
-                                                    .setListener(null);
-                                        }
-                                    });
-                        }
-                    }
-                }.start();
-
-
-            }
-
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-
-                System.out.println("Hey ERROR");
-            }
-        });
-    }
-
-    private void crossfade(final View contentView) {
+    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
 
         // Set the content view to 0% opacity but visible, so that it is visible
         // (but fully transparent) during the animation.
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
+        if (!dataSnapshot.exists()) {
+            mNoGroupsText.setAlpha(0f);
+            mNoGroupsText.setVisibility(View.VISIBLE);
+        }
 
         // Animate the loading view to 0% opacity. After the animation ends,
         // set its visibility to GONE as an optimization step (it won't
@@ -386,7 +262,16 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                                 .alpha(1f)
                                 // 1000ms used so the transition happens after the activity's transition on start up.
                                 .setDuration(mShortAnimationDuration)
-                                .setListener(null);
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        mNoGroupsText.animate()
+                                                .alpha(1f)
+                                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                                .setDuration(mShortAnimationDuration)
+                                                .setListener(null);
+                                    }
+                                });
                     }
                 });
     }

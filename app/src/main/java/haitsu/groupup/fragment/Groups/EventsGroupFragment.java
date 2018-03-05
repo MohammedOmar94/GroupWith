@@ -113,7 +113,6 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     private LocationManager locationManager;
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
-    private boolean foundData;
 
     public EventsGroupFragment() {
         // Required empty public constructor
@@ -180,14 +179,15 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    final ArrayList<Group> groupsList = new ArrayList<>();
-                    eventsByLocation.addValueEventListener(new ValueEventListener() {
+                    eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+                            final ArrayList<Group> groupsList = new ArrayList<>();
                             for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Group group = snapshot.getValue(Group.class);
                                 Location groupsLocation = new Location("Groups location");
-                                groupsLocation.setLatitude(snapshot.child("latitude").getValue(double.class));
-                                groupsLocation.setLongitude(snapshot.child("longitude").getValue(double.class));
+                                groupsLocation.setLatitude(group.getLatitude());
+                                groupsLocation.setLongitude(group.getLongitude());
 
                                 Location currentLocation = new Location("Current location");
                                 currentLocation.setLatitude(lm.getLatitude());
@@ -199,7 +199,6 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
                                 double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
 
-                                Group group = snapshot.getValue(Group.class);
                                 group.setGroupId(snapshot.getKey());
                                 group.setCategory(groupCategory);
                                 if ((group.getType()).equals("Events")) {
@@ -207,11 +206,10 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                                         groupsList.add(group);
                                         adapter = new GroupsAdapter(getContext(), groupsList);
                                         mListView.setAdapter(adapter);
-                                        crossfade(mainContent);
-                                        foundData = true;
                                     }
                                 }
                             }
+                            crossfade(mainContent, dataSnapshot);
                         }
 
                         @Override
@@ -247,12 +245,16 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         return view;
     }
 
-    private void crossfade(final View contentView) {
+    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
 
         // Set the content view to 0% opacity but visible, so that it is visible
         // (but fully transparent) during the animation.
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
+        if (!dataSnapshot.exists()) {
+            mNoGroupsText.setAlpha(0f);
+            mNoGroupsText.setVisibility(View.VISIBLE);
+        }
 
         // Animate the loading view to 0% opacity. After the animation ends,
         // set its visibility to GONE as an optimization step (it won't
@@ -271,7 +273,16 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                                 .alpha(1f)
                                 // 1000ms used so the transition happens after the activity's transition on start up.
                                 .setDuration(mShortAnimationDuration)
-                                .setListener(null);
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        mNoGroupsText.animate()
+                                                .alpha(1f)
+                                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                                .setDuration(mShortAnimationDuration)
+                                                .setListener(null);
+                                    }
+                                });
                     }
                 });
     }
