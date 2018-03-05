@@ -1,6 +1,8 @@
 package haitsu.groupup.activity.Search;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -19,8 +21,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -62,6 +67,7 @@ import java.util.Locale;
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
+import haitsu.groupup.other.Adapters.GroupsAdapter;
 import haitsu.groupup.other.Adapters.ResultsAdapter;
 import haitsu.groupup.other.LocationManager;
 import haitsu.groupup.other.Models.Group;
@@ -84,6 +90,9 @@ public class ResultsActivity extends AppCompatActivity implements
     private ResultsAdapter adapter;
 
     private ListView mainListView;
+    private View mainContent;
+    private TextView mNoGroupsText;
+    private ProgressBar progressSpinner;
     private ArrayAdapter<Group> listAdapter;
 
     private String selectedGroupID;
@@ -93,12 +102,14 @@ public class ResultsActivity extends AppCompatActivity implements
     private String groupGender;
     private String groupType;
     private int memberLimit;
-    private double kilometers;
+    private double selectedDistance;
 
+    private int mShortAnimationDuration;
 
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    private Query searchByLocation;
 
     private GeoQuery geoQuery;
 
@@ -131,9 +142,17 @@ public class ResultsActivity extends AppCompatActivity implements
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupType = extras.getString("GROUP_TYPE");
         memberLimit = extras.getInt("MEMBER_LIMIT");
-        kilometers = extras.getDouble("MILES_CONVERTED");
+        selectedDistance = extras.getDouble("MILES_CONVERTED");
 
         mListView = (ListView) findViewById(R.id.listview);
+        mainContent = findViewById(R.id.content);
+        progressSpinner = (ProgressBar) findViewById(R.id.loading_spinner);
+        mNoGroupsText = (TextView) findViewById(R.id.no_groups);
+        mainContent.setVisibility(View.GONE);
+        // Retrieve and cache the system's default "short" animation time.
+        mShortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+
         String title = "Results";
         getSupportActionBar().setTitle(title);
 
@@ -143,12 +162,51 @@ public class ResultsActivity extends AppCompatActivity implements
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        searchByLocation = databaseRef.child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
+
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     locationManager.storeLocationData(location);
-                    getSearchResults();
+                    searchByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            final ArrayList<Group> groupsList = new ArrayList<>();
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Group group = snapshot.getValue(Group.class);
+                                Location groupsLocation = new Location("Groups location");
+                                groupsLocation.setLatitude(group.getLatitude());
+                                groupsLocation.setLongitude(group.getLongitude());
+
+                                Location currentLocation = new Location("Current location");
+                                currentLocation.setLatitude(locationManager.getLatitude());
+                                currentLocation.setLongitude(locationManager.getLongitude());
+
+                                System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
+                                System.out.println("Lang " + locationManager.getLongitude());
+                                System.out.println("Lang " + locationManager.getLatitude());
+
+                                double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+
+                                group.setGroupId(snapshot.getKey());
+                                group.setCategory(groupCategory);
+                                if ((group.getType()).equals("Interests")) {
+                                    if (distanceInMiles < selectedDistance) {
+                                        groupsList.add(group);
+                                        adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
+                                        mListView.setAdapter(adapter);
+                                    }
+                                }
+                            }
+                            crossfade(mainContent, dataSnapshot);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
         };
@@ -177,106 +235,61 @@ public class ResultsActivity extends AppCompatActivity implements
 
     }
 
-    public void getSearchResults() {
-        final DatabaseReference searchByLocation = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
-        searchByLocation.keepSynced(true);
-        final Query searchByFilters = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
-        searchByFilters.keepSynced(true);
-        GeoFire geoFire = new GeoFire(searchByLocation);
-        // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
-        // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(locationManager.getLatitude(), locationManager.getLongitude()), kilometers);
+    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
 
+        // Set the content view to 0% opacity but visible, so that it is visible
+        // (but fully transparent) during the animation.
+        contentView.setAlpha(0f);
+        contentView.setVisibility(View.VISIBLE);
+        if (!dataSnapshot.exists()) {
+            mNoGroupsText.setAlpha(0f);
+            mNoGroupsText.setVisibility(View.VISIBLE);
+        }
 
-        final ArrayList<Group> planetList = new ArrayList<Group>();
-
-
-        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-
-            GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
-                @Override
-                public void onComplete(String key, DatabaseError error) {
-                    if (error != null) {
-                        System.err.println("There was an error saving the location to GeoFire: " + error);
-                    } else {
-                        System.out.println("Location saved on server successfully!");
+        // Animate the loading view to 0% opacity. After the animation ends,
+        // set its visibility to GONE as an optimization step (it won't
+        // participate in layout passes, etc.)
+        progressSpinner.animate()
+                .alpha(0f)
+                // Used so the transition doesn't interfere with the activity's transition on start up.
+                .setDuration(mShortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        progressSpinner.setVisibility(View.GONE);
+                        // Animate the content view to 100% opacity, and clear any animation
+                        // listener set on the view.
+                        contentView.animate()
+                                .alpha(1f)
+                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                .setDuration(mShortAnimationDuration)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        mNoGroupsText.animate()
+                                                .alpha(1f)
+                                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                                .setDuration(mShortAnimationDuration)
+                                                .setListener(null);
+                                    }
+                                });
                     }
-                }
-            };
-
-            // Once they've done that on the groups tree
-            @Override
-            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                Group group = dataSnapshot.getValue(Group.class);
-                group.setGroupId(dataSnapshot.getKey());
-                group.setCategory(groupCategory);
-                System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
-                System.out.println("hey " + dataSnapshot.getRef());
-                if ((group.getType_gender_memberLimit()).equals(groupType + "_" + groupGender + "_" + memberLimit)) {
-                    // Create ArrayAdapter using the planet list.
-                    planetList.add(group);
-                    adapter = new ResultsAdapter(ResultsActivity.this, planetList);
-                    mainListView.setAdapter(adapter);
-                }
-
-
-            }
-
-            @Override
-            public void onDataExited(DataSnapshot dataSnapshot) {
-                System.out.println("Hey Nothing to see here buddy");
-            }
-
-            @Override
-            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey just moved within range");
-            }
-
-            @Override
-            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey data has changed");
-            }
-
-            @Override
-            public void onGeoQueryReady() {
-
-            }
-
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-
-                System.out.println("Hey ERROR");
-            }
-        });
+                });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // remove all event listeners to stop updating in the background
-        getSearchResults();
     }
 
     @Override
     protected void onStop() {
-        if (adapter != null) {
-            adapter.clear();
-        }
         super.onStop();
-        // remove all event listeners to stop updating in the background
-        this.geoQuery.removeAllListeners();
     }
 
     @Override
     protected void onDestroy() {
-        if (adapter != null) {
-            adapter.clear();
-        }
         super.onDestroy();
-        // remove all event listeners to stop updating in the background
-        this.geoQuery.removeAllListeners();
         mGoogleApiClient.stopAutoManage(this);
         mGoogleApiClient.disconnect();
     }
