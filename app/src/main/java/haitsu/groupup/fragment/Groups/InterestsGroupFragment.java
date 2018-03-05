@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.firebase.geofire.GeoQuery;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -103,6 +105,9 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
 
+    private AdView mAdView;
+
+
     public InterestsGroupFragment() {
         // Required empty public constructor
     }
@@ -143,6 +148,10 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         GroupsActivity groupsActivity = (GroupsActivity) getActivity();
         // So both Events and Interest fragments use the same reference.
         locationManager = groupsActivity.locationManager;
+
+        mAdView = (AdView) view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         mainContent = view.findViewById(R.id.content);
         progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);

@@ -1,5 +1,7 @@
 package haitsu.groupup.fragment.Groups;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -52,13 +56,21 @@ public class GroupsCreatedFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    private View mainContent;
+    private TextView mNoGroupsText;
+    private ProgressBar progressSpinner;
+
+
+    private int mShortAnimationDuration;
 
     private ListView mListView;
-    private ProgressBar progressSpinner;
+
 
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+
+    private AdView mAdView;
 
     public GroupsCreatedFragment() {
         // Required empty public constructor
@@ -97,12 +109,22 @@ public class GroupsCreatedFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
 
+        mAdView = (AdView) view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
+        mainContent = view.findViewById(R.id.content);
         progressSpinner = (ProgressBar) view.findViewById(R.id.loading_spinner);
-        progressSpinner.setVisibility(View.GONE);
+        mNoGroupsText = (TextView) view.findViewById(R.id.no_groups);
+        mainContent.setVisibility(View.GONE);
+        // Retrieve and cache the system's default "short" animation time.
+        mShortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+
 
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
@@ -143,6 +165,7 @@ public class GroupsCreatedFragment extends Fragment {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mListView.setAdapter(usersAdapter);
+                crossfade(mainContent, dataSnapshot);
                 mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
                     public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
@@ -176,6 +199,48 @@ public class GroupsCreatedFragment extends Fragment {
 
 
         return view;
+    }
+
+    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
+
+        // Set the content view to 0% opacity but visible, so that it is visible
+        // (but fully transparent) during the animation.
+        contentView.setAlpha(0f);
+        contentView.setVisibility(View.VISIBLE);
+        if (!dataSnapshot.exists()) {
+            mNoGroupsText.setAlpha(0f);
+            mNoGroupsText.setVisibility(View.VISIBLE);
+        }
+
+        // Animate the loading view to 0% opacity. After the animation ends,
+        // set its visibility to GONE as an optimization step (it won't
+        // participate in layout passes, etc.)
+        progressSpinner.animate()
+                .alpha(0f)
+                // Used so the transition doesn't interfere with the activity's transition on start up.
+                .setDuration(mShortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        progressSpinner.setVisibility(View.GONE);
+                        // Animate the content view to 100% opacity, and clear any animation
+                        // listener set on the view.
+                        contentView.animate()
+                                .alpha(1f)
+                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                .setDuration(mShortAnimationDuration)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        mNoGroupsText.animate()
+                                                .alpha(1f)
+                                                // 1000ms used so the transition happens after the activity's transition on start up.
+                                                .setDuration(mShortAnimationDuration)
+                                                .setListener(null);
+                                    }
+                                });
+                    }
+                });
     }
 
     // TODO: Rename method, update argument and hook method into UI event
