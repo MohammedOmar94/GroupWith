@@ -180,7 +180,46 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    getSearchResults();
+                    final ArrayList<Group> groupsList = new ArrayList<>();
+                    eventsByLocation.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Location groupsLocation = new Location("Groups location");
+                                groupsLocation.setLatitude(snapshot.child("latitude").getValue(double.class));
+                                groupsLocation.setLongitude(snapshot.child("longitude").getValue(double.class));
+
+                                Location currentLocation = new Location("Current location");
+                                currentLocation.setLatitude(lm.getLatitude());
+                                currentLocation.setLongitude(lm.getLongitude());
+
+                                System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
+                                System.out.println("Lang " + lm.getLongitude());
+                                System.out.println("Lang " + lm.getLatitude());
+
+                                double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+
+                                Group group = snapshot.getValue(Group.class);
+                                group.setGroupId(snapshot.getKey());
+                                group.setCategory(groupCategory);
+                                if ((group.getType()).equals("Events")) {
+                                    if (distanceInMiles < 15) {
+                                        groupsList.add(group);
+                                        adapter = new GroupsAdapter(getContext(), groupsList);
+                                        mListView.setAdapter(adapter);
+                                        crossfade(mainContent);
+                                        foundData = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
         };
@@ -205,167 +244,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
         eventsByLocation = databaseRef.child("group").child(groupCategory);
         eventsByLocation.keepSynced(true);
-
-        getSearchResults();
-
-
-//        eventsByLocation.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-//                mainContent.setVisibility(View.GONE);
-//                progressSpinner.setVisibility(View.VISIBLE);
-//                mNoGroupsText.setVisibility(View.GONE);
-//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-//                if (getActivity() != null) {
-//                    getSearchResults();
-//                } else {
-//                    new CountDownTimer(1, 1000) {
-//
-//                        public void onTick(long millisUntilFinished) {
-//                        }
-//
-//                        public void onFinish() {
-//                            getSearchResults();
-//                        }
-//                    };
-//                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                mainContent.setVisibility(View.GONE);
-//                progressSpinner.setVisibility(View.VISIBLE);
-//                mNoGroupsText.setVisibility(View.GONE);
-//                // Maybe add it so only checks if child has entered range with datasnapshot.getRef?
-//                if (getActivity() != null) {
-//                    getSearchResults();
-//                } else {
-//                    new CountDownTimer(1, 1000) {
-//
-//                        public void onTick(long millisUntilFinished) {
-//                        }
-//
-//                        public void onFinish() {
-//                            getSearchResults();
-//                        }
-//                    };
-//                }
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-
         return view;
-    }
-
-    public void getSearchResults() {
-        GeoFire geoFire = new GeoFire(eventsByLocation);
-        // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
-        // Will be done via the users current location, and the radius they selected.
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(lm.getLatitude(), lm.getLongitude()), 24);
-        final ArrayList<Group> planetList = new ArrayList<Group>();
-
-
-        geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-
-            GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
-                @Override
-                public void onComplete(String key, DatabaseError error) {
-                    if (error != null) {
-                        System.err.println("There was an error saving the location to GeoFire: " + error);
-                    } else {
-                        System.out.println("Location saved on server successfully!");
-                    }
-                }
-            };
-
-            // Once they've done that on the groups tree
-            @Override
-            public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                Group group = dataSnapshot.getValue(Group.class);
-                group.setGroupId(dataSnapshot.getKey());
-                group.setCategory(groupCategory);
-                if ((group.getType()).equals("Events")) {
-                    System.out.println("Hey We IN " + String.format("The Key %s entered the search area at [%f,%f]", group.getName(), location.latitude, location.longitude));
-                    System.out.println("hey events " + dataSnapshot.getRef());
-                    // Create ArrayAdapter using the planet list.
-                    planetList.add(group);
-
-                    adapter = new GroupsAdapter(getContext(), planetList);
-                    mListView.setAdapter(adapter);
-                    crossfade(mainContent);
-                    foundData = true;
-                }
-            }
-
-            @Override
-            public void onDataExited(DataSnapshot dataSnapshot) {
-                System.out.println("Hey Nothing to see here buddy");
-            }
-
-            @Override
-            public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey just moved within range");
-            }
-
-            @Override
-            public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                System.out.println("Hey data has changed");
-            }
-
-            @Override
-            public void onGeoQueryReady() {
-                new CountDownTimer(15000, 1000) {
-
-                    public void onTick(long millisUntilFinished) {
-                    }
-
-                    public void onFinish() {
-                        if(!foundData) {
-                            mNoGroupsText.setAlpha(0f);
-                            mNoGroupsText.setVisibility(View.VISIBLE);
-
-                            progressSpinner.animate()
-                                    .alpha(0f)
-                                    .setDuration(mShortAnimationDuration)
-                                    .setListener(new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            progressSpinner.setVisibility(View.GONE);
-                                            // Animate the content view to 100% opacity, and clear any animation
-                                            // listener set on the view.
-                                            mNoGroupsText.animate()
-                                                    .alpha(1f)
-                                                    // 1000ms used so the transition happens after the activity's transition on start up.
-                                                    .setDuration(mShortAnimationDuration)
-                                                    .setListener(null);
-                                        }
-                                    });
-                        }
-                    }
-                }.start();
-
-
-            }
-
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-
-                System.out.println("Hey ERROR");
-            }
-        });
     }
 
     private void crossfade(final View contentView) {
