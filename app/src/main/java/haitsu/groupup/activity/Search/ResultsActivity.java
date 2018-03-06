@@ -191,12 +191,10 @@ public class ResultsActivity extends AppCompatActivity implements
 
                                 group.setGroupId(snapshot.getKey());
                                 group.setCategory(groupCategory);
-                                if ((group.getType()).equals("Interests")) {
-                                    if (distanceInMiles < selectedDistance) {
-                                        groupsList.add(group);
-                                        adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
-                                        mListView.setAdapter(adapter);
-                                    }
+                                if (distanceInMiles < selectedDistance) {
+                                    groupsList.add(group);
+                                    adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
+                                    mListView.setAdapter(adapter);
                                 }
                             }
                             crossfade(mainContent, dataSnapshot);
