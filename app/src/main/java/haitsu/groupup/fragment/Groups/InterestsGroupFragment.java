@@ -202,7 +202,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                                 if ((group.getType()).equals("Interests")) {
                                     if (distanceInMiles < 15) {
                                         groupsList.add(group);
-                                        adapter = new GroupsAdapter(getContext(), groupsList);
+                                        adapter = new GroupsAdapter(getActivity(), groupsList);
                                         mListView.setAdapter(adapter);
                                     }
                                 }

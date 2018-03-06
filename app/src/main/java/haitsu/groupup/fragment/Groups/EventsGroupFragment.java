@@ -212,7 +212,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                                 if ((group.getType()).equals("Events")) {
                                     if (distanceInMiles < 15) {
                                         groupsList.add(group);
-                                        adapter = new GroupsAdapter(getContext(), groupsList);
+                                        adapter = new GroupsAdapter(getActivity(), groupsList);
                                         mListView.setAdapter(adapter);
                                     }
                                 }
