@@ -192,6 +192,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             final ArrayList<Group> groupsList = new ArrayList<>();
+                            boolean hasGroups = false;
                             for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 Group group = snapshot.getValue(Group.class);
                                 Location groupsLocation = new Location("Groups location");
@@ -215,10 +216,11 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                                         groupsList.add(group);
                                         adapter = new GroupsAdapter(getActivity(), groupsList);
                                         mListView.setAdapter(adapter);
+                                        hasGroups = true;
                                     }
                                 }
                             }
-                            crossfade(mainContent, dataSnapshot);
+                            crossfade(mainContent, hasGroups);
                         }
 
                         @Override
@@ -254,13 +256,13 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         return view;
     }
 
-    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
+    private void crossfade(final View contentView, boolean hasGroups) {
 
         // Set the content view to 0% opacity but visible, so that it is visible
         // (but fully transparent) during the animation.
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
-        if (!dataSnapshot.exists()) {
+        if (!hasGroups) {
             mNoGroupsText.setAlpha(0f);
             mNoGroupsText.setVisibility(View.VISIBLE);
         }
