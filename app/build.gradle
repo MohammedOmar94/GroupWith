@@ -5,7 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "haitsu.groupup"
+        applicationId "haitsu.groupup_test"
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1

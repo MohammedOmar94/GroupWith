@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="haitsu.groupup">
+    package="haitsu.groupup_test">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -17,20 +17,20 @@
         android:theme="@style/AppTheme">
 
         <service
-            android:name=".MyFirebaseMessagingService">
+            android:name="haitsu.groupup_test.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".MyFirebaseInstanceIDService">
+            android:name="haitsu.groupup_test.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
-        <service android:name=".MyJobService"
+        <service android:name="haitsu.groupup_test.MyJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
@@ -38,7 +38,7 @@
         </service>
 
 
-        <activity android:name=".activity.SplashActivity" android:theme="@style/SplashTheme">
+        <activity android:name="haitsu.groupup_test.activity.SplashActivity" android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -58,79 +58,79 @@
 
         </activity>
         <activity
-            android:name=".activity.MainActivity"
+            android:name="haitsu.groupup_test.activity.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".activity.Account.SignInActivity"
+            android:name="haitsu.groupup_test.activity.Account.SignInActivity"
             android:label="@string/title_activity_signin"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar"/>
         <activity
-            android:name=".activity.PrivacyPolicyActivity"
+            android:name="haitsu.groupup_test.activity.PrivacyPolicyActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AboutUsActivity"
+            android:name="haitsu.groupup_test.activity.AboutUsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.Account.SettingsActivity"
+            android:name="haitsu.groupup_test.activity.Account.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupup_test.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.ChatsActivity"
+            android:name="haitsu.groupup_test.activity.ChatsActivity"
             android:label="@string/title_activity_chats"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupup_test.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.ChatRoomActivity"
+            android:name="haitsu.groupup_test.activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.Groups.MyGroupsActivity"
+            android:name="haitsu.groupup_test.activity.Groups.MyGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupup_test.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.CreateGroupActivity"
+            android:name="haitsu.groupup_test.activity.Groups.CreateGroupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupMembersActivity"
+            android:name="haitsu.groupup_test.activity.Groups.GroupMembersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupInfoActivity"
+            android:name="haitsu.groupup_test.activity.Groups.GroupInfoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Account.AccountSetupActivity"
+            android:name="haitsu.groupup_test.activity.Account.AccountSetupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupsActivity"
+            android:name="haitsu.groupup_test.activity.Groups.GroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Search.ResultsActivity"
+            android:name="haitsu.groupup_test.activity.Search.ResultsActivity"
             android:label="@string/title_activity_results"
-            android:parentActivityName=".activity.Search.SearchActivity"
+            android:parentActivityName="haitsu.groupup_test.activity.Search.SearchActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.Search.SearchActivity"
+            android:name="haitsu.groupup_test.activity.Search.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupup_test.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
         <activity
-            android:name=".activity.Account.ReportActivity"
+            android:name="haitsu.groupup_test.activity.Account.ReportActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Toolbar" />
     </application>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="haitsu.groupup.activity.Account.SignInActivity">
+    tools:context="haitsu.groupup_test.activity.Account.SignInActivity">
 
     <Button
         android:id="@+id/sign_in_Google"

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_marginRight="10dp"
     android:layout_marginLeft="10dp"
-    tools:context="haitsu.groupup.fragment.HomeFragment">
+    tools:context="haitsu.groupup_test.fragment.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
