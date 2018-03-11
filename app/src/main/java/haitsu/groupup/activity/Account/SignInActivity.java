@@ -1,6 +1,9 @@
 package haitsu.groupup.activity.Account;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -109,6 +112,16 @@ public class SignInActivity extends AppCompatActivity implements
         });
     }
 
+    public boolean hasInternetConnection() {
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -119,8 +132,13 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        if(hasInternetConnection()) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        } else {
+            Toast.makeText(SignInActivity.this, "Your device is not connected to the Internet.",
+                    Toast.LENGTH_SHORT).show();
+        }
         //Adds new user to database.
     }
 
