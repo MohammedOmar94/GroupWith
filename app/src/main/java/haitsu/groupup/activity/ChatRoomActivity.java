@@ -35,6 +35,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.ReportActivity;
+import haitsu.groupup.activity.Groups.GroupMembersActivity;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Groups;
@@ -53,6 +54,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private String groupID;
     private String groupName;
+    private String groupCategory;
     private String username;
 
     private ValueEventListener mListener;
@@ -88,6 +90,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         groupID = extras.getString("GROUP_ID");
         groupName = extras.getString("GROUP_NAME");
+        groupCategory = extras.getString("GROUP_CATEGORY");
 
         FirebaseMessaging.getInstance().subscribeToTopic(groupID);
 
@@ -332,6 +335,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 extras.putString("REPORT_TYPE", "group");
                 intent.putExtras(extras);
                 startActivity(intent);
+                break;
+            case R.id.action_view_members:
+                Intent intent2 = new Intent(ChatRoomActivity.this, GroupMembersActivity.class);
+                Bundle extras2 = new Bundle();
+                extras2.putString("GROUP_ID", groupID);
+                extras2.putString("GROUP_CATEGORY", groupCategory);
+                extras2.putString("REPORT_TYPE", "group");
+                intent2.putExtras(extras2);
+                startActivity(intent2);
                 break;
 
 

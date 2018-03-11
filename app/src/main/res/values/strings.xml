@@ -23,6 +23,7 @@
         <item>Create Group</item>
         <item>Group Info</item>
         <item>Report</item>
+        <item>Group Members</item>
     </string-array>
 
     <string name="activity_title_about_us">About Us</string>
@@ -32,6 +33,7 @@
     <string name="action_mark_all_read">Mark All as Read</string>
     <string name="action_submit">Submit</string>
     <string name="action_report">Report</string>
+    <string name="action_view_members">View Members</string>
     <string name="privacy_policy">Privacy Policy</string>
 
     <string name="action_settings">Settings</string>
