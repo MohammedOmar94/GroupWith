@@ -33,21 +33,31 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.ReportActivity;
 import haitsu.groupup.activity.Groups.GroupMembersActivity;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.EndlessRecyclerViewScrollListener;
 import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Groups;
+import haitsu.groupup.other.RecyclerViewAdapter;
 
 import static android.graphics.Color.WHITE;
 
 public class ChatRoomActivity extends AppCompatActivity {
     private FirebaseRecyclerAdapter<ChatMessage, MessageViewHolder> mFirebaseAdapter;
+    // Store a member variable for the listener
+    private EndlessRecyclerViewScrollListener scrollListener;
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
     private DatabaseReference chatrooms;
+    private Query messages;
     private DatabaseReference lastMessage;
     private DatabaseReference messageReceived;
     private Query queryStuff;
@@ -57,6 +67,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     private String groupCategory;
     private String username;
 
+    private int itemCount = 10;
+
     private ValueEventListener mListener;
 
     private ImageView mAddMessageImageView;
@@ -65,6 +77,20 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
+
+
+    private static final int TOTAL_ITEM_EACH_LOAD = 10;
+    private DatabaseReference mDatabase;
+    final List<ChatMessage> chatMessageList = new ArrayList<>();
+
+
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter mAdapter;
+
+    private int currentPage = 10;
+    private int scrollPosition = 5;
+
+    private String lastValue = "";
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView messageText;
@@ -116,6 +142,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         //Creates a reference to the chatrooms node from the JSON tree.
         //Location: https://group-up-34ab2.firebaseio.com/chatrooms
         chatrooms = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
+        messages = FirebaseDatabase.getInstance().getReference().child("chatrooms").child(groupID);
         chatrooms.keepSynced(true);
         //Creates a reference to the lastMessage node from the JSON tree.
         queryStuff = FirebaseDatabase.getInstance().getReference().child("users").orderByChild(groupID);
@@ -123,16 +150,27 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         messageReceived = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).child("lastMessage");
         mListener = messageReceived.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        dataSnapshot.child("messageCount").getRef().removeValue();
-                    }
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                dataSnapshot.child("messageCount").getRef().removeValue();
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+            }
+        });
+        chatrooms.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mLinearLayoutManager.scrollToPosition(chatMessageList.size() - 1);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         /*queryStuff.addValueEventListener(new ValueEventListener()
                 {
                     @Override
@@ -195,7 +233,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                                         //snapshot.getKey == current user in group (loop). Useless otherwise.
                                         //dataSnapshot.child("userid") == last person who sent message.
-                                        if(!mFirebaseUser.getUid().equals(snapshot.getKey())) {
+                                        if (!mFirebaseUser.getUid().equals(snapshot.getKey())) {
                                             if (!dataSnapshot.hasChild("messageCount")) {
                                                 System.out.println("this is uid " + snapshot.getKey());
                                                 dataSnapshot.child("messageCount").getRef().setValue(1);
@@ -244,31 +282,66 @@ public class ChatRoomActivity extends AppCompatActivity {
         mLinearLayoutManager.setStackFromEnd(true);
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
 
-        displayRecycler();
+        mAdapter = new RecyclerViewAdapter(chatMessageList);
+        mMessageRecyclerView.setAdapter(mAdapter);
+        // Retain an instance so that you can call `resetState()` for fresh searches
+//        scrollListener = new EndlessRecyclerViewScrollListener(mLinearLayoutManager) {
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+//                // Triggered only when new data needs to be appended to the list
+//                // Add whatever code is needed to append new items to the bottom of the list
+//                loadMoreData();
+//            }
+//        };
+        loadData(messages.orderByKey().limitToLast(currentPage));
+        mMessageRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-                int lastVisiblePosition =
-                        mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the
-                // user is at the bottom of the list, scroll to the bottom
-                // of the list to show the newly added message.
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (friendlyMessageCount - 1) &&
-                                lastVisiblePosition == (positionStart - 1))) {
-                    mMessageRecyclerView.scrollToPosition(positionStart);
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    // Scrolling up
+                    int itemCount = mLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
+//                    System.out.println("Scrolled up " + itemCount);
+                } else {
+                    // Scrolling down
+                    int itemCount = mLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
+                    int totalItems = mLinearLayoutManager.getItemCount();
+                    if (itemCount == 0) {
+                        System.out.println("Item count is 0");
+                        loadMoreData();
+                    }
                 }
             }
         });
+        // Adds the scroll listener to RecyclerView
+//        mMessageRecyclerView.addOnScrollListener(scrollListener);
 
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mMessageRecyclerView.getContext(),
-                mLinearLayoutManager.getOrientation());
-        mMessageRecyclerView.addItemDecoration(dividerItemDecoration);
+//        displayRecycler(messages);
+
+//        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+//            @Override
+//            public void onItemRangeInserted(int positionStart, int itemCount) {
+//                super.onItemRangeInserted(positionStart, itemCount);
+//                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+//                int lastVisiblePosition =
+//                        mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+//                // If the recycler view is initially being loaded or the
+//                // user is at the bottom of the list, scroll to the bottom
+//                // of the list to show the newly added message.
+//                if (lastVisiblePosition == -1 ||
+//                        (positionStart >= (friendlyMessageCount - 1) &&
+//                                lastVisiblePosition == (positionStart - 1))) {
+//                    mMessageRecyclerView.scrollToPosition(positionStart);
+//                }
+//            }
+//        });
+
+//        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+//        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mMessageRecyclerView.getContext(),
+//                mLinearLayoutManager.getOrientation());
+//        mMessageRecyclerView.addItemDecoration(dividerItemDecoration);
 
         mAddMessageImageView = (ImageView) findViewById(R.id.addMessageImageView);
         mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
@@ -282,7 +355,94 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
-    public void displayRecycler() {
+    private void loadData(Query query) {
+        // example
+        // at first load : currentPage = 0 -> we startAt(0 * 10 = 0)
+        // at second load (first loadmore) : currentPage = 1 -> we startAt(1 * 10 = 10)
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                chatMessageList.clear();;
+                if (!dataSnapshot.hasChildren()) {
+                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
+                    currentPage--;
+                }
+                boolean firstInLoop = true;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (firstInLoop) {
+                        System.out.println("last value " + data.getKey());
+                        lastValue = data.getKey();
+                        firstInLoop = false;
+                    }
+//                    if (!lastValue.equals(data.getKey())) {
+                    System.out.println("data " + data.getKey());
+                    ChatMessage chatMessage = data.getValue(ChatMessage.class);
+                    chatMessageList.add(chatMessage);
+//                    }
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void loadData2(Query query) {
+        // example
+        // at first load : currentPage = 0 -> we startAt(0 * 10 = 0)
+        // at second load (first loadmore) : currentPage = 1 -> we startAt(1 * 10 = 10)
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChildren()) {
+                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
+                    currentPage--;
+                    lastValue = "";
+                }
+                boolean firstInLoop = true;
+                List <ChatMessage> tempList = new ArrayList<ChatMessage>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (firstInLoop) {
+                        lastValue = data.getKey();
+                        System.out.println("last value is  " + data.getValue(ChatMessage.class).getMessageText());
+                        firstInLoop = false;
+                    }
+                    System.out.println("data2 " + data);
+
+//                    if (!lastValue.equals(data.getKey())) {
+                        ChatMessage chatMessage = data.getValue(ChatMessage.class);
+                        tempList.add(chatMessage);
+//                    }
+                }
+                Collections.reverse(tempList);
+                for (int i = 1; i < tempList.size(); i++) {
+                    System.out.println("messages  " + tempList.get(i).getMessageText());
+                    chatMessageList.add(0, tempList.get(i));
+                }
+                System.out.println("last key is  " + lastValue);
+//                Collections.reverse(chatMessageList);
+                int totalSizeBefore = tempList.size();
+                System.out.println("last visible is   " + scrollPosition);
+                mLinearLayoutManager.scrollToPosition(chatMessageList.size() - scrollPosition);
+                scrollPosition = scrollPosition + 9;
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void loadMoreData() {
+        System.out.println("Load more " + lastValue);
+        // List is ascending order, newer messages as you scroll down/
+        loadData2(messages.orderByKey().endAt(lastValue).limitToLast(currentPage));
+    }
+
+    public void displayRecycler(Query chatrooms) {
         mFirebaseAdapter = new FirebaseRecyclerAdapter<ChatMessage,
                 MessageViewHolder>(
                 ChatMessage.class,

@@ -71,7 +71,9 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                 mListView.setFocusable(true);//HACKS
                 Group group = ((Group) mListView.getItemAtPosition(position));
-                groupExists(group);
+                if (group != null) {
+                    groupExists(group);
+                }
             }
 
 
