@@ -285,7 +285,7 @@ public class DBConnections {
     public void submitNewGroup(String groupCategory, String groupType, String groupName, String groupDescription, String groupGender, String memberLimit, User user) {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).push();
+        DatabaseReference groupId2 = databaseRef.child("group").child(groupCategory).child(groupType).push();
         DatabaseReference notifications = databaseRef.child("notifications").child(mFirebaseUser.getUid()).push();
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
         // String notificationId = notifications.getKey();
@@ -312,8 +312,7 @@ public class DBConnections {
         groupId2.child("memberCount").setValue(1);
         groupId2.child("description").setValue(groupDescription.toString());
         groupId2.child("genders").setValue(groupGender);
-        groupId2.child("type").setValue(groupType);
-        groupId2.child("type_gender_memberLimit").setValue(groupType + "_" + groupGender + "_" + memberLimit);
+        groupId2.child("gender_memberLimit").setValue(groupGender + "_" + memberLimit);
         groupId2.child("latitude").setValue(user.getLatitude());
         groupId2.child("longitude").setValue(user.getLongitude());
 
