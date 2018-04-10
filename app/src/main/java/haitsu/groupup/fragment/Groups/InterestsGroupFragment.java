@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -54,7 +55,8 @@ import haitsu.groupup.other.Models.Group;
  * Use the {@link InterestsGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InterestsGroupFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class InterestsGroupFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks
+        , AbsListView.OnScrollListener, View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,6 +72,11 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private View mainContent;
     private TextView mNoGroupsText;
     private ProgressBar progressSpinner;
+    private int lastItem;
+
+    private int preLast;
+    private int mPageLimit = 9;
+    int mPageEndOffset = 0;
 
 
     private int mShortAnimationDuration;
@@ -81,6 +88,8 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private String selectedGroupName;
     private String groupCategory;
 
+    private boolean dataHasLoaded = false;
+
     private OnFragmentInteractionListener mListener;
 
     private DBConnections dbConnections = new DBConnections();
@@ -88,6 +97,8 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
     private Query eventsByLocation;
+
+    private String lastKey = "";
 
     private GeoQuery geoQuery;
 
@@ -98,6 +109,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private LocationRequest mLocationRequest;
     private FusedLocationProviderClient mFusedLocationClient;
 
+    private View footerView;
 
     private LocationCallback mLocationCallback;
 
@@ -105,9 +117,9 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     private LocationManager locationManager;
     private LocationManager lm = new LocationManager();
     private GroupsAdapter adapter;
+    final ArrayList<Group> groupsList = new ArrayList<>();
 
     private AdView mAdView;
-
 
     public InterestsGroupFragment() {
         // Required empty public constructor
@@ -163,7 +175,21 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                 android.R.integer.config_shortAnimTime);
 
         mListView = (ListView) view.findViewById(R.id.listview);
+        mListView.setOnScrollListener(this);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
+
+
+        footerView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.footer_layout, null, false);
+        mListView.addFooterView(footerView);
+        footerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eventsByLocation = databaseRef.child("group").child(groupCategory).child("Interests").orderByKey().startAt(lastKey).limitToFirst(mPageLimit);
+//                groupsList.clear();
+                System.out.println("Last item " + lastItem);
+                getGroups();
+            }
+        });
 
 
         Bundle extras = getActivity().getIntent().getExtras();
@@ -178,46 +204,8 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            final ArrayList<Group> groupsList = new ArrayList<>();
-                            boolean hasGroups = false;
-                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                Group group = snapshot.getValue(Group.class);
-                                Location groupsLocation = new Location("Groups location");
-                                groupsLocation.setLatitude(group.getLatitude());
-                                groupsLocation.setLongitude(group.getLongitude());
+                    getGroups();
 
-                                Location currentLocation = new Location("Current location");
-                                currentLocation.setLatitude(lm.getLatitude());
-                                currentLocation.setLongitude(lm.getLongitude());
-
-                                System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
-                                System.out.println("Lang " + lm.getLongitude());
-                                System.out.println("Lang " + lm.getLatitude());
-
-                                double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
-
-                                group.setGroupId(snapshot.getKey());
-                                group.setCategory(groupCategory);
-                                if ((group.getType()).equals("Interests")) {
-                                    if (distanceInMiles < 15) {
-                                        groupsList.add(group);
-                                        adapter = new GroupsAdapter(getActivity(), groupsList);
-                                        mListView.setAdapter(adapter);
-                                        hasGroups = true;
-                                    }
-                                }
-                            }
-                            crossfade(mainContent, hasGroups);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
 
                 }
             }
@@ -241,9 +229,64 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
 
         lm.initialiseLocationRequest(getActivity());
 
-        eventsByLocation = databaseRef.child("group").child(groupCategory).orderByChild("memberCount");;
+        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Interests").orderByKey().limitToFirst(mPageLimit);
         eventsByLocation.keepSynced(true);
         return view;
+    }
+
+    private void getGroups() {
+        eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Somehow need to get a 2nd value.
+                boolean hasGroups = false;
+                if (dataSnapshot.getChildrenCount() != 9) {
+                    mListView.removeFooterView(footerView);
+                }
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    System.out.println("snap " + snapshot.getValue());
+                    Group group = snapshot.getValue(Group.class);
+                    System.out.println("type " + group.getType());
+                    Location groupsLocation = new Location("Groups location");
+                    groupsLocation.setLatitude(group.getLatitude());
+                    groupsLocation.setLongitude(group.getLongitude());
+
+                    Location currentLocation = new Location("Current location");
+                    currentLocation.setLatitude(lm.getLatitude());
+                    currentLocation.setLongitude(lm.getLongitude());
+
+                    System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
+                    System.out.println("Lang " + lm.getLongitude());
+                    System.out.println("Lang " + lm.getLatitude());
+
+                    double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+
+                    group.setGroupId(snapshot.getKey());
+                    group.setCategory(groupCategory);
+                    if (group.getType().equals("Interests")) {
+                        if (distanceInMiles < 15) {
+                            // Prevents adding the group again when pressing "See more", we only need it as a starting point.
+                            if (!lastKey.equals(snapshot.getKey())) {
+                                System.out.println("Group name is " + group.getName());
+                                groupsList.add(group);
+                            }
+                            adapter = new GroupsAdapter(getActivity(), groupsList);
+                            mListView.setAdapter(adapter);
+                            hasGroups = true;
+                            lastKey = snapshot.getKey();
+                        }
+                    }
+                }
+                crossfade(mainContent, hasGroups);
+                mListView.setSelection(lastItem);
+                dataHasLoaded = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void crossfade(final View contentView, boolean hasGroups) {
@@ -293,6 +336,10 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onClick(View v) {
     }
 
     @Override
@@ -352,6 +399,28 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        lastItem = firstVisibleItem + visibleItemCount;
+        if (lastItem == totalItemCount) {
+            if (lastKey != null && preLast != lastItem) {
+                System.out.println("Last " + lastItem + " total " + totalItemCount + " " + lastKey);
+
+//                mPageLimit = mPageLimit + 10;
+//                mPageEndOffset = mPageEndOffset + 1;
+//                eventsByLocation = databaseRef.child("group").child(groupCategory).orderByKey().limitToFirst(mPageLimit).startAt(lastKey);
+//                groupsList.clear();
+//                getGroups();
+//                preLast = lastItem;
+            }
+        }
     }
 
 

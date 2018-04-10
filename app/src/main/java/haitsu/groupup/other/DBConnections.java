@@ -148,7 +148,8 @@ public class DBConnections {
         databaseRef.child("users").child(mFirebaseUser.getUid()).setValue(user);//Add user}
     }
 
-    public void userRequest(final String groupID, final String groupName, final String groupCategory, final String groupAdminId) {
+    public void userRequest(final String groupID, final String groupName, final String groupCategory, final String groupAdminId,
+                            final String groupType) {
         DatabaseReference userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -158,10 +159,11 @@ public class DBConnections {
                 request.setGroupName(groupName);
                 request.setGroupId(groupID);
                 request.setGroupCategory(groupCategory);
+                request.setType(groupType);
                 // Not even needed, what has the users own groups has to do with anything.
                 // Groups group = snapshot.child("groups").getValue(Groups.class);
                 // System.out.println("group admin is " + group.getName());
-                joinGroup(groupID, groupName, groupCategory, groupAdminId, request);
+                joinGroup(groupID, groupName, groupCategory, groupAdminId, groupType, request);
             }
 
             @Override
@@ -191,9 +193,10 @@ public class DBConnections {
     }
 
 
-    public void joinGroup(final String groupID, String groupName, String groupCategory, final String groupAdminId, UserRequest request) {
+    public void joinGroup(final String groupID, String groupName, String groupCategory, final String groupAdminId, String groupType,
+                          UserRequest request) {
         //String userid = databaseRef.child("Group").push().getKey();
-        final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupID);
+        final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupType).child(groupID);
 
 
         // Adds user requested to be joined in admins tree. Delete also needs a rework to remove from userRequest tree.
@@ -203,10 +206,11 @@ public class DBConnections {
         DatabaseReference usersGroupsTree = databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId());
         usersGroupsTree.child("name").setValue(request.getGroupName());
         usersGroupsTree.child("category").setValue(request.getGroupCategory());
+        usersGroupsTree.child("type").setValue(groupType);
         usersGroupsTree.child("admin").setValue(false);
         usersGroupsTree.child("userApproved").setValue(false);
 
-        databaseRef.child("users").child(groupAdminId).child("userRequest").push().setValue(request);
+        databaseRef.child("users").child(groupAdminId).child("userRequest").child(groupID).setValue(request);
 
         // Checks if member count has now exceeded after this new member has joined
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -290,19 +294,6 @@ public class DBConnections {
         String groupId = groupId2.getKey();//Stores key in local variable for testing purposes.
         // String notificationId = notifications.getKey();
 
-        GeoFire geoFire = new GeoFire(databaseRef.child("group").child(groupCategory));
-        geoFire.setLocation(groupId, new GeoLocation(user.getLatitude(), user.getLongitude()), new GeoFire.CompletionListener() {
-            @Override
-            public void onComplete(String key, DatabaseError error) {
-                if (error != null) {
-                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                } else {
-                    System.out.println("Location saved on server successfully!");
-                }
-            }
-
-        });
-
         //Adds to group tree
         groupId2.child("members").child(mFirebaseUser.getUid()).setValue(true);//Adds Members
         //groupId2.child("category").setValue(groupCategory);
@@ -312,6 +303,7 @@ public class DBConnections {
         groupId2.child("memberCount").setValue(1);
         groupId2.child("description").setValue(groupDescription.toString());
         groupId2.child("genders").setValue(groupGender);
+        groupId2.child("type").setValue(groupType);
         groupId2.child("gender_memberLimit").setValue(groupGender + "_" + memberLimit);
         groupId2.child("latitude").setValue(user.getLatitude());
         groupId2.child("longitude").setValue(user.getLongitude());
@@ -319,6 +311,7 @@ public class DBConnections {
 
         //Adds to users tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("type").setValue(groupType);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("userApproved").setValue(true);
@@ -369,7 +362,7 @@ public class DBConnections {
         // Need to delete firebase instance too.
     }
 
-    public void checkGroup(final String groupID, final String groupCategory) {
+    public void checkGroup(final String groupID, final String groupCategory, final String groupType) {
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -380,7 +373,7 @@ public class DBConnections {
                     deleteRequest(groupID);
                     deleteGroupFromUsers(groupID);
                     //Delete from group tree, which contains detail about the name and its members
-                    databaseRef.child("group").child(groupCategory).child(groupID).removeValue();
+                    databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).removeValue();
 
                     //Delete from the users group tree
                     databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
@@ -419,25 +412,25 @@ public class DBConnections {
     }
 
     // If an Approved user wants to leave the group they're in
-    public void leaveGroup(final String groupID, final String groupAdminId, final String groupCategory) {
+    public void leaveGroup(final String groupID, final String groupAdminId, final String groupCategory, final String groupType) {
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(false);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mFirebaseUser = mFirebaseAuth.getCurrentUser();
                 if (dataSnapshot.getValue() != null) {
+                    final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupType).child(groupID);
                     System.out.println("Category is" + groupCategory);
-                    //Delete member from group tree
-                    databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid())
-                            .removeValue();
 
-                    databaseRef.child("group").child(groupCategory).child(groupID).
-                            addListenerForSingleValueEvent(new ValueEventListener() {
+                    //Delete member from group tree
+                    groupRef.child("members").child(mFirebaseUser.getUid()).removeValue();
+
+                    groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     long memberCount = dataSnapshot.child("members").getChildrenCount();
                                     getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
-                                    databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
+                                    groupRef.child("memberCount").setValue(memberCount);
                                 }
 
                                 @Override
@@ -451,7 +444,7 @@ public class DBConnections {
                 databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
 
                 //Change group to not full, so group should reappear again in results
-                revertGroupType(groupCategory, groupID);
+                revertGroupType(groupCategory, groupID, groupType);
 
             }
 
@@ -464,21 +457,21 @@ public class DBConnections {
     }
 
     // Done by the user who changes their mind about joining a specific group
-    public void cancelJoinRequest(final String groupID, final String groupCategory, final String groupAdminId) {
+    public void cancelJoinRequest(final String groupID, final String groupCategory, final String groupAdminId, final String groupType) {
         // Deletes request from admin's user tree
-        databaseRef.child("users").child(groupAdminId).child("userRequest").removeValue();
+        databaseRef.child("users").child(groupAdminId).child("userRequest").child(groupID).removeValue();
         // Deletes group from the user's user tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
         // Delete member from the group tree
-        databaseRef.child("group").child(groupCategory).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
+        databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).child("members").child(mFirebaseUser.getUid()).removeValue();
         // Decrease member count by 1
-        databaseRef.child("group").child(groupCategory).child(groupID).
+        databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).
                 addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
                         getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
-                        databaseRef.child("group").child(groupCategory).child(groupID).child("memberCount").setValue(memberCount);
+                        databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).child("memberCount").setValue(memberCount);
                     }
 
                     @Override
@@ -487,12 +480,12 @@ public class DBConnections {
                     }
                 });
         // Group is no longer full anymore, so revert the type back to normal to reappear in group results.
-        revertGroupType(groupCategory, groupID);
+        revertGroupType(groupCategory, groupID, groupType);
     }
 
-    public void revertGroupType(final String groupCategory, final String groupID) {
+    public void revertGroupType(final String groupCategory, final String groupID, final String groupType) {
         // Separate full and type of group, should reappear as avaliable.
-        databaseRef.child("group").child(groupCategory).child(groupID).child("type")
+        databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).child("type")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
@@ -503,7 +496,7 @@ public class DBConnections {
                             String groupType = parts[1]; // group type
                             System.out.println("group type is now " + groupType);
                             //Reverts back type to normal
-                            databaseRef.child("group").child(groupCategory).child(groupID).child("type").setValue(groupType);
+                            databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).child("type").setValue(groupType);
 
                         }
                     }

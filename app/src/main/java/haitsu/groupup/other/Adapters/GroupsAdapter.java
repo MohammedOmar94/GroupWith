@@ -93,7 +93,7 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
             builder = new AlertDialog.Builder(getContext());
         }
 
-        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(group.getCategory());
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(group.getCategory()).child(group.getType());
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -116,6 +116,7 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
                         extras.putString("GROUP_ID", group.getGroupId());
                         extras.putString("GROUP_CATEGORY", group.getCategory());
                         extras.putString("GROUP_ADMIN", group.getAdminID());
+                        extras.putString("GROUP_TYPE", group.getType());
                         intent.putExtras(extras);
                         getContext().startActivity(intent);
 

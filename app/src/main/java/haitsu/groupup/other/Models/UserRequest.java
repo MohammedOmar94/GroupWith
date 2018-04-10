@@ -13,6 +13,7 @@ public class UserRequest {
     private String gender;
     private String groupname;
     private String groupCategory;
+    private String type;
     private String age;
     private String city;
     private String country;
@@ -134,5 +135,13 @@ public class UserRequest {
 
     public void setGroupCategory(String groupCategory) {
         this.groupCategory = groupCategory;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -198,7 +198,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         footerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventsByLocation = databaseRef.child("group").child(groupCategory).orderByKey().startAt(lastKey).limitToFirst(mPageLimit);
+                eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().startAt(lastKey).limitToFirst(mPageLimit);
 //                groupsList.clear();
                 System.out.println("Last item " + lastItem);
                 getGroups();
@@ -243,7 +243,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
         lm.initialiseLocationRequest(getActivity());
 
-        eventsByLocation = databaseRef.child("group").child(groupCategory).orderByKey().limitToFirst(mPageLimit);
+        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().limitToFirst(mPageLimit);
         eventsByLocation.keepSynced(true);
         return view;
     }
@@ -260,6 +260,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     System.out.println("snap " + snapshot.getValue());
                     Group group = snapshot.getValue(Group.class);
+                    System.out.println("type " + group.getType());
                     Location groupsLocation = new Location("Groups location");
                     groupsLocation.setLatitude(group.getLatitude());
                     groupsLocation.setLongitude(group.getLongitude());
@@ -276,7 +277,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
                     group.setGroupId(snapshot.getKey());
                     group.setCategory(groupCategory);
-                    if ((group.getType()).equals("Events")) {
+                    if (group.getType().equals("Events")) {
                         if (distanceInMiles < 15) {
                             // Prevents adding the group again when pressing "See more", we only need it as a starting point.
                             if (!lastKey.equals(snapshot.getKey())) {

@@ -7,6 +7,7 @@ package haitsu.groupup.other.Models;
 public class Groups {
 
     private String category;
+    private String type;
     private String name;
     private int memberCount;
     private int memberLimit;
@@ -73,5 +74,13 @@ public class Groups {
 
     public void setMemberLimit(int memberLimit) {
         this.memberLimit = memberLimit;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
