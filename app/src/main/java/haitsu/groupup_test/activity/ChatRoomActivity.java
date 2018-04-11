@@ -44,7 +44,7 @@ import haitsu.groupup_test.other.DBConnections;
 import haitsu.groupup_test.other.EndlessRecyclerViewScrollListener;
 import haitsu.groupup_test.other.Models.ChatMessage;
 import haitsu.groupup_test.other.Models.Groups;
-import haitsu.groupup.other.RecyclerViewAdapter;
+import haitsu.groupup_test.other.RecyclerViewAdapter;
 
 import static android.graphics.Color.WHITE;
 

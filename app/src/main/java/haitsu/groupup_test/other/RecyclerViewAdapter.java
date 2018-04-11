@@ -1,11 +1,10 @@
-package haitsu.groupup.other;
+package haitsu.groupup_test.other;
 
 /**
  * Created by moham on 01/04/2018.
  */
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -21,10 +20,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-import haitsu.groupup.R;
-import haitsu.groupup.activity.ChatRoomActivity;
-import haitsu.groupup.other.Models.ChatMessage;
-import haitsu.groupup.other.Models.Group;
+import haitsu.groupup_test.R;
+import haitsu.groupup_test.other.Models.ChatMessage;
 
 /**
  * Created by phanvanlinh on 12/04/2017.

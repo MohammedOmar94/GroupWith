@@ -1,4 +1,4 @@
-package haitsu.groupup.other;
+package haitsu.groupup_test.other;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

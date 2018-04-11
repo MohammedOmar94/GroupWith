@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import haitsu.groupup_test.R;
 import haitsu.groupup_test.other.DBConnections;
 import haitsu.groupup_test.other.Models.DataModel;
+import haitsu.groupup_test.other.Models.Group;
 import haitsu.groupup_test.other.Models.User;
 import haitsu.groupup_test.other.Models.UserRequest;
 

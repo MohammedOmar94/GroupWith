@@ -10,11 +10,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-<<<<<<< HEAD:app/src/main/java/haitsu/groupup_test/fragment/Groups/EventsGroupFragment.java
-=======
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
->>>>>>> master:app/src/main/java/haitsu/groupup/fragment/Groups/EventsGroupFragment.java
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
