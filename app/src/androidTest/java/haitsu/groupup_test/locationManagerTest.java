@@ -24,6 +24,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import haitsu.groupup_test.activity.Account.SignInActivity;
 import haitsu.groupup_test.other.DBConnections;
 import haitsu.groupup_test.other.LocationManager;
+import haitsu.groupup_test.other.Models.Group;
 import haitsu.groupup_test.other.Models.User;
 
 import static android.content.ContentValues.TAG;
@@ -61,7 +64,6 @@ public class locationManagerTest extends ActivityUnitTestCase<SignInActivity> {
     private CountDownLatch lock;
     private CountDownLatch lock2;
     private CountDownLatch locationLock;
-    private Object databaseNode;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
 
@@ -81,7 +83,6 @@ public class locationManagerTest extends ActivityUnitTestCase<SignInActivity> {
         locationLock = new CountDownLatch(1);
         dbConnections = new DBConnections();
         locationManager = new LocationManager();
-
 
 
         // Initialize Firebase Auth
@@ -123,102 +124,74 @@ public class locationManagerTest extends ActivityUnitTestCase<SignInActivity> {
     }
 
 
-
     // Test case for users from London, searching for groups within a 15 mile radius.
     @Test
     public void twoNearbyGroups() throws ExecutionException, InterruptedException {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mActivityRule.getActivity());
-        mLocationCallback = new LocationCallback() {
+
+        user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.550174, -0.003371);
+        dbConnections.submitNewGroup("Test", "Events", "", "", "", "5", user);
+
+        // London, Harrow
+        user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.580559, -0.341995);
+        dbConnections.submitNewGroup("Test", "Events", "", "", "", "5", user);
+
+        // Scotland
+        user = new User("test boy", "male", "fakeboys@gmail.com", "21", "Scot-city", "UK", null, 56.490671, -4.202646);
+        dbConnections.submitNewGroup("Test", "Events", "", "", "", "5", user);
+
+        // Japan, Tokyo
+        user = new User("test boy", "male", "fakeboys@gmail.com", "21", "Tokyo", "UK", null, 35.689487, -139.691706);
+        dbConnections.submitNewGroup("Test", "Events", "", "", "", "5", user);
+
+        // Chigwell (just outside of 15 mile radius)
+        user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.626281, 0.080647);
+        dbConnections.submitNewGroup("Test", "Events", "", "", "", "5", user);
+
+        locationLock.countDown();
+
+
+        locationLock.await(5000, TimeUnit.MILLISECONDS);
+        Query eventsByLocation = databaseRef.child("group").child("Test").child("Events").orderByKey();
+        eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Group group = snapshot.getValue(Group.class);
+                    System.out.println("Group is " + group.getName());
+                    Location groupsLocation = new Location("Groups location");
+                    groupsLocation.setLatitude(group.getLatitude());
+                    groupsLocation.setLongitude(group.getLongitude());
 
-                    // London, Stratford
-                    user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.550174,-0.003371);
-                    dbConnections.submitNewGroup("Test","Events", "","", "","5",user);
+                    Location currentLocation = new Location("Current location");
+                    currentLocation.setLatitude(51.5238634);
+                    currentLocation.setLongitude(-0.1024785);
 
-                    // London, Harrow
-                    user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.580559,-0.341995);
-                    dbConnections.submitNewGroup("Test","Events", "","", "","5",user);
+                    System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
 
-                    // Scotland
-                    user = new User("test boy", "male", "fakeboys@gmail.com", "21", "Scot-city", "UK", null, 56.490671,-4.202646);
-                    dbConnections.submitNewGroup("Test","Events", "","", "","5",user);
-
-                    // Japan, Tokyo
-                    user = new User("test boy", "male", "fakeboys@gmail.com", "21", "Tokyo", "UK", null, 35.689487,-139.691706);
-                    dbConnections.submitNewGroup("Test","Events", "","", "","5",user);
-
-                    // Chigwell (just outside of 15 mile radius)
-                    user = new User("test boy", "male", "fakeboys@gmail.com", "21", "London", "UK", null, 51.626281,0.080647);
-                    dbConnections.submitNewGroup("Test","Events", "","", "","5",user);
-
-                    GeoFire geoFire = new GeoFire(groupRef);
-                    // creates a new query around [37.7832, -122.4056] with a radius of 0.6 kilometers
-                    // Will be done via the users current location, and the radius they selected.
-                    GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 24);
-
-
-                    geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
-
-                        GeoFire.CompletionListener abc = new GeoFire.CompletionListener() {
-                            @Override
-                            public void onComplete(String key, DatabaseError error) {
-                                if (error != null) {
-                                    locationLock.countDown();
-                                    System.err.println("There was an error saving the location to GeoFire: " + error);
-                                } else {
-                                    System.out.println("Location saved on server successfully!");
-                                }
-                            }
-                        };
-
-                        // Once they've done that on the groups tree
-                        @Override
-                        public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
-                            groupsFound++;
-                        }
-
-                        @Override
-                        public void onDataExited(DataSnapshot dataSnapshot) {
-                            System.out.println("Hey Nothing to see here buddy");
-                        }
-
-                        @Override
-                        public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                            System.out.println("Hey just moved within range");
-                        }
-
-                        @Override
-                        public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
-
-                            System.out.println("Hey data has changed");
-                        }
-
-                        @Override
-                        public void onGeoQueryReady() {
-
-
-                        }
-
-                        @Override
-                        public void onGeoQueryError(DatabaseError error) {
-
-                            System.out.println("Hey ERROR");
-                        }
-                    });
+                    double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+                    if (distanceInMiles > 15) {
+                        groupsFound++;
+                    }
                 }
+
+                lock.countDown();
             }
-        };
 
-        locationManager.setmLocationCallback(mLocationCallback);
-        locationManager.setmFusedLocationClient(mFusedLocationClient);
-        locationManager.initialiseLocationRequest(mActivityRule.getActivity());
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
-
-        locationLock.await(2000, TimeUnit.MILLISECONDS);
-        assertEquals(2, groupsFound);
+        try {
+            lock.await(2000, TimeUnit.MILLISECONDS);
+            System.out.println("groups Found " + groupsFound);
+            assertEquals(2, groupsFound);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
+
