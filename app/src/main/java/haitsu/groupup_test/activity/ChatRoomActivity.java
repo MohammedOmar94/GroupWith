@@ -33,26 +33,18 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-<<<<<<< HEAD:app/src/main/java/haitsu/groupup_test/activity/ChatRoomActivity.java
-import haitsu.groupup_test.R;
-import haitsu.groupup_test.activity.Account.ReportActivity;
-import haitsu.groupup_test.activity.Groups.GroupMembersActivity;
-import haitsu.groupup_test.other.Models.ChatMessage;
-import haitsu.groupup_test.other.Models.Groups;
-=======
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import haitsu.groupup.R;
-import haitsu.groupup.activity.Account.ReportActivity;
-import haitsu.groupup.activity.Groups.GroupMembersActivity;
-import haitsu.groupup.other.DBConnections;
-import haitsu.groupup.other.EndlessRecyclerViewScrollListener;
-import haitsu.groupup.other.Models.ChatMessage;
-import haitsu.groupup.other.Models.Groups;
+import haitsu.groupup_test.R;
+import haitsu.groupup_test.activity.Account.ReportActivity;
+import haitsu.groupup_test.activity.Groups.GroupMembersActivity;
+import haitsu.groupup_test.other.DBConnections;
+import haitsu.groupup_test.other.EndlessRecyclerViewScrollListener;
+import haitsu.groupup_test.other.Models.ChatMessage;
+import haitsu.groupup_test.other.Models.Groups;
 import haitsu.groupup.other.RecyclerViewAdapter;
->>>>>>> master:app/src/main/java/haitsu/groupup/activity/ChatRoomActivity.java
 
 import static android.graphics.Color.WHITE;
 
