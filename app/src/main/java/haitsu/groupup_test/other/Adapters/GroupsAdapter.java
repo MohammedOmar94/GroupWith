@@ -67,7 +67,9 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                 mListView.setFocusable(true);//HACKS
                 Group group = ((Group) mListView.getItemAtPosition(position));
-                groupExists(group);
+                if (group != null) {
+                    groupExists(group);
+                }
             }
 
 
@@ -87,7 +89,7 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
             builder = new AlertDialog.Builder(getContext());
         }
 
-        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(group.getCategory());
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(group.getCategory()).child(group.getType());
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -110,6 +112,7 @@ public class GroupsAdapter extends ArrayAdapter<Group> {
                         extras.putString("GROUP_ID", group.getGroupId());
                         extras.putString("GROUP_CATEGORY", group.getCategory());
                         extras.putString("GROUP_ADMIN", group.getAdminID());
+                        extras.putString("GROUP_TYPE", group.getType());
                         intent.putExtras(extras);
                         getContext().startActivity(intent);
 

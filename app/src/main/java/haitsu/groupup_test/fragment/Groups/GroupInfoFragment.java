@@ -69,6 +69,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private String groupCategory;
     private String groupID;
     private String groupAdminId;
+    private String groupType;
     private String selectedGroupName;
 
 
@@ -137,6 +138,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         Bundle extras = getActivity().getIntent().getExtras();
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupID = extras.getString("GROUP_ID");
+        groupType = extras.getString("GROUP_TYPE");
         // groupAdminId = extras.getString("GROUP_ADMIN");
         System.out.println("group cat" + groupCategory + " " + groupID);
         //mListView = (ListView) view.findViewById(R.id.listview);
@@ -144,7 +146,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         System.out.println("Group is " + groupCategory + " " + groupID);
-        final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupID);
+        final DatabaseReference groups2 = databaseRef.child("group").child(groupCategory).child(groupType).child(groupID);
         groups2.keepSynced(true);
         groups2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -260,7 +262,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
-        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory);
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(groupCategory).child(groupType);
         switch (v.getId()) {
             case R.id.join_button:
                 groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -276,7 +278,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                                     .setPositiveButton(android.R.string.yes, null)
                                     .show();
                         } else {
-                            dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId);
+                            dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId, groupType);
                             Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
                             getActivity().finish();
                         }
@@ -289,7 +291,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 });
                 break;
             case R.id.delete_button:
-                dbConnections.checkGroup(groupID, groupCategory);
+                dbConnections.checkGroup(groupID, groupCategory, groupType);
                 getActivity().finish();
                 break;
             case R.id.leave_button:
@@ -302,7 +304,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                             getActivity().finish();
                         } else {
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
-                            dbConnections.leaveGroup(groupID, groupAdminId, groupCategory);
+                            dbConnections.leaveGroup(groupID, groupAdminId, groupCategory, groupType);
                             getActivity().finish();
                         }
                     }
@@ -324,7 +326,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                             databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
                             getActivity().finish();
                         } else {
-                            dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId);
+                            dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId, groupType);
                             getActivity().finish();
                         }
                     }

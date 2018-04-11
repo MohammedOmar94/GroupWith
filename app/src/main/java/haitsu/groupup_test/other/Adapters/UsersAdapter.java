@@ -86,6 +86,8 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                 final String userId = ((DataModel) mListView.getItemAtPosition(position)).getUserSnapshot().getKey();
                 final String groupId = ((DataModel) mListView.getItemAtPosition(position)).getGroupId();
                 final String groupCategory = ((DataModel) mListView.getItemAtPosition(position)).getGroupCategory();
+                final String groupType = ((Group) mListView.getItemAtPosition(position)).getType();
+                System.out.println("group type issss " + groupType);
                 AlertDialog.Builder builder;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -98,7 +100,7 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                             .setMessage(Html.fromHtml(removeMemberDialogMessage(user)))
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    removeUser(userId, groupId, groupCategory);
+                                    removeUser(userId, groupId, groupCategory, groupType);
 
                                 }
                             })
@@ -145,7 +147,7 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
         // Need to add groups tree for that user who was accepted to join.
     }
 
-    public void removeUser(String userId, final String groupId, final String groupCategory) {
+    public void removeUser(String userId, final String groupId, final String groupCategory, final String groupType) {
         databaseRef.child("users").child(userId).child("groups").child(groupId).removeValue();
         databaseRef.child("group").child(groupCategory).child(groupId).child("members").child(userId).removeValue();
         // Updates member count
@@ -154,7 +156,7 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("group").child(groupCategory).child(groupId).child("memberCount").setValue(memberCount);
+                        databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).child("memberCount").setValue(memberCount);
                     }
 
                     @Override
@@ -163,7 +165,7 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                     }
                 });
         //Reverts group type from full if already so.
-        dbConnections.revertGroupType(groupCategory, groupId);
+        dbConnections.revertGroupType(groupCategory, groupId, groupType);
     }
 
 }
