@@ -173,7 +173,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 editText.setSummary(user.getUsername());
                 editText.setText(user.getUsername());
                 pref3.setSummary(user.getAge());
-                pref2.setSummary(user.getCity() + ", " + user.getCountry());
+                if (user.getCity() != null && user.getCountry() != null) {
+                    pref2.setSummary(user.getCity() + ", " + user.getCountry());
+                } else {
+                    pref2.setSummary("-");
+                }
             }
 
             @Override

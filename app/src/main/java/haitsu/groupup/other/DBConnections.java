@@ -17,6 +17,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.other.Models.ChatMessage;
 import haitsu.groupup.other.Models.Group;
@@ -143,8 +145,8 @@ public class DBConnections {
     }
 
 
-    public void createUserAccount(EditText username, String gender, String email, TextView age, String city, String country, double latitude, double longitude) {
-        User user = new User(username.getText().toString(), gender, email, age.getText().toString(), city, country, null, latitude, longitude);
+    public void createUserAccount(EditText username, String gender, String email, TextView age) {
+        User user = new User(username.getText().toString(), gender, email, age.getText().toString(), null, null, null, 0, 0);
         databaseRef.child("users").child(mFirebaseUser.getUid()).setValue(user);//Add user}
     }
 
@@ -332,21 +334,20 @@ public class DBConnections {
         final String userId = mFirebaseUser.getUid();
         databaseRef.child("users").child(userId).removeValue();
         Query findGroupsWithUserId = databaseRef.child("group").orderByChild(userId);
-        findGroupsWithUserId.keepSynced(true);
         findGroupsWithUserId.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
-                        String adminID = groupSnapshot.child("adminID").getValue(String.class);
-                        if (adminID.equals(userId)) {
-                            System.out.println("group created " + groupSnapshot.getRef());
-                            groupSnapshot.getRef().removeValue();
-                        } else if (groupSnapshot.child("members").hasChild(userId)) {
-                            System.out.println("group joined " +
-                                    groupSnapshot.child("members").child(userId).getRef());
-                            ;
-                            groupSnapshot.child("members").child(userId).getRef().removeValue();
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
+                            for (DataSnapshot eventSnapshot : groupSnapshot.getChildren()) {
+                                String adminID = eventSnapshot.child("adminID").getValue(String.class);
+                                if (adminID != "" && adminID.equals(mFirebaseUser.getUid())) {
+                                    eventSnapshot.getRef().removeValue();
+                                } else if (eventSnapshot.child("members").hasChild(userId)) {
+                                    eventSnapshot.child("members").child(userId).getRef().removeValue();
+                                }
+                            }
                         }
                     }
                 }
@@ -426,18 +427,18 @@ public class DBConnections {
                     groupRef.child("members").child(mFirebaseUser.getUid()).removeValue();
 
                     groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    long memberCount = dataSnapshot.child("members").getChildrenCount();
-                                    getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
-                                    groupRef.child("memberCount").setValue(memberCount);
-                                }
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            long memberCount = dataSnapshot.child("members").getChildrenCount();
+                            getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
+                            groupRef.child("memberCount").setValue(memberCount);
+                        }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                                }
-                            });
+                        }
+                    });
                 }
 
                 //Delete from the users group tree

@@ -96,7 +96,7 @@ public class AccountSetupActivity extends AppCompatActivity
         mfinishSetup = (Button) findViewById(R.id.finish_setup);
         spinner = (Spinner) findViewById(R.id.gender_spinner);
         birthdayLabel = (TextView) findViewById(R.id.birthday_label);
-        locationLabel = (TextView) findViewById(R.id.location_label);
+//        locationLabel = (TextView) findViewById(R.id.location_label);
         mfinishSetup.setOnClickListener(this);
         spinner.setOnItemSelectedListener(this);
 
@@ -112,27 +112,27 @@ public class AccountSetupActivity extends AppCompatActivity
         permissionUtils.check_permission(permissions, "Need GPS permission for getting your location", 1);
 
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    locationManager.storeLocationData(location);
-                    locationLabel.setText(locationManager.getCity() + "/" + locationManager.getCountry());
-                    locationManager.stopLocationUpdates();
-                }
-            }
-        };
-
-
-        locationManager.setmLocationCallback(mLocationCallback);
-
-        // Handles all location logic
-        locationManager.setmFusedLocationClient(mFusedLocationClient);
-
-        locationManager.initialiseLocationRequest(this);
+//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//
+//
+//        mLocationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                for (Location location : locationResult.getLocations()) {
+//                    locationManager.storeLocationData(location);
+//                    locationLabel.setText(locationManager.getCity() + "/" + locationManager.getCountry());
+//                    locationManager.stopLocationUpdates();
+//                }
+//            }
+//        };
+//
+//
+//        locationManager.setmLocationCallback(mLocationCallback);
+//
+//        // Handles all location logic
+//        locationManager.setmFusedLocationClient(mFusedLocationClient);
+//
+//        locationManager.initialiseLocationRequest(this);
     }
 
     @Override
@@ -148,12 +148,12 @@ public class AccountSetupActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(),
                             "Please enter your date of birth.", Toast.LENGTH_LONG)
                             .show();
-                } else if (locationManager.getCountry() == null || locationManager.getCity() == null) {
-                    Toast.makeText(getApplicationContext(),
-                            "Please turn on your location.", Toast.LENGTH_LONG)
-                            .show();
+//                } else if (locationManager.getCountry() == null || locationManager.getCity() == null) {
+//                    Toast.makeText(getApplicationContext(),
+//                            "Please turn on your location.", Toast.LENGTH_LONG)
+//                            .show();
                 } else {
-                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel, locationManager.getCity(), locationManager.getCountry(), locationManager.getLatitude(), locationManager.getLongitude());
+                    dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel);
                     //Redirects user to the Home screen.
                     startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));
                     finish();
