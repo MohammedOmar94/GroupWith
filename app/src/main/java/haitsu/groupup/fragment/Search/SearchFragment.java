@@ -51,7 +51,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
     private String typeValue;
     private int sizeValue;
     private int milesValue;
-    private double milesConverted;
+    private int milesConverted;
 
     private Button mSignOutButton;
     Button button;
@@ -238,7 +238,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         categoryValue = currText2.toString();
         typeValue = currText3.toString();
         sizeValue = Integer.parseInt(currText4.toString());
-        milesConverted = calculateKilometers(currText5.toString());
+        milesConverted = Integer.parseInt(currText5.toString());
         // With default values already selected, not sure if this case is even possible...
         if (genderValue == null || categoryValue == null || typeValue == null) {
             //
@@ -251,7 +251,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
             extras.putString("GROUP_CATEGORY", categoryValue);
             extras.putString("GROUP_TYPE", typeValue);
             extras.putInt("MEMBER_LIMIT", sizeValue);
-            extras.putDouble("MILES_CONVERTED", milesConverted);
+            extras.putInt("MILES_CONVERTED", milesConverted);
             intent.putExtras(extras);
             startActivity(intent);
         }

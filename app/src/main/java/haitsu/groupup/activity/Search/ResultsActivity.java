@@ -102,7 +102,7 @@ public class ResultsActivity extends AppCompatActivity implements
     private String groupGender;
     private String groupType;
     private int memberLimit;
-    private double selectedDistance;
+    private int selectedDistance;
 
     private int mShortAnimationDuration;
 
@@ -142,7 +142,7 @@ public class ResultsActivity extends AppCompatActivity implements
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupType = extras.getString("GROUP_TYPE");
         memberLimit = extras.getInt("MEMBER_LIMIT");
-        selectedDistance = extras.getDouble("MILES_CONVERTED");
+        selectedDistance = extras.getInt("MILES_CONVERTED");
 
         mListView = (ListView) findViewById(R.id.listview);
         mainContent = findViewById(R.id.content);
@@ -162,7 +162,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        searchByLocation = databaseRef.child("group").child(groupCategory).orderByChild("type_gender_memberLimit").equalTo(groupType + "_" + groupGender + "_" + memberLimit);
+        searchByLocation = databaseRef.child("group").child(groupCategory).child(groupType).orderByChild("gender_memberLimit").equalTo(groupGender + "_" + memberLimit);
 
         mLocationCallback = new LocationCallback() {
             @Override
@@ -192,12 +192,13 @@ public class ResultsActivity extends AppCompatActivity implements
                                 group.setGroupId(snapshot.getKey());
                                 group.setCategory(groupCategory);
                                 if (distanceInMiles < selectedDistance) {
+                                    System.out.println("Final is " + distanceInMiles + " " + selectedDistance);
                                     groupsList.add(group);
                                     adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
                                     mListView.setAdapter(adapter);
                                 }
                             }
-                            crossfade(mainContent, dataSnapshot);
+                            crossfade(mainContent, dataSnapshot, groupsList);
                         }
 
                         @Override
@@ -233,13 +234,13 @@ public class ResultsActivity extends AppCompatActivity implements
 
     }
 
-    private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
+    private void crossfade(final View contentView, DataSnapshot dataSnapshot, List<Group> groupsList) {
 
         // Set the content view to 0% opacity but visible, so that it is visible
         // (but fully transparent) during the animation.
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
-        if (!dataSnapshot.exists()) {
+        if (!dataSnapshot.exists() || groupsList.size() == 0) {
             mNoGroupsText.setAlpha(0f);
             mNoGroupsText.setVisibility(View.VISIBLE);
         }
