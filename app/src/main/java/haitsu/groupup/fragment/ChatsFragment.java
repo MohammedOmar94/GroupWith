@@ -214,6 +214,7 @@ public class ChatsFragment extends Fragment {
                         extras.putString("GROUP_ID", selectedGroup);
                         extras.putString("GROUP_NAME", selectedGroupName);
                         extras.putString("GROUP_CATEGORY", group.getCategory());
+                        extras.putString("GROUP_TYPE", group.getType());
                         intent.putExtras(extras);
                         startActivity(intent);
                         //User id2 = (User) mListView.getItemAtPosition(position); //

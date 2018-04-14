@@ -89,9 +89,10 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                 User user = ((DataModel) mListView.getItemAtPosition(position)).getUserSnapshot().getValue(User.class);
                 final String userId = ((DataModel) mListView.getItemAtPosition(position)).getUserSnapshot().getKey();
                 final String groupId = ((DataModel) mListView.getItemAtPosition(position)).getGroupId();
+                final String adminId =  ((DataModel) mListView.getItemAtPosition(position)).getGroupAdminId();
                 final String groupCategory = ((DataModel) mListView.getItemAtPosition(position)).getGroupCategory();
-                final String groupType = ((Group) mListView.getItemAtPosition(position)).getType();
-                System.out.println("group type issss " + groupType);
+                final String groupType = ((DataModel) mListView.getItemAtPosition(position)).getType();
+                System.out.println("group type issss " + userId + " " + mFirebaseUser.getUid() + " admin " + adminId);
                 AlertDialog.Builder builder;
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -99,12 +100,17 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                 } else {
                     builder = new AlertDialog.Builder(getContext());
                 }
-                if (!mFirebaseUser.getUid().equals(userId)) {
-                    builder.setTitle(groupId + " " + groupCategory)
+                // userid = selected user id
+                // isAdmin = selected user is admin
+                // Need group ID, and testing for deleting group deletion one more time with member accepted.
+
+                // if selected user id is not your id and you are the admin.
+                if (!mFirebaseUser.getUid().equals(userId) && mFirebaseUser.getUid().equals(adminId)) {
+                    builder.setTitle("Remove member?")
                             .setMessage(Html.fromHtml(removeMemberDialogMessage(user)))
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    removeUser(userId, groupId, groupCategory, groupType);
+                                    dbConnections.removeUser(userId, groupId, groupCategory, groupType);
 
                                 }
                             })
@@ -149,27 +155,6 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
         databaseRef.child("group").child(request.getGroupCategory()).child(request.getGroupId()).child("members").child(request.getUserId()).setValue(true);
 
         // Need to add groups tree for that user who was accepted to join.
-    }
-
-    public void removeUser(String userId, final String groupId, final String groupCategory, final String groupType) {
-        databaseRef.child("users").child(userId).child("groups").child(groupId).removeValue();
-        databaseRef.child("group").child(groupCategory).child(groupId).child("members").child(userId).removeValue();
-        // Updates member count
-        databaseRef.child("group").child(groupCategory).child(groupId).
-                addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).child("memberCount").setValue(memberCount);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-        //Reverts group type from full if already so.
-        dbConnections.revertGroupType(groupCategory, groupId, groupType);
     }
 
 }

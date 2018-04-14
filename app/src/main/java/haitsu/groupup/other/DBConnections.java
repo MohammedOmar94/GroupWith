@@ -484,6 +484,27 @@ public class DBConnections {
         revertGroupType(groupCategory, groupID, groupType);
     }
 
+    public void removeUser(String userId, final String groupId, final String groupCategory, final String groupType) {
+        databaseRef.child("users").child(userId).child("groups").child(groupId).removeValue();
+        databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).child("members").child(userId).removeValue();
+        // Updates member count
+        databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).
+                addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        long memberCount = dataSnapshot.child("members").getChildrenCount();
+                        databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).child("memberCount").setValue(memberCount);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        //Reverts group type from full if already so.
+        revertGroupType(groupCategory, groupId, groupType);
+    }
+
     public void revertGroupType(final String groupCategory, final String groupID, final String groupType) {
         // Separate full and type of group, should reappear as avaliable.
         databaseRef.child("group").child(groupCategory).child(groupType).child(groupID).child("type")

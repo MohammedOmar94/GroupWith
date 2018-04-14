@@ -10,7 +10,9 @@ public class DataModel {
 
     private DataSnapshot userSnapshot;
     private String groupId;
-    private String groupCategory;
+    private String groupCategory;;
+    private String type;
+    private String groupAdminId;
 
     public DataModel() {
 
@@ -38,5 +40,21 @@ public class DataModel {
 
     public void setGroupCategory(String groupCategory) {
         this.groupCategory = groupCategory;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getGroupAdminId() {
+        return groupAdminId;
+    }
+
+    public void setGroupAdminId(String groupAdminId) {
+        this.groupAdminId = groupAdminId;
     }
 }

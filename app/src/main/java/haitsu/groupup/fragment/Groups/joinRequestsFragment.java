@@ -243,27 +243,9 @@ public class joinRequestsFragment extends Fragment {
     }
 
     public void declineJoinRequest(String requestId, final UserRequest request) {
+        // Remove request from admin.
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
-        databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("members").child(request.getUserId()).removeValue();
-        // Updates member count
-        databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).
-                addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        long memberCount = dataSnapshot.child("members").getChildrenCount();
-                        databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("memberCount").setValue(memberCount);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-        //Removes from users tree if admin declines request
-        databaseRef.child("users").child((request.getUserId())).child("groups").child(request.getGroupId()).removeValue();
-        //Reverts group type from full if already so.
-        dbConnections.revertGroupType(request.getGroupCategory(), request.getGroupId(), request.getType());
+        dbConnections.removeUser(request.getUserId(), requestId, request.getGroupCategory(), request.getType());
     }
 
     private void crossfade(final View contentView, DataSnapshot dataSnapshot) {

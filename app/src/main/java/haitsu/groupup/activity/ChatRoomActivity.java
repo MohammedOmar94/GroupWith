@@ -65,6 +65,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private String groupID;
     private String groupName;
     private String groupCategory;
+    private String groupType;
     private String username;
 
     private int itemCount = 10;
@@ -117,6 +118,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         groupID = extras.getString("GROUP_ID");
         groupName = extras.getString("GROUP_NAME");
         groupCategory = extras.getString("GROUP_CATEGORY");
+        groupType = extras.getString("GROUP_TYPE");
 
         FirebaseMessaging.getInstance().subscribeToTopic(groupID);
 
@@ -501,6 +503,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 Bundle extras2 = new Bundle();
                 extras2.putString("GROUP_ID", groupID);
                 extras2.putString("GROUP_CATEGORY", groupCategory);
+                extras2.putString("GROUP_TYPE", groupType);
                 extras2.putString("REPORT_TYPE", "group");
                 intent2.putExtras(extras2);
                 startActivity(intent2);

@@ -77,6 +77,8 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
 
     private String groupID;
     private String groupCategory;
+    private String groupType;
+    private String groupAdminId;
 
     private OnFragmentInteractionListener mListener;
 
@@ -85,6 +87,7 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference groupRef;
+    private ValueEventListener valueListener;
     private Query groupMembers;
 
     private GeoQuery geoQuery;
@@ -147,6 +150,7 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
         Bundle extras = getActivity().getIntent().getExtras();
         groupCategory = extras.getString("GROUP_CATEGORY");
         groupID = extras.getString("GROUP_ID");
+        groupType = extras.getString("GROUP_TYPE");
 
         mAdView = (AdView) view.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -163,29 +167,34 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
-        groupMembers = databaseRef.child("group").child(groupCategory).child(groupID);
-        groupMembers.addValueEventListener(new ValueEventListener() {
+        groupMembers = databaseRef.child("group").child(groupCategory).child(groupType).child(groupID);
+        valueListener = groupMembers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final ArrayList<DataModel> membersList = new ArrayList<>();
+                groupAdminId = dataSnapshot.child("adminID").getValue(String.class);
                 for (final DataSnapshot snapshot : dataSnapshot.child("members").getChildren()) {
-                    databaseRef.child("users").child(snapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            DataModel dataModel = new DataModel();
-                            dataModel.setUserSnapshot(dataSnapshot);
-                            dataModel.setGroupId(groupID);
-                            dataModel.setGroupCategory(groupCategory);
-                            membersList.add(dataModel);
-                            adapter = new UsersAdapter(getActivity(), membersList);
-                            mListView.setAdapter(adapter);
-                        }
+                    if (snapshot.getValue(boolean.class)) {
+                        databaseRef.child("users").child(snapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                DataModel dataModel = new DataModel();
+                                dataModel.setUserSnapshot(dataSnapshot);
+                                dataModel.setGroupId(groupID);
+                                dataModel.setGroupCategory(groupCategory);
+                                dataModel.setGroupAdminId(groupAdminId);
+                                dataModel.setType(groupType);
+                                membersList.add(dataModel);
+                                adapter = new UsersAdapter(getActivity(), membersList);
+                                mListView.setAdapter(adapter);
+                            }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
                 crossfade(mainContent, dataSnapshot);
             }
@@ -268,6 +277,21 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
     @Override
     public void onStop() {
         super.onStop();
+        groupMembers.removeEventListener(valueListener);
+//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.stopAutoManage(getActivity());
+//            mGoogleApiClient.disconnect();
+//        }
+        // remove all event listeners to stop updating in the background
+        if (geoQuery != null) {
+            this.geoQuery.removeAllListeners();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        groupMembers.removeEventListener(valueListener);
 //        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.stopAutoManage(getActivity());
 //            mGoogleApiClient.disconnect();
