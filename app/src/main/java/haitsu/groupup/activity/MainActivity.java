@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
 
                 // initializing navigation menu
                 setUpNavigationView();  // showing dot next to notifications label
-                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
+//                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
 
                 if (savedInstanceState == null) {
                     navItemIndex = 0;
@@ -334,10 +334,10 @@ public class MainActivity extends AppCompatActivity
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
                         break;
-                    case R.id.nav_notifications:
-                        navItemIndex = 1;
-                        CURRENT_TAG = TAG_NOTIFICATIONS;
-                        break;
+//                    case R.id.nav_notifications:
+//                        navItemIndex = 1;
+//                        CURRENT_TAG = TAG_NOTIFICATIONS;
+//                        break;
                     case R.id.nav_my_groups:
                         //navItemIndex = 2;
                         //CURRENT_TAG = TAG_MY_GROUPS;

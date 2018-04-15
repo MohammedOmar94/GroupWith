@@ -189,7 +189,7 @@ public class joinRequestsFragment extends Fragment {
                                         acceptJoinRequest(requestId, request);
                                     }
                                 })
-                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         declineJoinRequest(requestId, request);
                                     }

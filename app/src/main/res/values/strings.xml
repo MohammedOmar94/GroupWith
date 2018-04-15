@@ -235,4 +235,7 @@
     <string name="title_activity_search">Search</string>
     <string name="title_activity_join_requests">JoinRequests</string>
 
+    <!-- options -->
+    <string name="option_decline">Decline</string>
+
 </resources>
