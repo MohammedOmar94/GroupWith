@@ -366,7 +366,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 chatMessageList.clear();;
                 if (!dataSnapshot.hasChildren()) {
-                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
                     currentPage--;
                 }
                 boolean firstInLoop = true;
