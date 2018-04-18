@@ -166,17 +166,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         final EditTextPreference editText = (EditTextPreference) findPreference("username");
         DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid());
-        user.addListenerForSingleValueEvent(new ValueEventListener() {
+        user.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                editText.setSummary(user.getUsername());
-                editText.setText(user.getUsername());
-                pref3.setSummary(user.getAge());
-                if (user.getCity() != null && user.getCountry() != null) {
-                    pref2.setSummary(user.getCity() + ", " + user.getCountry());
+                if (snapshot.getChildrenCount() == 0) {
+                    System.out.println("snake " + snapshot.getValue());
+                    signOut();
                 } else {
-                    pref2.setSummary("-");
+                    User user = snapshot.getValue(User.class);
+                    editText.setSummary(user.getUsername());
+                    editText.setText(user.getUsername());
+                    pref3.setSummary(user.getAge());
+                    if (user.getCity() != null && user.getCountry() != null) {
+                        pref2.setSummary(user.getCity() + ", " + user.getCountry());
+                    } else {
+                        pref2.setSummary("-");
+                    }
                 }
             }
 
@@ -217,7 +222,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 new DBConnections().deleteAccount();
-                                signOut();
+//                                signOut();
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
