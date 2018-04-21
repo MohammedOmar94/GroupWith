@@ -16,8 +16,11 @@
 
 package haitsu.groupup;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -37,8 +40,11 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 import haitsu.groupup.activity.ChatRoomActivity;
 import haitsu.groupup.activity.ChatsActivity;
@@ -95,7 +101,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     Intent intent = new Intent(this, ChatRoomActivity.class);
                     intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
                     intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
-                    sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
+                    try {
+                        String activity = getActivity().getClass().getSimpleName();
+                        System.out.println("current activity is " + activity);
+                        if (!activity.equals("ChatRoomActivity") && !activity.equals("ChatsActivity")) {
+                            sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchFieldException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -110,7 +132,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //                Intent intent = new Intent(this, MyGroupsActivity.class);
 //                sendNotification(remoteMessage.getNotification().getBody(), intent);
 //            } else {
-                // User id from the chat message received
+        // User id from the chat message received
 //                String userId = remoteMessage.getData().get("userid");
 //                // Prevents user from receiving a push notification from the message they sent
 //                if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
@@ -196,10 +218,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         notificationManager.notify(1 /* ID of notification */, notificationBuilder.build());
     }
 
-    private void sendChatNotification(String messageBody, String groupId, Intent intent) {
+    private void sendChatNotification(String messageBody, String groupId, Intent intent) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
+        ActivityManager am = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+
 
         Bitmap bitmap = getBitmapFromURL(icon);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -225,4 +250,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
+    /* https://stackoverflow.com/a/28423385/8033866 */
+    public static Activity getActivity() throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class activityThreadClass = Class.forName("android.app.ActivityThread");
+        Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
+        Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
+        activitiesField.setAccessible(true);
+
+        Map<Object, Object> activities = (Map<Object, Object>) activitiesField.get(activityThread);
+        if (activities == null)
+            return null;
+
+        for (Object activityRecord : activities.values()) {
+            Class activityRecordClass = activityRecord.getClass();
+            Field pausedField = activityRecordClass.getDeclaredField("paused");
+            pausedField.setAccessible(true);
+            if (!pausedField.getBoolean(activityRecord)) {
+                Field activityField = activityRecordClass.getDeclaredField("activity");
+                activityField.setAccessible(true);
+                Activity activity = (Activity) activityField.get(activityRecord);
+                return activity;
+            }
+        }
+
+        return null;
+    }
+
 }

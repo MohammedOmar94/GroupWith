@@ -91,7 +91,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, model.getMessageUser(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, model.getMessageUser(), Toast.LENGTH_LONG).show();
             }
         });
     }

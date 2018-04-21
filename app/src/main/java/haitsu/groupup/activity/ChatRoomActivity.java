@@ -400,7 +400,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()) {
-                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
                     currentPage--;
                     lastValue = "";
                 }
@@ -477,7 +477,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getApplicationContext(), model.getMessageUser(), Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), model.getMessageUser(), Toast.LENGTH_LONG).show();
                     }
                 });
             }

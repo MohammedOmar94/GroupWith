@@ -81,9 +81,9 @@ public class SignInActivity extends AppCompatActivity implements
 
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser != null) {
-            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
         }
 
         // Initialize FirebaseAuth
