@@ -126,6 +126,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private ValueEventListener listener;
 
+    private EditTextPreference editText;
+
     private Boolean mRequestingLocationUpdates;
     private final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
 
@@ -167,32 +169,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         addPreferencesFromResource(R.xml.preferences);
 
-        final EditTextPreference editText = (EditTextPreference) findPreference("username");
+        editText = (EditTextPreference) findPreference("username");
         user = databaseRef.child("users").child(mFirebaseUser.getUid());
-        listener = user.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                if (snapshot.getChildrenCount() == 0) {
-                    System.out.println("snake " + snapshot.getValue());
-                    signOut();
-                } else {
-                    User user = snapshot.getValue(User.class);
-                    editText.setSummary(user.getUsername());
-                    editText.setText(user.getUsername());
-                    pref3.setSummary(user.getAge());
-                    if (user.getCity() != null && user.getCountry() != null) {
-                        pref2.setSummary(user.getCity() + ", " + user.getCountry());
-                    } else {
-                        pref2.setSummary("-");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         Preference pref = findPreference("sign_out");
@@ -267,6 +245,33 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         return view;
     }
 
+    public void setListener() {
+        listener = user.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+                if (snapshot.getChildrenCount() == 0) {
+                    System.out.println("snake " + snapshot.getValue());
+                    signOut();
+                } else {
+                    User user = snapshot.getValue(User.class);
+                    editText.setSummary(user.getUsername());
+                    editText.setText(user.getUsername());
+                    pref3.setSummary(user.getAge());
+                    if (user.getCity() != null && user.getCountry() != null) {
+                        pref2.setSummary(user.getCity() + ", " + user.getCountry());
+                    } else {
+                        pref2.setSummary("-");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -305,6 +310,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Set up a listener whenever a key changes
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+        setListener();
+        System.out.println("Started listener");
 //        if (mRequestingLocationUpdates) {
 //            startLocationUpdates();
 //        }
@@ -325,6 +332,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Unregister the listener whenever a key changes
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+        System.out.println("Stopped listener");
         user.removeEventListener(listener);
     }
 
