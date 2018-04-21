@@ -23,13 +23,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.ChatRoomActivity;
+import haitsu.groupup.other.Adapters.ChatsAdapter;
+import haitsu.groupup.other.Adapters.GroupsAdapter;
 import haitsu.groupup.other.DBHandler;
 import haitsu.groupup.other.Models.ChatMessage;
+import haitsu.groupup.other.Models.Group;
 import haitsu.groupup.other.Models.Groups;
 
 /**
@@ -61,6 +67,10 @@ public class ChatsFragment extends Fragment {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+
+
+    private ChatsAdapter adapter;
+    final ArrayList<Groups> groupsList = new ArrayList<>();
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -111,127 +121,104 @@ public class ChatsFragment extends Fragment {
         // db.onCreate(s);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("userApproved").equalTo(true);
+        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
         us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.group_chat, us) {
-            protected void populateView(View view, Groups groupInfo, int position) {
-                // Map<String,String> lastMessage = groupInfo.getLastMessage();
-                // System.out.println("Group name is " + lastMessage);
-                ChatMessage message = groupInfo.getLastMessage();
-                if (message != null) {
-                    // db.addMessage(mFirebaseUser.getUid(),message.getMessageText(), message.getMessageTime(), message.getMessageUser());
-                }
-                //db.displayMessage();
 
-                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
-                if (groupInfo.getLastMessage() != null) {
-                    ((TextView) view.findViewById(R.id.message_text)).setText(message.getMessageUser() + ": " + message.getMessageText());
-                    if (message.getMessageCount() > 0) {
-                        ((TextView) view.findViewById(R.id.message_count)).setText(Integer.toString(message.getMessageCount()));
-                        if ((view.findViewById(R.id.message_count)).getVisibility() == View.GONE) {
-                            (view.findViewById(R.id.message_count)).setVisibility(View.VISIBLE);
-                        }
-                    } else {
-                        (view.findViewById(R.id.message_count)).setVisibility(View.GONE);
-                    }
-                    Date messageDate = new Date(message.getMessageTime());
-                    Date currentDate = new Date();
-                    Calendar cal1 = Calendar.getInstance();
-                    Calendar cal2 = Calendar.getInstance();
-
-                    cal1.setTime(currentDate);
-                    cal2.setTime(messageDate);
-
-                    int today = cal1.get(Calendar.DAY_OF_WEEK);
-                    int notificationDay = cal2.get(Calendar.DAY_OF_WEEK);
-
-                    int daysFromWeek = today - notificationDay;
-
-                    long diff = currentDate.getTime() - messageDate.getTime();
-                    float daysFromTime = (diff / (1000 * 60 * 60 * 24));
-                    int daysRounded = Math.round(daysFromTime);
-
-                    if (daysFromWeek == 0 && daysRounded == 0) {
-                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm", messageDate));
-                    } else if (daysRounded == 1 || (daysFromWeek == 1 && daysRounded == 0)) {
-                        ((TextView) view.findViewById(R.id.message_time)).setText("Yesterday " + DateFormat.format("HH:mm", messageDate));
-                    } else {
-                        ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("dd-MM-yyyy", messageDate));
-                    }
-                } else {
-                    view.findViewById(R.id.message_count).setVisibility(View.GONE);
-                    ((TextView) view.findViewById(R.id.message_text)).setText("Say hello to the group!");
-                }
-                //  (
-            }
-/*
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent){
-                // Get the Item from ListView
-                View view = super.getView(position, convertView, parent);
-
-                // Initialize a TextView for ListView each Item
-                TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                TextView tv2 = (TextView) view.findViewById(android.R.id.text2);
-
-                // Set the text color of TextView (ListView Item)
-                tv.setTextColor(Color.BLACK);
-                tv2.setTextColor(Color.BLACK);
-
-                // Generate ListView Item using TextView
-                return view;
-            }
-*/
-
-        };
-        final FirebaseListAdapter<Groups> usersAdapter2 = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.messages, us) {
-            protected void populateView(View view, Groups groupInfo, int position) {
-                // Map<String,String> lastMessage = groupInfo.getLastMessage();
-                // System.out.println("Group name is " + lastMessage);
-                ((TextView) view.findViewById(R.id.message_user)).setText(groupInfo.getName());
-                // ((TextView) view.findViewById(R.id.message_text)).setText(groupInfo.getCategory());
-                // ((TextView) view.findViewById(R.id.message_time)).setText("aaa");
-            }
-
-
-        };
         us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                mListView.setAdapter(usersAdapter);
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                ArrayList<Groups> groupsWithMsg = new ArrayList<>();
+                groupsList.clear();
+                System.out.println("heyyyyy");
+                ChatMessage previousMessage = null;
+                Groups previousGroup = null;
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Groups group = snapshot.getValue(Groups.class);
+                    ChatMessage chatMessage = group.getLastMessage();
+                    group.setGroupId(snapshot.getKey());
 
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                        mListView.setFocusable(true);//HACKS
-                        String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
-                        Groups group = ((Groups) mListView.getItemAtPosition(position));
-                        selectedGroup = key;
-                        selectedGroupName = group.getName();
-                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_NAME", selectedGroupName);
-                        extras.putString("GROUP_CATEGORY", group.getCategory());
-                        extras.putString("GROUP_TYPE", group.getType());
-                        intent.putExtras(extras);
-                        startActivity(intent);
-                        //User id2 = (User) mListView.getItemAtPosition(position); //
-                        System.out.println("ID IS " + key);
+                    if (group.getUserApproved()) {
+
+//                        if (chatMessage != null) {
+//                            if (previousMessage != null) {
+//                                // Current msg happened after previous
+//                                boolean compareMsgTimes = chatMessage.getMessageTime() > previousMessage.getMessageTime();
+//                                if (compareMsgTimes) {
+//                                    groupsList.add(group);
+//                                    groupsList.add(previousGroup);
+//                                } else {
+//                                    groupsList.add(previousGroup);
+//                                    groupsList.add(group);
+//                                }
+//                            }
+//
+//                            previousMessage = chatMessage;
+//                            previousGroup = group;
+//                        } else {
+//                            // New groups no msgs have been recieved for.
+//                        if (chatMessage != null) {
+//                            System.out.println("group " + snapshot.getValue());
+//                            if (previousMessage != null) {
+//                                System.out.println("previous " + previousGroup.getName() + " current " + group.getName());
+//                                System.out.println("current is newest? " + (chatMessage.getMessageTime() > previousMessage.getMessageTime()));
+//                                if (chatMessage.getMessageTime() > previousMessage.getMessageTime()) {
+//                                    groupsList.add(0, group);
+//                                } else {
+//                                    groupsList.add(group);
+//                                }
+//                            } else {
+//                                groupsList.add(group);
+//                            }
+//                            previousMessage = chatMessage;
+//                            previousGroup = group;
+//
+//                        } else {
+//                            groupsList.add(group);
+//                        }
+////                        }
+//                    }
+                        if (chatMessage != null) {
+                            groupsWithMsg.add(0, group);
+                        } else {
+                            groupsList.add(group);
+                        }
+                        adapter = new ChatsAdapter(getActivity(), groupsList);
+                        mListView.setAdapter(adapter);
                     }
 
 
-                });
-            }
 
+                }
+                Collections.sort(groupsWithMsg, new Comparator<Groups>() {
+                    @Override
+                    public int compare(Groups o1, Groups o2) {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+
+                for (Groups d : groupsWithMsg) {
+                    System.out.println("groups msg " + d.getLastMessage().getMessageTime());
+                    groupsList.add(0, d);
+                    //something here
+                }
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-
         });
+
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//
+//        });
 
 
         return view;

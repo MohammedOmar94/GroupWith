@@ -4,8 +4,9 @@ package haitsu.groupup.other.Models;
  * Created by moham on 20/06/2017.
  */
 
-public class Groups {
+public class Groups implements Comparable<Groups> {
 
+    private String groupId;
     private String category;
     private String type;
     private String name;
@@ -83,4 +84,29 @@ public class Groups {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+
+    @Override
+    public int compareTo(Groups that) {
+        long lastMessage1 = this.getLastMessage().getMessageTime();
+        long lastMessage2 = that.getLastMessage().getMessageTime();
+
+        if (lastMessage1 > lastMessage2) {
+            return 1;
+        } else if (lastMessage1 < lastMessage2) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 }
+
+
