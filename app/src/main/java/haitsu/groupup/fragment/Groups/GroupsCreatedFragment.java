@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
+import haitsu.groupup.other.Adapters.UsersAdapter;
 import haitsu.groupup.other.Models.Group;
 import haitsu.groupup.other.Models.Groups;
 
@@ -67,6 +68,7 @@ public class GroupsCreatedFragment extends Fragment {
     private int mShortAnimationDuration;
 
     private ListView mListView;
+    private FirebaseListAdapter<Groups> usersAdapter;
 
 
 
@@ -136,7 +138,7 @@ public class GroupsCreatedFragment extends Fragment {
         us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
-        final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.groups_item, us) {
+        usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.groups_item, us) {
             protected void populateView(View view, Groups group, int position) {
                 ((TextView) view.findViewById(R.id.group_name)).setText(group.getName());
                 ((TextView) view.findViewById(R.id.group_gender)).setText("Category: " + group.getCategory());
@@ -164,42 +166,7 @@ public class GroupsCreatedFragment extends Fragment {
 
 
         };
-        listener = us.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                mListView.setAdapter(usersAdapter);
-                crossfade(mainContent, dataSnapshot);
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                        mListView.setFocusable(true);//HACKS
-                        String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
-                        Groups group = ((Groups) mListView.getItemAtPosition(position));
-                        selectedGroup = key;
-                        selectedGroupName = group.getName();
-                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_NAME", selectedGroupName);
-                        extras.putString("GROUP_CATEGORY", group.getCategory());
-                        extras.putString("GROUP_TYPE", group.getType());
-                        intent.putExtras(extras);
-                        startActivity(intent);
-                        //User id2 = (User) mListView.getItemAtPosition(position); //
-                        // System.out.println("ID IS " + key);
-                    }
-
-
-                });
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-        });
 
 
         return view;
@@ -247,6 +214,44 @@ public class GroupsCreatedFragment extends Fragment {
                 });
     }
 
+    public void setListener() {
+        listener = us.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                mListView.setAdapter(usersAdapter);
+                crossfade(mainContent, dataSnapshot);
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                        mListView.setFocusable(true);//HACKS
+                        String key = usersAdapter.getRef(position).getKey();//Gets key of listview item
+                        Groups group = ((Groups) mListView.getItemAtPosition(position));
+                        selectedGroup = key;
+                        selectedGroupName = group.getName();
+                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
+                        Bundle extras = new Bundle();
+                        extras.putString("GROUP_ID", selectedGroup);
+                        extras.putString("GROUP_NAME", selectedGroupName);
+                        extras.putString("GROUP_CATEGORY", group.getCategory());
+                        extras.putString("GROUP_TYPE", group.getType());
+                        intent.putExtras(extras);
+                        startActivity(intent);
+                        //User id2 = (User) mListView.getItemAtPosition(position); //
+                        // System.out.println("ID IS " + key);
+                    }
+
+
+                });
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+    }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -272,6 +277,13 @@ public class GroupsCreatedFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("Started listener");
+        setListener();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         us.removeEventListener(listener);
@@ -280,6 +292,7 @@ public class GroupsCreatedFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        System.out.println("Stopped listener");
         us.removeEventListener(listener);
     }
 
