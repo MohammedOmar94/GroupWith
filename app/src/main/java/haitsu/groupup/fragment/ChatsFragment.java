@@ -64,6 +64,8 @@ public class ChatsFragment extends Fragment {
 
     private ListView mListView;
 
+    private Query us;
+    private ValueEventListener listener;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -121,12 +123,12 @@ public class ChatsFragment extends Fragment {
         // db.onCreate(s);
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
+        us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups");
         us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
 
-        us.addValueEventListener(new ValueEventListener() {
+        listener = us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 ArrayList<Groups> groupsWithMsg = new ArrayList<>();
@@ -246,6 +248,24 @@ public class ChatsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        us.removeEventListener(listener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        us.removeEventListener(listener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        us.removeEventListener(listener);
     }
 
     /**
