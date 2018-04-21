@@ -122,6 +122,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private FirebaseUser mFirebaseUser;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference user;
+
+    private ValueEventListener listener;
 
     private Boolean mRequestingLocationUpdates;
     private final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -165,8 +168,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.preferences);
 
         final EditTextPreference editText = (EditTextPreference) findPreference("username");
-        DatabaseReference user = databaseRef.child("users").child(mFirebaseUser.getUid());
-        user.addValueEventListener(new ValueEventListener() {
+        user = databaseRef.child("users").child(mFirebaseUser.getUid());
+        listener = user.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
@@ -293,6 +296,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         super.onDestroy();
         mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
         mGoogleApiClient.disconnect();
+        user.removeEventListener(listener);
     }
 
     @Override
@@ -312,6 +316,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Unregister the listener whenever a key changes
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+        user.removeEventListener(listener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Unregister the listener whenever a key changes
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+        user.removeEventListener(listener);
     }
 
 
