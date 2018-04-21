@@ -36,6 +36,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.ReportActivity;
@@ -203,81 +204,84 @@ public class ChatRoomActivity extends AppCompatActivity {
                 final String message = input.getText().toString();
                 final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ChatRoomActivity.this);
                 System.out.println("photo old " + account.getPhotoUrl());
+                // Regexp ensures that at least one non-blank character is used.
+                if(Pattern.compile("\\S").matcher(message).find()) {
+                    // Read the input field and push a new instance
+                    // of ChatMessage to the Firebase database
+                    chatrooms.push()
+                            .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(), input.getText().toString(), username, account.getPhotoUrl().toString()));
 
-                // Read the input field and push a new instance
-                // of ChatMessage to the Firebase database
-                chatrooms.push()
-                        .setValue(new ChatMessage(groupName, mFirebaseUser.getUid(), input.getText().toString(), username, account.getPhotoUrl().toString()));
+                    // When added in Firebase using the ChatMessage model, messageCount is set to 0 by default;
+                    final ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, username, account.getPhotoUrl().toString());
 
-                // When added in Firebase using the ChatMessage model, messageCount is set to 0 by default;
-                final ChatMessage usersLastMessage = new ChatMessage(groupName, mFirebaseUser.getUid(), message, username, account.getPhotoUrl().toString());
-
-                // All users that have are apart of this group.
-                queryStuff.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            //System.out.println("Snapshot " + snapshot);
-                            if (snapshot
-                                    .child("groups").hasChild(groupID)) {
-                                //Path: users/userid/groups/groupid/lastMessage
-                                lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
-                                        .child("groups").child(groupID).child("lastMessage");
-                                System.out.println("user id " + snapshot.getKey());
-                                lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        // Do this with all lastMessage in groups, count total unread messages
-                                        // Can add all unread messages this way in a single notification.
-                                        // Makes sure doesn't add count if admin is sending.
+                    // All users that have are apart of this group.
+                    queryStuff.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                //System.out.println("Snapshot " + snapshot);
+                                if (snapshot
+                                        .child("groups").hasChild(groupID)) {
+                                    //Path: users/userid/groups/groupid/lastMessage
+                                    lastMessage = FirebaseDatabase.getInstance().getReference().child("users").child(snapshot.getKey())
+                                            .child("groups").child(groupID).child("lastMessage");
+                                    System.out.println("user id " + snapshot.getKey());
+                                    lastMessage.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            // Do this with all lastMessage in groups, count total unread messages
+                                            // Can add all unread messages this way in a single notification.
+                                            // Makes sure doesn't add count if admin is sending.
 //                                        System.out.println("this is datasnap " + dataSnapshot.child("userId").getValue(String.class));
-                                        // Each user vs message id.
+                                            // Each user vs message id.
 
-                                        //snapshot.getKey == current user in group (loop). Useless otherwise.
-                                        //dataSnapshot.child("userid") == last person who sent message.
-                                        if (!mFirebaseUser.getUid().equals(snapshot.getKey())) {
-                                            if (!dataSnapshot.hasChild("messageCount")) {
-                                                System.out.println("this is uid " + snapshot.getKey());
-                                                dataSnapshot.child("messageCount").getRef().setValue(1);
-                                                usersLastMessage.setMessageCount(1);
+                                            //snapshot.getKey == current user in group (loop). Useless otherwise.
+                                            //dataSnapshot.child("userid") == last person who sent message.
+                                            if (!mFirebaseUser.getUid().equals(snapshot.getKey())) {
+                                                if (!dataSnapshot.hasChild("messageCount")) {
+                                                    System.out.println("this is uid " + snapshot.getKey());
+                                                    dataSnapshot.child("messageCount").getRef().setValue(1);
+                                                    usersLastMessage.setMessageCount(1);
+                                                } else {
+                                                    int messageCount = dataSnapshot.child("messageCount").getValue(Integer.class);
+                                                    System.out.println("this is " + (messageCount + 1) + " " + snapshot.getKey());
+                                                    dataSnapshot.child("messageCount").getRef().setValue(messageCount + 1);
+                                                    usersLastMessage.setMessageCount(messageCount + 1);
+                                                }
+                                                dataSnapshot.getRef().setValue(usersLastMessage);
                                             } else {
-                                                int messageCount = dataSnapshot.child("messageCount").getValue(Integer.class);
-                                                System.out.println("this is " + (messageCount + 1) + " " + snapshot.getKey());
-                                                dataSnapshot.child("messageCount").getRef().setValue(messageCount + 1);
-                                                usersLastMessage.setMessageCount(messageCount + 1);
+                                                usersLastMessage.setMessageCount(0);
+                                                dataSnapshot.getRef().setValue(usersLastMessage);
+                                                System.out.println("this was sent from your id " + snapshot.getKey());
+                                                System.out.println("this was your msg from your id " + usersLastMessage.getMessageText());
                                             }
-                                            dataSnapshot.getRef().setValue(usersLastMessage);
-                                        } else {
-                                            usersLastMessage.setMessageCount(0);
-                                            dataSnapshot.getRef().setValue(usersLastMessage);
-                                            System.out.println("this was sent from your id " + snapshot.getKey());
-                                            System.out.println("this was your msg from your id " + usersLastMessage.getMessageText());
+
                                         }
 
-                                    }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                                        }
+                                    });
 
-                                    }
-                                });
-
-                                Groups groupData = snapshot.getValue(Groups.class);
+                                    Groups groupData = snapshot.getValue(Groups.class);
 //                                System.out.println("Snapshot " + snapshot);
+                                }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                }
 
                 // Clear the input
                 input.setText("");
             }
         });
+
 
         // Initialize ProgressBar and RecyclerView.
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
