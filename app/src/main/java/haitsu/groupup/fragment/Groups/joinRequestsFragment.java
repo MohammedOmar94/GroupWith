@@ -209,6 +209,8 @@ public class joinRequestsFragment extends Fragment {
             mNoGroupsText.setAlpha(0f);
             mNoGroupsText.setVisibility(View.VISIBLE);
             mNoGroupsText.setText("No new requests found.");
+        } else {
+            mNoGroupsText.setVisibility(View.GONE);
         }
 
         // Animate the loading view to 0% opacity. After the animation ends,
