@@ -58,6 +58,7 @@ public class joinRequestsFragment extends Fragment {
     private String selectedGroup;
     private String selectedGroupName;
 
+    private ValueEventListener listener;
     private OnFragmentInteractionListener mListener;
 
     private View mainContent;
@@ -74,7 +75,7 @@ public class joinRequestsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-
+    private DatabaseReference groupRef;
     private DBConnections dbConnections = new DBConnections();
 
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
@@ -138,7 +139,7 @@ public class joinRequestsFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
-        final DatabaseReference groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
+        groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
         groupRef.keepSynced(true);
         final FirebaseListAdapter<UserRequest> usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.group_chat, groupRef) {
             protected void populateView(View view, UserRequest request, int position) {
@@ -155,7 +156,7 @@ public class joinRequestsFragment extends Fragment {
 
         };
 
-        groupRef.addValueEventListener(new ValueEventListener() {
+        listener = groupRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mListView.setAdapter(usersAdapter);
@@ -313,6 +314,24 @@ public class joinRequestsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        groupRef.removeEventListener(listener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        groupRef.removeEventListener(listener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        groupRef.removeEventListener(listener);
     }
 
     /**

@@ -143,6 +143,8 @@ public class GroupsJoinedFragment extends Fragment {
                         + group.getMemberLimit());
                 if(!group.getUserApproved()){
                     ((TextView) view.findViewById(R.id.awaiting_approval)).setText("Awaiting approval");
+                } else {
+                    ((TextView) view.findViewById(R.id.awaiting_approval)).setText("");
                 }
 
             }
