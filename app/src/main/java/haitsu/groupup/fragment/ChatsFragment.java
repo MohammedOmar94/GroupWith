@@ -128,6 +128,21 @@ public class ChatsFragment extends Fragment {
         final DatabaseReference group = databaseRef.child("group");
         final DatabaseReference chats = databaseRef.child("chats");
 
+
+
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//
+//        });
+
+
+        return view;
+    }
+
+    public void setListener() {
         listener = us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -186,8 +201,6 @@ public class ChatsFragment extends Fragment {
                         } else {
                             groupsList.add(group);
                         }
-                        adapter = new ChatsAdapter(getActivity(), groupsList);
-                        mListView.setAdapter(adapter);
                     }
 
 
@@ -206,6 +219,8 @@ public class ChatsFragment extends Fragment {
                     groupsList.add(0, d);
                     //something here
                 }
+                adapter = new ChatsAdapter(getActivity(), groupsList);
+                mListView.setAdapter(adapter);
             }
 
             @Override
@@ -213,17 +228,6 @@ public class ChatsFragment extends Fragment {
 
             }
         });
-
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//
-//        });
-
-
-        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -251,14 +255,16 @@ public class ChatsFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        us.removeEventListener(listener);
+    public void onResume() {
+        super.onResume();
+        System.out.println("Started listener");
+        setListener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        System.out.println("Stopped listener");
         us.removeEventListener(listener);
     }
 

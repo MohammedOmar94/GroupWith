@@ -246,11 +246,12 @@ public class ChatRoomActivity extends AppCompatActivity {
                                                 dataSnapshot.child("messageCount").getRef().setValue(messageCount + 1);
                                                 usersLastMessage.setMessageCount(messageCount + 1);
                                             }
-                                            lastMessage.setValue(usersLastMessage);
+                                            dataSnapshot.getRef().setValue(usersLastMessage);
                                         } else {
                                             usersLastMessage.setMessageCount(0);
-                                            lastMessage.setValue(usersLastMessage);
+                                            dataSnapshot.getRef().setValue(usersLastMessage);
                                             System.out.println("this was sent from your id " + snapshot.getKey());
+                                            System.out.println("this was your msg from your id " + usersLastMessage.getMessageText());
                                         }
 
                                     }
