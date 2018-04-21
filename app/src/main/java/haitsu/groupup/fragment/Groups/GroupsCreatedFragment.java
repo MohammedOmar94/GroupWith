@@ -54,7 +54,10 @@ public class GroupsCreatedFragment extends Fragment {
     private String selectedGroup;
     private String selectedGroupName;
 
+    private Query us;
+
     private OnFragmentInteractionListener mListener;
+    private ValueEventListener listener;
 
     private View mainContent;
     private TextView mNoGroupsText;
@@ -130,7 +133,7 @@ public class GroupsCreatedFragment extends Fragment {
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        final Query us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
+        us = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         us.keepSynced(true);
         final DatabaseReference group = databaseRef.child("group");
         final FirebaseListAdapter<Groups> usersAdapter = new FirebaseListAdapter<Groups>(getActivity(), Groups.class, R.layout.groups_item, us) {
@@ -161,7 +164,7 @@ public class GroupsCreatedFragment extends Fragment {
 
 
         };
-        us.addValueEventListener(new ValueEventListener() {
+        listener = us.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mListView.setAdapter(usersAdapter);
@@ -268,6 +271,23 @@ public class GroupsCreatedFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        us.removeEventListener(listener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        us.removeEventListener(listener);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        us.removeEventListener(listener);
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
