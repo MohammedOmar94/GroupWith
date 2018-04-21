@@ -65,6 +65,8 @@ public class joinRequestsFragment extends Fragment {
     private TextView mNoGroupsText;
     private ProgressBar progressSpinner;
 
+    private FirebaseListAdapter<UserRequest> usersAdapter;
+
 
     private int mShortAnimationDuration;
 
@@ -141,7 +143,7 @@ public class joinRequestsFragment extends Fragment {
 
         groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
         groupRef.keepSynced(true);
-        final FirebaseListAdapter<UserRequest> usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.group_chat, groupRef) {
+        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.group_chat, groupRef) {
             protected void populateView(View view, UserRequest request, int position) {
                 System.out.println("ayy " + request.getGroupCategory());
                 int age = calculateAge(request.getAge());
@@ -156,59 +158,7 @@ public class joinRequestsFragment extends Fragment {
 
         };
 
-        listener = groupRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                mListView.setAdapter(usersAdapter);
-                crossfade(mainContent, dataSnapshot);
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
-                        mListView.setFocusable(true);//HACKS
-                        final String requestId = usersAdapter.getRef(position).getKey();//Gets key of listview item
-                        final UserRequest request = ((UserRequest) mListView.getItemAtPosition(position));
-//                        selectedGroupName = group.getName();
-//                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
-//                        Bundle extras = new Bundle();
-//                        extras.putString("GROUP_ID", selectedGroup);
-//                        extras.putString("GROUP_NAME", selectedGroupName);
-//                        intent.putExtras(extras);
-//                        startActivity(intent);
-                        //User id2 = (User) mListView.getItemAtPosition(position); //
-
-                        AlertDialog.Builder builder;
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
-                        } else {
-                            builder = new AlertDialog.Builder(getActivity());
-                        }
-                        builder.setTitle("Accept request to join group")
-                                .setMessage(Html.fromHtml(joinRequestDialogMessage(request)))
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        acceptJoinRequest(requestId, request);
-                                    }
-                                })
-                                .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        declineJoinRequest(requestId, request);
-                                    }
-                                })
-                                .show();
-                        System.out.println("ID IS " + requestId);
-                    }
-
-
-                });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-        });
 
 
         return view;
@@ -292,6 +242,62 @@ public class joinRequestsFragment extends Fragment {
                 });
     }
 
+    public void setListener() {
+        listener = groupRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                mListView.setAdapter(usersAdapter);
+                crossfade(mainContent, dataSnapshot);
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                    public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                        mListView.setFocusable(true);//HACKS
+                        final String requestId = usersAdapter.getRef(position).getKey();//Gets key of listview item
+                        final UserRequest request = ((UserRequest) mListView.getItemAtPosition(position));
+//                        selectedGroupName = group.getName();
+//                        Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
+//                        Bundle extras = new Bundle();
+//                        extras.putString("GROUP_ID", selectedGroup);
+//                        extras.putString("GROUP_NAME", selectedGroupName);
+//                        intent.putExtras(extras);
+//                        startActivity(intent);
+                        //User id2 = (User) mListView.getItemAtPosition(position); //
+
+                        AlertDialog.Builder builder;
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
+                        } else {
+                            builder = new AlertDialog.Builder(getActivity());
+                        }
+                        builder.setTitle("Accept request to join group")
+                                .setMessage(Html.fromHtml(joinRequestDialogMessage(request)))
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        acceptJoinRequest(requestId, request);
+                                    }
+                                })
+                                .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        declineJoinRequest(requestId, request);
+                                    }
+                                })
+                                .show();
+                        System.out.println("ID IS " + requestId);
+                    }
+
+
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -323,8 +329,16 @@ public class joinRequestsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("Started listener");
+        setListener();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+        System.out.println("Stopped listener");
         groupRef.removeEventListener(listener);
     }
 
