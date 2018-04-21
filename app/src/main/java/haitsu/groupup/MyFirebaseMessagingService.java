@@ -18,6 +18,7 @@ package haitsu.groupup;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -25,6 +26,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -102,9 +110,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
                     intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
                     try {
-                        String activity = getActivity().getClass().getSimpleName();
-                        System.out.println("current activity is " + activity);
-                        if (!activity.equals("ChatRoomActivity") && !activity.equals("ChatsActivity")) {
+                        if (getActivity() != null) {
+                            String activity = getActivity().getClass().getSimpleName();
+                            System.out.println("current activity is " + activity);
+                            if (!activity.equals("ChatRoomActivity") && !activity.equals("ChatsActivity")) {
+                                sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
+                            }
+                        } else {
                             sendChatNotification(remoteMessage.getData().get("body"), remoteMessage.getData().get("tag"), intent);
                         }
                     } catch (ClassNotFoundException e) {
@@ -149,6 +161,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
     // [END receive_message]
 
+
+    private Bitmap getCircleBitmap(Bitmap bitmap) {
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+
+        final int color = Color.RED;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        bitmap.recycle();
+
+        return output;
+    }
+
     /**
      * Schedule a job using FirebaseJobDispatcher.
      */
@@ -178,7 +214,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             connection.connect();
             InputStream input = connection.getInputStream();
             Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
+            return getCircleBitmap(myBitmap);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -203,6 +239,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
+                        .setPriority(Notification.PRIORITY_MAX)
                         .setContentIntent(pendingIntent);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -234,6 +271,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
+                        .setPriority(Notification.PRIORITY_MAX)
                         .setContentIntent(pendingIntent);
 
         Log.d(TAG, "Message Notification Icon: " + icon);
