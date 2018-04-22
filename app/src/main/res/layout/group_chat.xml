@@ -72,8 +72,6 @@
             android:layout_gravity="right"
             android:gravity="center"
             android:padding="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
             android:textColor="@android:color/white"
             android:maxLines="1"
             android:layout_weight="1"

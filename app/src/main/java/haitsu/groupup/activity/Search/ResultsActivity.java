@@ -169,43 +169,7 @@ public class ResultsActivity extends AppCompatActivity implements
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     locationManager.storeLocationData(location);
-                    searchByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            final ArrayList<Group> groupsList = new ArrayList<>();
-                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                Group group = snapshot.getValue(Group.class);
-                                Location groupsLocation = new Location("Groups location");
-                                groupsLocation.setLatitude(group.getLatitude());
-                                groupsLocation.setLongitude(group.getLongitude());
-
-                                Location currentLocation = new Location("Current location");
-                                currentLocation.setLatitude(locationManager.getLatitude());
-                                currentLocation.setLongitude(locationManager.getLongitude());
-
-                                System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
-                                System.out.println("Lang " + locationManager.getLongitude());
-                                System.out.println("Lang " + locationManager.getLatitude());
-
-                                double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
-
-                                group.setGroupId(snapshot.getKey());
-                                group.setCategory(groupCategory);
-                                if (distanceInMiles < selectedDistance) {
-                                    System.out.println("Final is " + distanceInMiles + " " + selectedDistance);
-                                    groupsList.add(group);
-                                    adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
-                                    mListView.setAdapter(adapter);
-                                }
-                            }
-                            crossfade(mainContent, dataSnapshot, groupsList);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    getResults();
                 }
             }
         };
@@ -225,7 +189,6 @@ public class ResultsActivity extends AppCompatActivity implements
 
         // Handles all location logic
         locationManager.setmFusedLocationClient(mFusedLocationClient);
-        locationManager.initialiseLocationRequest(ResultsActivity.this);
 
 
         // First filter by groups with the key, containing the latitude and longitude
@@ -276,14 +239,79 @@ public class ResultsActivity extends AppCompatActivity implements
                 });
     }
 
+    public void getResults() {
+        searchByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final ArrayList<Group> groupsList = new ArrayList<>();
+                for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Group group = snapshot.getValue(Group.class);
+                    Location groupsLocation = new Location("Groups location");
+                    groupsLocation.setLatitude(group.getLatitude());
+                    groupsLocation.setLongitude(group.getLongitude());
+
+                    Location currentLocation = new Location("Current location");
+                    currentLocation.setLatitude(locationManager.getLatitude());
+                    currentLocation.setLongitude(locationManager.getLongitude());
+
+                    System.out.println("Distance between groups is " + (groupsLocation.distanceTo(currentLocation) * 0.00062137));
+                    System.out.println("Lang " + locationManager.getLongitude());
+                    System.out.println("Lang " + locationManager.getLatitude());
+
+                    double distanceInMiles = groupsLocation.distanceTo(currentLocation) * 0.00062137;
+
+                    group.setGroupId(snapshot.getKey());
+                    group.setCategory(groupCategory);
+                    if (distanceInMiles < selectedDistance) {
+                        System.out.println("Final is " + distanceInMiles + " " + selectedDistance);
+                        groupsList.add(group);
+                        adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
+                        mListView.setAdapter(adapter);
+                    }
+                }
+                crossfade(mainContent, dataSnapshot, groupsList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        System.out.println("Fragment resume");
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    locationManager.storeLocationData(location);
+                    getResults();
+                    System.out.println("Updating");
+
+
+                }
+            }
+        };
+
+        locationManager.setmLocationCallback(mLocationCallback);
+
+        locationManager.initialiseLocationRequest(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        locationManager.stopLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.stopLocationUpdates();
     }
 
     @Override
@@ -291,6 +319,7 @@ public class ResultsActivity extends AppCompatActivity implements
         super.onDestroy();
         mGoogleApiClient.stopAutoManage(this);
         mGoogleApiClient.disconnect();
+        locationManager.stopLocationUpdates();
     }
 
     @Override

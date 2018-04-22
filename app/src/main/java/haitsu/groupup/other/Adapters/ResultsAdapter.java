@@ -51,6 +51,7 @@ public class ResultsAdapter extends ArrayAdapter<Group> {
                 extras.putString("GROUP_ID", group.getGroupId());
                 extras.putString("GROUP_CATEGORY", group.getCategory());
                 extras.putString("GROUP_ADMIN", group.getAdminID());
+                extras.putString("GROUP_TYPE", group.getType());
                 intent.putExtras(extras);
                 getContext().startActivity(intent);
             }

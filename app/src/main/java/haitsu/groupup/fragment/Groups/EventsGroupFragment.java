@@ -173,6 +173,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         GroupsActivity groupsActivity = (GroupsActivity) getActivity();
+        System.out.println("Groups activity is " + groupsActivity);
         // So both Events and Interest fragments use the same reference.
         locationManager = groupsActivity.locationManager;
 
@@ -194,7 +195,6 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
 
         footerView = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.footer_layout, null, false);
-        mListView.addFooterView(footerView);
         footerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,19 +213,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
 
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    lm.storeLocationData(location);
-                    getGroups();
 
-
-                }
-            }
-        };
-
-        lm.setmLocationCallback(mLocationCallback);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -241,8 +229,6 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             mGoogleApiClient = locationManager.getmGoogleApiClient();
         }
 
-        lm.initialiseLocationRequest(getActivity());
-
         eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().limitToFirst(mPageLimit);
         eventsByLocation.keepSynced(true);
         return view;
@@ -254,8 +240,9 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Somehow need to get a 2nd value.
                 boolean hasGroups = false;
-                if (dataSnapshot.getChildrenCount() != 9) {
-                    mListView.removeFooterView(footerView);
+                mListView.removeFooterView(footerView);
+                if (dataSnapshot.getChildrenCount() == 9) {
+                    mListView.addFooterView(footerView);
                 }
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     System.out.println("snap " + snapshot.getValue());
@@ -356,9 +343,19 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     public void onClick(View v) {
     }
 
+    public void reloadData() {
+        groupsList.clear();
+        lastKey = "";
+        lastItem = 0;
+        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().limitToFirst(mPageLimit);
+        lm.stopLocationUpdates();
+    }
+
     @Override
     public void onPause() {
         super.onPause();
+        System.out.println("Fragment pause");
+        reloadData();
 //        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.stopAutoManage(getActivity());
 //            mGoogleApiClient.disconnect();
@@ -370,8 +367,48 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        groupsList.clear();
+        System.out.println("Fragment resume");
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    lm.storeLocationData(location);
+                    getGroups();
+                    System.out.println("Updating");
+
+
+                }
+            }
+        };
+
+        lm.setmLocationCallback(mLocationCallback);
+
+        lm.initialiseLocationRequest(getActivity());
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+        System.out.println("Fragment stop");
+        reloadData();
+//        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.stopAutoManage(getActivity());
+//            mGoogleApiClient.disconnect();
+//        }
+        // remove all event listeners to stop updating in the background
+        if (geoQuery != null) {
+            this.geoQuery.removeAllListeners();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("Fragment destroy");
+        reloadData();
 //        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
 //            mGoogleApiClient.stopAutoManage(getActivity());
 //            mGoogleApiClient.disconnect();

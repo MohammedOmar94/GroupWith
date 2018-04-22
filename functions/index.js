@@ -21,7 +21,7 @@ console.log('event params ' + valueObject.imageUrl);
         data : {
             userid: valueObject.userId,
             title: valueObject.groupName,
-            body: valueObject.messageUser + ": " + valueObject.messageText,
+            body: valueObject.messageUser + " @ " + valueObject.groupName + ": " + valueObject.messageText,
             tag: event.params.groupId,
             icon: valueObject.imageUrl,
             sound: "default"
