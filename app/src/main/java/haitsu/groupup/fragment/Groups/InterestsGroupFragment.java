@@ -228,7 +228,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                 if (dataSnapshot.getChildrenCount() == 9) {
                     mListView.addFooterView(footerView);
                 }
-                System.out.println("Activity is " + getActivity());
+                System.out.println("Activity is " + getActivity() + " in Interests " + groupCategory);
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     System.out.println("snap " + snapshot.getValue());
                     Group group = snapshot.getValue(Group.class);
@@ -255,6 +255,10 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                             if (!lastKey.equals(snapshot.getKey())) {
                                 System.out.println("Group name is " + group.getName());
                                 groupsList.add(group);
+                            }
+                            if(getActivity() == null) {
+                                System.out.println("Return activity");
+                                return;
                             }
                             adapter = new GroupsAdapter(getActivity(), groupsList);
                             mListView.setAdapter(adapter);
@@ -360,8 +364,9 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    getGroups();
                     System.out.println("Updating");
+                    getGroups();
+                    lm.stopLocationUpdates();
 
 
                 }

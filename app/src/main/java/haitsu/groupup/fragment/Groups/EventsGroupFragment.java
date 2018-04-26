@@ -244,6 +244,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                 if (dataSnapshot.getChildrenCount() == 9) {
                     mListView.addFooterView(footerView);
                 }
+                System.out.println("Activity is " + getActivity() + " in Events " + groupCategory);
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     System.out.println("snap " + snapshot.getValue());
                     Group group = snapshot.getValue(Group.class);
@@ -270,6 +271,10 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                             if (!lastKey.equals(snapshot.getKey())) {
                                 System.out.println("Group name is " + group.getName());
                                 groupsList.add(group);
+                            }
+                            if(getActivity() == null) {
+                                System.out.println("Return activity");
+                                return;
                             }
                             adapter = new GroupsAdapter(getActivity(), groupsList);
                             mListView.setAdapter(adapter);
@@ -374,10 +379,15 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    System.out.println("The location is off now");
+                    return;
+                }
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
-                    getGroups();
                     System.out.println("Updating");
+                    getGroups();
+                    lm.stopLocationUpdates();
 
 
                 }
