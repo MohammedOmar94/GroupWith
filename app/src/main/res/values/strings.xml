@@ -41,11 +41,14 @@
     <string name="category_prompt">Choose a category</string>
 
     <string-array name="category_arrays">
+        <item>Adventures</item>
+        <item>Books</item>
         <item>Food</item>
         <item>Gaming</item>
         <item>Language Learning</item>
         <item>Movies</item>
         <item>Programming</item>
+        <item>Photography</item>
         <item>Sports</item>
     </string-array>
 

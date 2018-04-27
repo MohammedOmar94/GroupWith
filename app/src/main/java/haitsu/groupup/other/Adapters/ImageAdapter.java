@@ -60,6 +60,12 @@ public class ImageAdapter extends BaseAdapter {
                 imageView.setImageResource(R.drawable.icon_code_black);
             } else if (mobile.equals("Sports")) {
                 imageView.setImageResource(R.drawable.icon_soccer_black);
+            } else if (mobile.equals("Adventures")) {
+                imageView.setImageResource(R.drawable.icon_trekking_black);
+            } else if (mobile.equals("Books")) {
+                imageView.setImageResource(R.drawable.icon_book_black);
+            } else if (mobile.equals("Photography")) {
+                imageView.setImageResource(R.drawable.ic_menu_camera);
             } else {
                 //imageView.setImageResource(R.drawable.ic_settings_black_24dp);
             }

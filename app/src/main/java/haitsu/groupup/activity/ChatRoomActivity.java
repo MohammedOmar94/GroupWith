@@ -205,7 +205,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ChatRoomActivity.this);
                 System.out.println("photo old " + account.getPhotoUrl());
                 // Regexp ensures that at least one non-blank character is used.
-                if(Pattern.compile("\\S").matcher(message).find()) {
+                if (Pattern.compile("\\S").matcher(message).find()) {
                     // Read the input field and push a new instance
                     // of ChatMessage to the Firebase database
                     chatrooms.push()
@@ -354,10 +354,11 @@ public class ChatRoomActivity extends AppCompatActivity {
         mAddMessageImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_IMAGE);
+                Toast.makeText(ChatRoomActivity.this, "Coming soon!", Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                intent.setType("image/*");
+//                startActivityForResult(intent, REQUEST_IMAGE);
             }
         });
     }
@@ -369,7 +370,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                chatMessageList.clear();;
+                chatMessageList.clear();
+                ;
                 if (!dataSnapshot.hasChildren()) {
 //                    Toast.makeText(ChatRoomActivity.this, "No more questions", Toast.LENGTH_SHORT).show();
                     currentPage--;
@@ -409,7 +411,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     lastValue = "";
                 }
                 boolean firstInLoop = true;
-                List <ChatMessage> tempList = new ArrayList<ChatMessage>();
+                List<ChatMessage> tempList = new ArrayList<ChatMessage>();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (firstInLoop) {
                         lastValue = data.getKey();
@@ -419,8 +421,8 @@ public class ChatRoomActivity extends AppCompatActivity {
                     System.out.println("data2 " + data);
 
 //                    if (!lastValue.equals(data.getKey())) {
-                        ChatMessage chatMessage = data.getValue(ChatMessage.class);
-                        tempList.add(chatMessage);
+                    ChatMessage chatMessage = data.getValue(ChatMessage.class);
+                    tempList.add(chatMessage);
 //                    }
                 }
                 Collections.reverse(tempList);

@@ -170,6 +170,7 @@ public class ResultsActivity extends AppCompatActivity implements
                 for (Location location : locationResult.getLocations()) {
                     locationManager.storeLocationData(location);
                     getResults();
+                    locationManager.stopLocationUpdates();
                 }
             }
         };

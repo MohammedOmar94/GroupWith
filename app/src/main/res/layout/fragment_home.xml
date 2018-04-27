@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp"
     tools:context="haitsu.groupup.fragment.HomeFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -13,9 +11,9 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Find a group"
-        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:layout_marginTop="28dp"
+        android:text="Select a Group Category"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:textColor="@android:color/black"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="8dp"
@@ -27,14 +25,15 @@
 
     <GridView
         android:id="@+id/gridview"
-        android:layout_width="368dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:columnWidth="100dp"
-        android:background="#e5e5e5"
+        android:background="@drawable/rounded_gridview"
         android:gravity="center"
         android:numColumns="3"
         android:stretchMode="columnWidth"
         app:layout_constraintTop_toTopOf="parent"
+        android:paddingBottom="50px"
         android:layout_marginTop="79dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"

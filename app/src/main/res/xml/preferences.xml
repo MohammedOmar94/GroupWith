@@ -18,6 +18,7 @@
         android:maxLength="20"
         android:selectAllOnFocus="true"
         android:singleLine="true"
+        android:textColorHighlight="red"
         android:title="@string/pref_title_username" />
 
     <Preference
