@@ -33,6 +33,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import haitsu.groupup.R;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.Models.UserRequest;
@@ -143,22 +146,45 @@ public class joinRequestsFragment extends Fragment {
 
         groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
         groupRef.keepSynced(true);
-        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.group_chat, groupRef) {
+        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.requests_item, groupRef) {
             protected void populateView(View view, UserRequest request, int position) {
                 System.out.println("ayy " + request.getGroupCategory());
                 int age = calculateAge(request.getAge());
-                view.findViewById(R.id.message_count).setVisibility(View.GONE);
-                ((TextView) view.findViewById(R.id.message_user)).setText(request.getGroupName().toString());
-                ((TextView) view.findViewById(R.id.message_text)).setText("User: " + request.getUsername() + " Age: " + age + " City: " + request.getCity() + "/ " + request.getCountry());
-                ((TextView) view.findViewById(R.id.message_time)).setText((DateFormat.format("dd-MM-yyyy", request.getTimeOfRequest())));
+                ((TextView) view.findViewById(R.id.group_name)).setText(request.getGroupName().toString());
+                ((TextView) view.findViewById(R.id.users_details)).setText(request.getUsername() + " wants to join your group!");
+//                ((TextView) view.findViewById(R.id.time_label)).setText((DateFormat.format("dd-MM-yyyy", request.getTimeOfRequest())));
+
+                Date requestDate = new Date(request.getTimeOfRequest());
+                Date currentDate = new Date();
+                Calendar cal1 = Calendar.getInstance();
+                Calendar cal2 = Calendar.getInstance();
+
+                cal1.setTime(currentDate);
+                cal2.setTime(requestDate);
+
+                int today = cal1.get(Calendar.DAY_OF_WEEK);
+                int notificationDay = cal2.get(Calendar.DAY_OF_WEEK);
+
+                int daysFromWeek = today - notificationDay;
+
+                long diff = currentDate.getTime() - requestDate.getTime();
+                float daysFromTime = (diff / (1000 * 60 * 60 * 24));
+                int daysRounded = Math.round(daysFromTime);
+
+                if (daysFromWeek == 0 && daysRounded == 0) {
+                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("HH:mm", requestDate));
+                } else if (daysRounded == 1 || (daysFromWeek == 1 && daysRounded == 0)) {
+                    System.out.println("ayyy");
+                    ((TextView) view.findViewById(R.id.time_label)).setText("Yesterday " + DateFormat.format("HH:mm", requestDate));
+                } else {
+                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("dd-MM-yyyy", requestDate));
+                }
                 // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
                 //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
             }
 
 
         };
-
-
 
 
         return view;

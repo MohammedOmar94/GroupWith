@@ -497,14 +497,14 @@ public class ChatRoomActivity extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.action_report:
-                Intent intent = new Intent(ChatRoomActivity.this, ReportActivity.class);
-                Bundle extras = new Bundle();
-                extras.putString("GROUP_ID", groupID);
-                extras.putString("REPORT_TYPE", "group");
-                intent.putExtras(extras);
-                startActivity(intent);
-                break;
+//            case R.id.action_report:
+//                Intent intent = new Intent(ChatRoomActivity.this, ReportActivity.class);
+//                Bundle extras = new Bundle();
+//                extras.putString("GROUP_ID", groupID);
+//                extras.putString("REPORT_TYPE", "group");
+//                intent.putExtras(extras);
+//                startActivity(intent);
+//                break;
             case R.id.action_view_members:
                 Intent intent2 = new Intent(ChatRoomActivity.this, GroupMembersActivity.class);
                 Bundle extras2 = new Bundle();
