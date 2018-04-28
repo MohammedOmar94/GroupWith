@@ -351,6 +351,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
     }
 
     public void reloadData() {
+        mainContent.setVisibility(View.GONE);
         groupsList.clear();
         lastKey = "";
         lastItem = 0;

@@ -335,6 +335,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     }
 
     public void reloadData() {
+        mainContent.setVisibility(View.GONE);
         groupsList.clear();
         lastKey = "";
         lastItem = 0;

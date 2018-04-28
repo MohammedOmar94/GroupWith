@@ -66,6 +66,8 @@ public class ImageAdapter extends BaseAdapter {
                 imageView.setImageResource(R.drawable.icon_book_black);
             } else if (mobile.equals("Photography")) {
                 imageView.setImageResource(R.drawable.ic_menu_camera);
+            } else if (mobile.equals("Cultures")) {
+                imageView.setImageResource(R.drawable.icon_globe_black);
             } else {
                 //imageView.setImageResource(R.drawable.ic_settings_black_24dp);
             }
