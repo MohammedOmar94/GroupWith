@@ -113,7 +113,7 @@
 
     <string name="pref_title_username">Username</string>
 
-    <string name="pref_title_gender">Members Gender</string>
+    <string name="pref_title_gender">Members</string>
 
     <string name="pref_title_member_limit">Group size</string>
 
@@ -121,9 +121,9 @@
 
     <string name="pref_summary_gender">Choose which gender you want to join your group.</string>
     <string-array name="pref_gender_list">
-        <item>Any</item>
-        <item>Male</item>
-        <item>Female</item>
+        <item>Mixed</item>
+        <item>Male only</item>
+        <item>Female only</item>
     </string-array>
 
     <string-array name="pref_member_limit">

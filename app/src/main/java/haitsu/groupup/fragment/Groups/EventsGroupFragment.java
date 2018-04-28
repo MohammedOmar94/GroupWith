@@ -238,6 +238,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                mNoGroupsText.setText("");
                 // Somehow need to get a 2nd value.
                 boolean hasGroups = false;
                 mListView.removeFooterView(footerView);
@@ -302,6 +303,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
         if (!hasGroups) {
+            mNoGroupsText.setText("No groups found.");
             mNoGroupsText.setAlpha(0f);
             mNoGroupsText.setVisibility(View.VISIBLE);
         }

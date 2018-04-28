@@ -219,6 +219,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
     }
 
     private void getGroups() {
+        mNoGroupsText.setText("");
         eventsByLocation.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -286,6 +287,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         contentView.setAlpha(0f);
         contentView.setVisibility(View.VISIBLE);
         if (!hasGroups) {
+            mNoGroupsText.setText("No groups found.");
             mNoGroupsText.setAlpha(0f);
             mNoGroupsText.setVisibility(View.VISIBLE);
         }

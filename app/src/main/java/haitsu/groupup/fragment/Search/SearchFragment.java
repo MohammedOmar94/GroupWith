@@ -233,8 +233,13 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
         CharSequence currText3 = listPreference3.getEntry();
         CharSequence currText4 = listPreference4.getEntry();
         CharSequence currText5 = listPreference5.getEntry();
-
-        genderValue = currText.toString();
+        if (currText.toString().equals("Mixed")) {
+            genderValue = "Any";
+        } else if (currText.toString().equals("Male only")) {
+            genderValue = "Male";
+        } else if (currText.toString().equals("Female only")) {
+            genderValue = "Female";
+        }
         categoryValue = currText2.toString();
         typeValue = currText3.toString();
         sizeValue = Integer.parseInt(currText4.toString());

@@ -24,6 +24,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:paddingTop="20px"
         android:orientation="horizontal">
 
         <ImageView
@@ -45,8 +46,8 @@
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            ads:srcCompat="@android:drawable/ic_dialog_email" />
+            android:layout_gravity="center"
+            ads:srcCompat="@drawable/icon_reply" />
 
     </LinearLayout>
 
