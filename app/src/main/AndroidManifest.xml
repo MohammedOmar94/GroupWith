@@ -66,7 +66,7 @@
             android:name=".activity.Account.SignInActivity"
             android:label="@string/title_activity_signin"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar"/>
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".activity.PrivacyPolicyActivity"
             android:screenOrientation="portrait" />
@@ -78,18 +78,18 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/Settings" />
         <activity
             android:name=".activity.ChatsActivity"
             android:label="@string/title_activity_chats"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.Groups.MyGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
@@ -122,17 +122,17 @@
             android:label="@string/title_activity_results"
             android:parentActivityName=".activity.Search.SearchActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.Search.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".activity.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.Account.ReportActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Toolbar" />
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

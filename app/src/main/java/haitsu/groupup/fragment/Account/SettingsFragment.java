@@ -13,9 +13,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
@@ -24,6 +23,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+
+import com.takisoft.fix.support.v7.preference.EditTextPreference;
+import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,7 +81,7 @@ import haitsu.groupup.other.Models.User;
  * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener,
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener,
         com.google.android.gms.location.LocationListener,
         View.OnClickListener, GoogleApiClient.OnConnectionFailedListener,
         DialogInterface.OnDismissListener, GoogleApiClient.ConnectionCallbacks,
@@ -163,11 +166,26 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);// Load the preferences from an XML resource
 
+
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
+    }
+
+    @Override
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        addPreferencesFromResource(R.xml.preferences);
+        setPreferencesFromResource(R.xml.preferences, rootKey);
 
         editText = (EditTextPreference) findPreference("username");
         user = databaseRef.child("users").child(mFirebaseUser.getUid());
@@ -217,13 +235,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 return true;
             }
         });
-
-
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -375,7 +386,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (pref instanceof EditTextPreference) {
             EditTextPreference listPref = (EditTextPreference) pref;
             // Regexp ensures that at least one non-blank character is used.
-            if(Pattern.compile("\\S").matcher(listPref.getText().toString()).find()) {
+            if (Pattern.compile("\\S").matcher(listPref.getText().toString()).find()) {
                 databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
                 pref.setSummary(listPref.getText().toString());
                 ((EditTextPreference) pref).setText(listPref.getText().toString());
