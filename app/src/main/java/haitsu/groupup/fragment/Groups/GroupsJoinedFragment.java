@@ -3,11 +3,14 @@ package haitsu.groupup.fragment.Groups;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
+import haitsu.groupup.other.Models.Group;
 import haitsu.groupup.other.Models.Groups;
 
 /**
@@ -66,7 +70,6 @@ public class GroupsJoinedFragment extends Fragment {
     private int mShortAnimationDuration;
 
     private ListView mListView;
-
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -141,7 +144,7 @@ public class GroupsJoinedFragment extends Fragment {
                 ((TextView) view.findViewById(R.id.group_gender)).setText("Category: " + group.getCategory());
                 ((TextView) view.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
                         + group.getMemberLimit());
-                if(!group.getUserApproved()){
+                if (!group.getUserApproved()) {
                     ((TextView) view.findViewById(R.id.awaiting_approval)).setText("Awaiting approval");
                 } else {
                     ((TextView) view.findViewById(R.id.awaiting_approval)).setText("");
@@ -181,14 +184,7 @@ public class GroupsJoinedFragment extends Fragment {
                         Groups group = ((Groups) mListView.getItemAtPosition(position));
                         selectedGroup = key;
                         selectedGroupName = group.getName();
-                        Intent intent = new Intent(getActivity(), GroupInfoActivity.class);
-                        Bundle extras = new Bundle();
-                        extras.putString("GROUP_ID", selectedGroup);
-                        extras.putString("GROUP_NAME", selectedGroupName);
-                        extras.putString("GROUP_CATEGORY", group.getCategory());
-                        extras.putString("GROUP_TYPE", group.getType());
-                        intent.putExtras(extras);
-                        startActivity(intent);
+                        groupExists(group, selectedGroup, usersAdapter.getRef(position).getRef());
                         //User id2 = (User) mListView.getItemAtPosition(position); //
                         // System.out.println("ID IS " + key);
                     }
@@ -251,6 +247,49 @@ public class GroupsJoinedFragment extends Fragment {
                 });
     }
 
+
+    public void groupExists(final Groups group, final String groupId, final DatabaseReference userGroupRef) {
+        final AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getContext(), R.style.MyAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(getContext());
+        }
+
+        final DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child("group").child(group.getCategory()).child(group.getType());
+        groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(groupId)) {
+                    // Group doesn't exist anymore
+                    builder.setTitle("Group not found")
+                            .setMessage("The group may have been removed by the admin. However, you can still talk with other members" +
+                                    " in the chatroom. Would you like to leave this group instead?")
+                            .setPositiveButton("Leave group",  new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    userGroupRef.removeValue();
+                                }
+                            })
+                            .setNegativeButton("Close", null)
+                            .show();
+                } else {
+                    Intent intent = new Intent(getContext(), GroupInfoActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("GROUP_ID", groupId);
+                    extras.putString("GROUP_CATEGORY", group.getCategory());
+                    extras.putString("GROUP_TYPE", group.getType());
+                    intent.putExtras(extras);
+                    getContext().startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -292,6 +331,7 @@ public class GroupsJoinedFragment extends Fragment {
         super.onDestroy();
         us.removeEventListener(listener);
     }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
