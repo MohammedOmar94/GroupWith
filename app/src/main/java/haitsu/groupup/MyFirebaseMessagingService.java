@@ -106,7 +106,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             } else {
                 // Prevents user from receiving a push notification from the message they sent
                 if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(userId)) {
-                    Intent intent = new Intent(this, ChatRoomActivity.class);
+                    Intent intent = new Intent(this, ChatsActivity.class);
                     intent.putExtra("GROUP_ID", remoteMessage.getData().get("tag"));
                     intent.putExtra("GROUP_NAME", remoteMessage.getData().get("title"));
                     try {
