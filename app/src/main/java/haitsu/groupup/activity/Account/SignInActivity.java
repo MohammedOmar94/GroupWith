@@ -31,6 +31,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
+
 import haitsu.groupup.R;
 import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.activity.SplashActivity;
@@ -100,6 +102,7 @@ public class SignInActivity extends AppCompatActivity implements
                     finish();
                 } else {
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    snapshot.child((mFirebaseUser.getUid())).child("lastLogin").getRef().setValue(new Date().getTime());
                     startActivity(intent);
                     finish();
                 }

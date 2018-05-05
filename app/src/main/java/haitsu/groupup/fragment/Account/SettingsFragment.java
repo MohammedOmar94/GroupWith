@@ -63,6 +63,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -197,6 +198,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO Auto-generated method stub
+                databaseRef.child("users").child((mFirebaseUser.getUid())).child("lastLogout").setValue(new Date().getTime());
                 signOut();
                 //finish();
                 // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();

@@ -1,5 +1,9 @@
 package haitsu.groupup.other.Models;
 
+import org.joda.time.DateTime;
+
+import java.util.Date;
+
 /**
  * Created by moham on 04/06/2017.
  */
@@ -15,6 +19,7 @@ public class User {
     private Groups group;
     private double latitude;
     private double longitude;
+    private long dateCreated;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -30,6 +35,7 @@ public class User {
         this.group = group;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.dateCreated = new Date().getTime();
     }
 
 
@@ -104,5 +110,13 @@ public class User {
 
     public void setGroup(Groups group) {
         this.group = group;
+    }
+
+    public Long getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Long dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }
