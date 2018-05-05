@@ -33,11 +33,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import haitsu.groupup.R;
+import haitsu.groupup.other.Adapters.JoinRequestsAdapter;
+import haitsu.groupup.other.Adapters.UsersAdapter;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.Models.DataModel;
 import haitsu.groupup.other.Models.UserRequest;
 
 /**
@@ -80,12 +84,15 @@ public class joinRequestsFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
-    private DatabaseReference groupRef;
+    private DatabaseReference requestsRef;
     private DBConnections dbConnections = new DBConnections();
 
     private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
     private AdView mAdView;
+
+
+    private JoinRequestsAdapter adapter;
 
     public joinRequestsFragment() {
         // Required empty public constructor
@@ -144,47 +151,74 @@ public class joinRequestsFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.listview);
         mListView.setFocusable(false);//PREVENTS FROM JUMPING TO BOTTOM OF PAGE
 
-        groupRef = databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest");
-        groupRef.keepSynced(true);
-        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.requests_item, groupRef) {
-            protected void populateView(View view, UserRequest request, int position) {
-                System.out.println("ayy " + request.getGroupCategory());
-                int age = calculateAge(request.getAge());
-                ((TextView) view.findViewById(R.id.group_name)).setText(request.getGroupName().toString());
-                ((TextView) view.findViewById(R.id.users_details)).setText(request.getUsername() + " wants to join your group!");
-//                ((TextView) view.findViewById(R.id.time_label)).setText((DateFormat.format("dd-MM-yyyy", request.getTimeOfRequest())));
+        requestsRef = databaseRef.child("users").child(mFirebaseUser.getUid());
+        requestsRef.keepSynced(true);
 
-                Date requestDate = new Date(request.getTimeOfRequest());
-                Date currentDate = new Date();
-                Calendar cal1 = Calendar.getInstance();
-                Calendar cal2 = Calendar.getInstance();
-
-                cal1.setTime(currentDate);
-                cal2.setTime(requestDate);
-
-                int today = cal1.get(Calendar.DAY_OF_WEEK);
-                int notificationDay = cal2.get(Calendar.DAY_OF_WEEK);
-
-                int daysFromWeek = today - notificationDay;
-
-                long diff = currentDate.getTime() - requestDate.getTime();
-                float daysFromTime = (diff / (1000 * 60 * 60 * 24));
-                int daysRounded = Math.round(daysFromTime);
-
-                if (daysFromWeek == 0 && daysRounded == 0) {
-                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("HH:mm", requestDate));
-                } else if (daysRounded == 1 || (daysFromWeek == 1 && daysRounded == 0)) {
-                    System.out.println("ayyy");
-                    ((TextView) view.findViewById(R.id.time_label)).setText("Yesterday " + DateFormat.format("HH:mm", requestDate));
-                } else {
-                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("dd-MM-yyyy", requestDate));
+        listener = requestsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mListView.setAdapter(null);
+                final ArrayList<DataModel> requestsList = new ArrayList<>();
+                for (final DataSnapshot groupRequestSnapshot : dataSnapshot.child("userRequest").getChildren()) {
+                    for (final DataSnapshot userRequestSnapshot : groupRequestSnapshot.getChildren()) {
+                        System.out.println("Users " + userRequestSnapshot);
+                        DataModel dataModel = new DataModel();
+                        dataModel.setUserSnapshot(dataSnapshot);
+                        dataModel.setJoinRequestSnapshot(userRequestSnapshot);
+                        requestsList.add(dataModel);
+                        System.out.println("data model is  " + dataModel.getJoinRequestSnapshot().getValue(UserRequest.class).getGroupName());
+                        adapter = new JoinRequestsAdapter(getActivity(), requestsList);
+                        mListView.setAdapter(adapter);
+                    }
+                    System.out.println("size is " + requestsList.size());
                 }
-                // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
-                //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
+                crossfade(mainContent, dataSnapshot.child("userRequest"));
             }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        };
+            }
+        });
+//        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.requests_item, requestsRef) {
+//            protected void populateView(View view, UserRequest request, int position) {
+//                System.out.println("ayy " + request.getGroupCategory());
+//                int age = calculateAge(request.getAge());
+//                ((TextView) view.findViewById(R.id.group_name)).setText(request.getGroupName().toString());
+//                ((TextView) view.findViewById(R.id.users_details)).setText(request.getUsername() + " wants to join your group!");
+////                ((TextView) view.findViewById(R.id.time_label)).setText((DateFormat.format("dd-MM-yyyy", request.getTimeOfRequest())));
+//
+//                Date requestDate = new Date(request.getTimeOfRequest());
+//                Date currentDate = new Date();
+//                Calendar cal1 = Calendar.getInstance();
+//                Calendar cal2 = Calendar.getInstance();
+//
+//                cal1.setTime(currentDate);
+//                cal2.setTime(requestDate);
+//
+//                int today = cal1.get(Calendar.DAY_OF_WEEK);
+//                int notificationDay = cal2.get(Calendar.DAY_OF_WEEK);
+//
+//                int daysFromWeek = today - notificationDay;
+//
+//                long diff = currentDate.getTime() - requestDate.getTime();
+//                float daysFromTime = (diff / (1000 * 60 * 60 * 24));
+//                int daysRounded = Math.round(daysFromTime);
+//
+//                if (daysFromWeek == 0 && daysRounded == 0) {
+//                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("HH:mm", requestDate));
+//                } else if (daysRounded == 1 || (daysFromWeek == 1 && daysRounded == 0)) {
+//                    System.out.println("ayyy");
+//                    ((TextView) view.findViewById(R.id.time_label)).setText("Yesterday " + DateFormat.format("HH:mm", requestDate));
+//                } else {
+//                    ((TextView) view.findViewById(R.id.time_label)).setText(DateFormat.format("dd-MM-yyyy", requestDate));
+//                }
+//                // ((TextView) view.findViewById(R.id.message_text)).setText("Be the first to say Hello!");
+//                //    ((TextView) view.findViewById(R.id.message_time)).setText(DateFormat.format("HH:mm:ss", message.getMessageTime()));
+//            }
+//
+//
+//        };
 
 
         return view;
@@ -199,30 +233,6 @@ public class joinRequestsFragment extends Fragment {
         LocalDate now = new LocalDate();
         Years age = Years.yearsBetween(birthdate, now);
         return age.getYears();
-    }
-
-    public String joinRequestDialogMessage(UserRequest request) {
-        int age = calculateAge(request.getAge());
-        String message = "Username: <b>" + request.getUsername() + "</b><br>" +
-                "Gender: <b>" + request.getGender() + "</b><br>" +
-                "Age: <b>" + age + "</b><br>" +
-                "Location: <b>" + request.getCity() + "/" + request.getCountry() + "</b><br>" +
-                "Requesting to join: <b>" + request.getGroupName();
-        return message;
-    }
-
-    public void acceptJoinRequest(String requestId, UserRequest request) {
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
-        databaseRef.child("users").child(request.getUserId()).child("groups").child(request.getGroupId()).child("userApproved").setValue(true);
-        databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("members").child(request.getUserId()).setValue(true);
-
-        // Need to add groups tree for that user who was accepted to join.
-    }
-
-    public void declineJoinRequest(String requestId, final UserRequest request) {
-        // Remove request from admin.
-        databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(requestId).removeValue();
-        dbConnections.removeUser(request.getUserId(), requestId, request.getGroupCategory(), request.getType());
     }
 
     private void crossfade(final View contentView, DataSnapshot dataSnapshot) {
@@ -271,7 +281,7 @@ public class joinRequestsFragment extends Fragment {
     }
 
     public void setListener() {
-        listener = groupRef.addValueEventListener(new ValueEventListener() {
+        listener = requestsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
                 mListView.setAdapter(usersAdapter);
@@ -298,20 +308,20 @@ public class joinRequestsFragment extends Fragment {
                         } else {
                             builder = new AlertDialog.Builder(getActivity());
                         }
-                        builder.setTitle("Accept request to join group")
-                                .setMessage(Html.fromHtml(joinRequestDialogMessage(request)))
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        acceptJoinRequest(requestId, request);
-                                    }
-                                })
-                                .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        declineJoinRequest(requestId, request);
-                                    }
-                                })
-                                .show();
-                        System.out.println("ID IS " + requestId);
+//                        builder.setTitle("Accept request to join group")
+//                                .setMessage(Html.fromHtml(joinRequestDialogMessage(request)))
+//                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        acceptJoinRequest(requestId, request);
+//                                    }
+//                                })
+//                                .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        declineJoinRequest(requestId, request);
+//                                    }
+//                                })
+//                                .show();
+//                        System.out.println("ID IS " + requestId);
                     }
 
 
@@ -353,27 +363,26 @@ public class joinRequestsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        groupRef.removeEventListener(listener);
+        requestsRef.removeEventListener(listener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         System.out.println("Started listener");
-        setListener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         System.out.println("Stopped listener");
-        groupRef.removeEventListener(listener);
+        requestsRef.removeEventListener(listener);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        groupRef.removeEventListener(listener);
+        requestsRef.removeEventListener(listener);
     }
 
     /**

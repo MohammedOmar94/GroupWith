@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot;
 public class DataModel {
 
     private DataSnapshot userSnapshot;
+    private DataSnapshot joinRequestSnapshot;
     private String groupId;
     private String groupCategory;;
     private String type;
@@ -56,5 +57,13 @@ public class DataModel {
 
     public void setGroupAdminId(String groupAdminId) {
         this.groupAdminId = groupAdminId;
+    }
+
+    public DataSnapshot getJoinRequestSnapshot() {
+        return joinRequestSnapshot;
+    }
+
+    public void setJoinRequestSnapshot(DataSnapshot joinRequestSnapshot) {
+        this.joinRequestSnapshot = joinRequestSnapshot;
     }
 }
