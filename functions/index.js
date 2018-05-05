@@ -35,7 +35,7 @@ console.log('event params ' + valueObject.imageUrl);
 return admin.messaging().sendToTopic(event.params.groupId, payload, options);
 });
 
-exports.joinRequestPushNotification = functions.database.ref('/users/{userId}/userRequest/{pushId}').onCreate( event => {
+exports.joinRequestPushNotification = functions.database.ref('/users/{userId}/userRequest/{groupId}/{userId2}').onCreate( event => {
 console.log('Push notification event triggered ');
 /* Grab the current value of what was written to the Realtime Database */
     var valueObject = event.data.val();
