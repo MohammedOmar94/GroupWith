@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 
@@ -212,7 +213,7 @@ public class DBConnections {
         usersGroupsTree.child("admin").setValue(false);
         usersGroupsTree.child("userApproved").setValue(false);
 
-        databaseRef.child("users").child(groupAdminId).child("userRequest").child(groupID).setValue(request);
+        databaseRef.child("users").child(groupAdminId).child("userRequest").child(groupID).child(request.getUserId()).setValue(request);
 
         // Checks if member count has now exceeded after this new member has joined
         groupRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -369,6 +370,7 @@ public class DBConnections {
     }
 
     public void checkGroup(final String groupID, final String groupCategory, final String groupType) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -490,6 +492,7 @@ public class DBConnections {
     }
 
     public void removeUser(String userId, final String groupId, final String groupCategory, final String groupType) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(groupId);
         databaseRef.child("users").child(userId).child("groups").child(groupId).removeValue();
         databaseRef.child("group").child(groupCategory).child(groupType).child(groupId).child("members").child(userId).removeValue();
         // Updates member count
