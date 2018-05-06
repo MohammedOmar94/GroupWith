@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -102,6 +103,8 @@ public class SignInActivity extends AppCompatActivity implements
                     finish();
                 } else {
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    Amplitude.getInstance().setUserId(mFirebaseUser.getUid());
+                    Amplitude.getInstance().logEvent("Logged in");
                     snapshot.child((mFirebaseUser.getUid())).child("lastLogin").getRef().setValue(new Date().getTime());
                     startActivity(intent);
                     finish();

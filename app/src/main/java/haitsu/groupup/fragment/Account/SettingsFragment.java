@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 
+import com.amplitude.api.Amplitude;
 import com.takisoft.fix.support.v7.preference.EditTextPreference;
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
@@ -198,6 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // TODO Auto-generated method stub
+                Amplitude.getInstance().logEvent("Logged out");
                 databaseRef.child("users").child((mFirebaseUser.getUid())).child("lastLogout").setValue(new Date().getTime());
                 signOut();
                 //finish();
@@ -222,6 +224,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                         .setMessage("Are you sure you want to completely delete your account?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                Amplitude.getInstance().logEvent("Deleted account");
                                 new DBConnections().deleteAccount();
 //                                signOut();
                             }

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,6 +33,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,6 +132,20 @@ public class ChatRoomActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put("Username", username);
+            jo.put("Group name", groupName);
+            jo.put("Group Category", groupCategory);
+            jo.put("Group tyoe", groupType);
+            jo.put("Group ID", groupID);
+//                        Amplitude.getInstance().initialize(MainActivity.this, "945da593068312c2f8521a681f457c2b").enableForegroundTracking(getApplication());
+            Amplitude.getInstance().logEvent("Entered Group Chatroom", jo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(mFirebaseUser.getUid()).child("username");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {

@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.api.ApiException;
@@ -35,6 +36,9 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupsActivity;
@@ -186,6 +190,13 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             categoryLabel.getText(), Toast.LENGTH_SHORT).show();
 
+                    JSONObject jo = new JSONObject();
+                    try {
+                        jo.put("Group Category", categoryLabel.getText().toString());
+                        Amplitude.getInstance().logEvent("Selected " + categoryLabel.getText().toString() + " Category", jo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     Intent intent = new Intent(getActivity(), GroupsActivity.class);
                     Bundle extras = new Bundle();
                     extras.putString("GROUP_CATEGORY",
