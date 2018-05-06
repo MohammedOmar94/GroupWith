@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.amplitude.api.Amplitude;
 import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,26 +36,22 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Amplitude.getInstance().initialize(this, "945da593068312c2f8521a681f457c2b").enableForegroundTracking(getApplication());
+        Amplitude.getInstance().logEvent("App started");
         super.onCreate(savedInstanceState);
-        if(FirebaseDatabase.getInstance() == null) {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        }
         MobileAds.initialize(this, "ca-app-pub-7072858762761381~4076592994");
 
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (!hasInternetConnection()) {
+        if (mFirebaseUser == null || !hasInternetConnection()) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         } else {
-//            checkUsersDetails();
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            checkUsersDetails();
         }
     }
 
@@ -66,5 +63,30 @@ public class SplashActivity extends AppCompatActivity {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
+    }
+
+
+    public void checkUsersDetails() {
+        DatabaseReference usersNodeRef = FirebaseDatabase.getInstance().getReference().child("users");
+        usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+                // If the user hasn't setup their account details like Username and DoB...
+                if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
+                    startActivity(new Intent(SplashActivity.this, AccountSetupActivity.class));
+                    finish();
+                } else {
+                    Amplitude.getInstance().setUserId(mFirebaseUser.getUid());
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
