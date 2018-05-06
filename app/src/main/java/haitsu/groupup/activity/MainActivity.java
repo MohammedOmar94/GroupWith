@@ -108,64 +108,85 @@ public class MainActivity extends AppCompatActivity
     private Handler mHandler;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DBHandler db = new DBHandler(this);
-        // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
-        // db.onCreate(s);
-        // db.dropTable("MyGroups");
-        // db.addData();
-//        db.displayMessage();
+        getSupportActionBar().hide();
 
-        mHandler = new Handler();
-
-        // load toolbar titles from string resources
-        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
-
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-
+        checkUsersDetails();
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
-        if (mFirebaseUser == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-            return;
-        } else {
-            if (mFirebaseUser.getPhotoUrl() != null) {
-                FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
-                mPhotoUrl = account.getPhotoUrl().toString();
 
-                header = navigationView.getHeaderView(0);
-                imgvw = (ImageView) header.findViewById(R.id.account_image);
+        DatabaseReference usersNodeRef = FirebaseDatabase.getInstance().getReference().child("users");
+        usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot snapshot) {
+                // If the user hasn't setup their account details like Username and DoB...
+                if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
+                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
+                    finish();
+                } else {
+                    getSupportActionBar().show();
+                    DBHandler db = new DBHandler(MainActivity.this);
+                    // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
+                    // db.onCreate(s);
+                    // db.dropTable("MyGroups");
+                    // db.addData();
+//        db.displayMessage();
 
-                // initializing navigation menu
-                setUpNavigationView();  // showing dot next to notifications label
+                    mHandler = new Handler();
+
+                    // load toolbar titles from string resources
+                    activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+
+                    drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                            MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                    drawer.setDrawerListener(toggle);
+                    toggle.syncState();
+
+                    navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+                    GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+                    if (mFirebaseUser == null) {
+                        // Not signed in, launch the Sign In activity
+                        startActivity(new Intent(MainActivity.this, SignInActivity.class));
+                        finish();
+                        return;
+                    } else {
+                        if (mFirebaseUser.getPhotoUrl() != null) {
+                            FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
+                            mPhotoUrl = account.getPhotoUrl().toString();
+
+                            header = navigationView.getHeaderView(0);
+                            imgvw = (ImageView) header.findViewById(R.id.account_image);
+
+                            // initializing navigation menu
+                            setUpNavigationView();  // showing dot next to notifications label
 //                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
 
-                if (savedInstanceState == null) {
-                    navItemIndex = 0;
-                    CURRENT_TAG = TAG_HOME;
-                    loadHomeFragment();
+                            if (savedInstanceState == null) {
+                                navItemIndex = 0;
+                                CURRENT_TAG = TAG_HOME;
+                                loadHomeFragment();
+                            }
+                            getUser();
+                        }
+                    }
                 }
-                getUser();
             }
-        }
-    }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public void getUser() {
         DatabaseReference username = databaseRef.child("users");

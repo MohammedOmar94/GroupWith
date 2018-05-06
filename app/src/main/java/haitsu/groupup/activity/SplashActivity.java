@@ -45,13 +45,16 @@ public class SplashActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (mFirebaseUser == null || !hasInternetConnection()) {
+        if (!hasInternetConnection()) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
         } else {
-            checkUsersDetails();
+//            checkUsersDetails();
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -63,28 +66,5 @@ public class SplashActivity extends AppCompatActivity {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
-    }
-
-    public void checkUsersDetails() {
-        DatabaseReference usersNodeRef = FirebaseDatabase.getInstance().getReference().child("users");
-        usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                // If the user hasn't setup their account details like Username and DoB...
-              if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
-                    startActivity(new Intent(SplashActivity.this, AccountSetupActivity.class));
-                    finish();
-                } else {
-                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 }
