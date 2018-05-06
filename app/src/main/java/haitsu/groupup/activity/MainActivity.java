@@ -115,62 +115,54 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().hide();
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        DatabaseReference usersNodeRef = FirebaseDatabase.getInstance().getReference().child("users");
-        usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                getSupportActionBar().show();
-                // DBHandler db = new DBHandler(MainActivity.this);
-                // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
-                // db.onCreate(s);
-                // db.dropTable("MyGroups");
-                // db.addData();
-                // db.displayMessage();
 
-                mHandler = new Handler();
+        if (FirebaseDatabase.getInstance() == null) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        }
 
-                // load toolbar titles from string resources
-                activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+        // DBHandler db = new DBHandler(MainActivity.this);
+        // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
+        // db.onCreate(s);
+        // db.dropTable("MyGroups");
+        // db.addData();
+        // db.displayMessage();
 
-                drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawer.addDrawerListener(toggle);
-                toggle.syncState();
+        mHandler = new Handler();
 
-                navigationView = (NavigationView) findViewById(R.id.nav_view);
+        // load toolbar titles from string resources
+        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
-                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
-                if (mFirebaseUser.getPhotoUrl() != null) {
-                    FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
-                    mPhotoUrl = account.getPhotoUrl().toString();
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-                    header = navigationView.getHeaderView(0);
-                    imgvw = (ImageView) header.findViewById(R.id.account_image);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-                    // initializing navigation menu
-                    setUpNavigationView();  // showing dot next to notifications label
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+        if (mFirebaseUser.getPhotoUrl() != null) {
+            FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
+            mPhotoUrl = account.getPhotoUrl().toString();
+
+            header = navigationView.getHeaderView(0);
+            imgvw = (ImageView) header.findViewById(R.id.account_image);
+
+            // initializing navigation menu
+            setUpNavigationView();  // showing dot next to notifications label
 //                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
 
-                    if (savedInstanceState == null) {
-                        navItemIndex = 0;
-                        CURRENT_TAG = TAG_HOME;
-                        loadHomeFragment();
-                    }
-                }
+            if (savedInstanceState == null) {
+                navItemIndex = 0;
+                CURRENT_TAG = TAG_HOME;
+                loadHomeFragment();
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
     }
 
     public void getUser() {
