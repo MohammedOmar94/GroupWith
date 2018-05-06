@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -124,57 +125,43 @@ public class MainActivity extends AppCompatActivity
         usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                // If the user hasn't setup their account details like Username and DoB...
-                if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
-                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
-                    finish();
-                } else {
-                    getSupportActionBar().show();
-                    DBHandler db = new DBHandler(MainActivity.this);
-                    // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
-                    // db.onCreate(s);
-                    // db.dropTable("MyGroups");
-                    // db.addData();
-//        db.displayMessage();
+                getSupportActionBar().show();
+                // DBHandler db = new DBHandler(MainActivity.this);
+                // SQLiteDatabase s = openOrCreateDatabase("MyGroups",MODE_PRIVATE,null);
+                // db.onCreate(s);
+                // db.dropTable("MyGroups");
+                // db.addData();
+                // db.displayMessage();
 
-                    mHandler = new Handler();
+                mHandler = new Handler();
 
-                    // load toolbar titles from string resources
-                    activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+                // load toolbar titles from string resources
+                activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
-                    drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                            MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                    drawer.setDrawerListener(toggle);
-                    toggle.syncState();
+                drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                        MainActivity.this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                drawer.addDrawerListener(toggle);
+                toggle.syncState();
 
-                    navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-                    GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
-                    if (mFirebaseUser == null) {
-                        // Not signed in, launch the Sign In activity
-                        startActivity(new Intent(MainActivity.this, SignInActivity.class));
-                        finish();
-                        return;
-                    } else {
-                        if (mFirebaseUser.getPhotoUrl() != null) {
-                            FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
-                            mPhotoUrl = account.getPhotoUrl().toString();
+                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+                if (mFirebaseUser.getPhotoUrl() != null) {
+                    FirebaseMessaging.getInstance().subscribeToTopic(mFirebaseUser.getUid());
+                    mPhotoUrl = account.getPhotoUrl().toString();
 
-                            header = navigationView.getHeaderView(0);
-                            imgvw = (ImageView) header.findViewById(R.id.account_image);
+                    header = navigationView.getHeaderView(0);
+                    imgvw = (ImageView) header.findViewById(R.id.account_image);
 
-                            // initializing navigation menu
-                            setUpNavigationView();  // showing dot next to notifications label
+                    // initializing navigation menu
+                    setUpNavigationView();  // showing dot next to notifications label
 //                navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
 
-                            if (savedInstanceState == null) {
-                                navItemIndex = 0;
-                                CURRENT_TAG = TAG_HOME;
-                                loadHomeFragment();
-                            }
-                            getUser();
-                        }
+                    if (savedInstanceState == null) {
+                        navItemIndex = 0;
+                        CURRENT_TAG = TAG_HOME;
+                        loadHomeFragment();
                     }
                 }
             }
@@ -192,10 +179,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
                 userInfo = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);//ISSUE IF USER LEAVES APP ON ACCOUNT CREATION, CAN STILL USE APP USING FIREBASE.
-                if (!snapshot.hasChild((mFirebaseUser.getUid()))) {//User not saved account details then setup account.
-//                    startActivity(new Intent(MainActivity.this, AccountSetupActivity.class));
-//                    finish();
-                } else {
+                if (snapshot.hasChild((mFirebaseUser.getUid()))) {
                     mUsername = userInfo.getUsername();
                     // load nav menu header data
                     loadNavHeader(imgvw);
