@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -284,6 +285,7 @@ public class ResultsActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
+        Amplitude.getInstance().logEvent("Viewing Results screen");
         System.out.println("Fragment resume");
         mLocationCallback = new LocationCallback() {
             @Override

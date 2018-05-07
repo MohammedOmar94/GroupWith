@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.amplitude.api.Amplitude;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,6 +26,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Search.ResultsActivity;
@@ -107,6 +111,7 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Amplitude.getInstance().logEvent("Opened Search screen");
     }
 
     @Override
@@ -259,6 +264,24 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
             extras.putInt("MILES_CONVERTED", milesConverted);
             intent.putExtras(extras);
             startActivity(intent);
+
+            JSONObject jo = new JSONObject();
+            try {
+                jo.put("User ID", mFirebaseUser.getUid());
+                jo.put("Member Limit", sizeValue);
+                jo.put("Group Gemder", genderValue);
+                jo.put("Group Category", categoryValue);
+                jo.put("Group Type", typeValue);
+                jo.put("Group Distance", milesConverted + " Miles or less");
+                Amplitude.getInstance().logEvent("Filter for Gender  -  " + genderValue);
+                Amplitude.getInstance().logEvent("Filter for Group Category  -  " + categoryValue);
+                Amplitude.getInstance().logEvent("Filter for Member Limit  -  " + sizeValue);
+                Amplitude.getInstance().logEvent("Filter for Group Type  -  " + typeValue);
+                Amplitude.getInstance().logEvent("Filter for Group Distance  -  " + milesConverted + " Miles or less");
+                Amplitude.getInstance().logEvent("Submitted Search Filters", jo);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
