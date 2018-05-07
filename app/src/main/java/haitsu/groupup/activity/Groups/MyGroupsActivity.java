@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.amplitude.api.Amplitude;
+
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.GroupsJoinedFragment;
 import haitsu.groupup.fragment.Groups.GroupsCreatedFragment;
@@ -77,6 +79,12 @@ public class MyGroupsActivity extends AppCompatActivity implements
 
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Amplitude.getInstance().logEvent("Viewing My Groups screen");
     }
 
     @Override

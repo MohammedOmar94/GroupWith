@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -258,6 +259,7 @@ public class ChatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         System.out.println("Started listener");
+        Amplitude.getInstance().logEvent("Viewing Chats screen");
         setListener();
     }
 

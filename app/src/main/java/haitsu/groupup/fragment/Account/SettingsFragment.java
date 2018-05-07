@@ -173,6 +173,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Amplitude.getInstance().logEvent("Viewing Settings screen");
     }
 
     @Override
