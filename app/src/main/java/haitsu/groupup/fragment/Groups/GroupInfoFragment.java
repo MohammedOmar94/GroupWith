@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Groups.GroupInfoActivity;
@@ -195,8 +199,23 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 }
 
                 crossfade(mainContent);
-//                progressSpinner.setVisibility(View.GONE);
-//                view.setVisibility(View.VISIBLE);
+
+                // Amplitude Event Tracking.
+                JSONObject jo = new JSONObject();
+                try {
+                    jo.put("Group ID", groupID);
+                    jo.put("Group Name", selectedGroupName);
+                    jo.put("Admin ID", groupAdminId);
+                    jo.put("User ID", mFirebaseUser.getUid());
+                    jo.put("Member Count", groupSize);
+                    jo.put("Member Limit", groupLimit);
+                    jo.put("Group Gemder", groupGender);
+                    jo.put("Group Category", groupCategory);
+                    jo.put("Group Type", groupType);
+                    Amplitude.getInstance().logEvent("Viewing Group Info", jo);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -288,6 +307,23 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         } else {
                             dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId, groupType);
                             Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
+                            // Amplitude Event Tracking.
+                            JSONObject jo = new JSONObject();
+                            try {
+                                jo.put("Group ID", groupID);
+                                jo.put("Group Name", selectedGroupName);
+                                jo.put("Admin ID", groupAdminId);
+                                jo.put("User ID", mFirebaseUser.getUid());
+                                jo.put("Member Count", groupSize);
+                                jo.put("Member Limit", groupLimit);
+                                jo.put("Group Gemder", groupGender);
+                                jo.put("Group Category", groupCategory);
+                                jo.put("Group Type", groupType);
+                                Amplitude.getInstance().logEvent("Join Request for Group in " + groupCategory, jo);
+                                Amplitude.getInstance().logEvent("Join Request for type " + groupType, jo);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             getActivity().finish();
                         }
                     }
@@ -299,7 +335,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 });
                 break;
             case R.id.delete_button:
-                dbConnections.checkGroup(groupID, groupCategory, groupType, selectedGroupName,  groupSize, groupLimit, groupGender);
+                dbConnections.checkGroup(groupID, groupCategory, groupType, selectedGroupName, groupSize, groupLimit, groupGender);
                 getActivity().finish();
                 break;
             case R.id.leave_button:
@@ -309,12 +345,30 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         if (!dataSnapshot.hasChild(groupID)) {
                             // Group doesn't exist anymore
                             databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
-                            getActivity().finish();
                         } else {
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
                             dbConnections.leaveGroup(groupID, groupAdminId, groupCategory, groupType);
-                            getActivity().finish();
                         }
+
+                        // Amplitude Event Tracking.
+                        JSONObject jo = new JSONObject();
+                        try {
+                            jo.put("Group ID", groupID);
+                            jo.put("Group Name", selectedGroupName);
+                            jo.put("Admin ID", groupAdminId);
+                            jo.put("User ID", mFirebaseUser.getUid());
+                            jo.put("Member Count", groupSize);
+                            jo.put("Member Limit", groupLimit);
+                            jo.put("Group Gemder", groupGender);
+                            jo.put("Group Category", groupCategory);
+                            jo.put("Group Type", groupType);
+                            Amplitude.getInstance().logEvent("Left Group in " + groupCategory, jo);
+                            Amplitude.getInstance().logEvent("Left Group of type " + groupType, jo);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        getActivity().finish();
                     }
 
                     @Override
@@ -332,11 +386,30 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                         if (!dataSnapshot.hasChild(groupID)) {
                             // Group doesn't exist anymore
                             databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupID).removeValue();
-                            getActivity().finish();
                         } else {
                             dbConnections.cancelJoinRequest(groupID, groupCategory, groupAdminId, groupType);
-                            getActivity().finish();
                         }
+
+
+                        // Amplitude Event Tracking.
+                        JSONObject jo = new JSONObject();
+                        try {
+                            jo.put("Group ID", groupID);
+                            jo.put("Group Name", selectedGroupName);
+                            jo.put("Admin ID", groupAdminId);
+                            jo.put("User ID", mFirebaseUser.getUid());
+                            jo.put("Member Count", groupSize);
+                            jo.put("Member Limit", groupLimit);
+                            jo.put("Group Gemder", groupGender);
+                            jo.put("Group Category", groupCategory);
+                            jo.put("Group Type", groupType);
+                            Amplitude.getInstance().logEvent("Cancelled Join Request for Group in " + groupCategory, jo);
+                            Amplitude.getInstance().logEvent("Cancelled Join Request for Group of type " + groupType, jo);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        getActivity().finish();
                     }
 
                     @Override
