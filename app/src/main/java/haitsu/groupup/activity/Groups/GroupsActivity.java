@@ -13,6 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.amplitude.api.Amplitude;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import haitsu.groupup.R;
 import haitsu.groupup.fragment.Groups.EventsGroupFragment;
 import haitsu.groupup.fragment.Groups.InterestsGroupFragment;
@@ -38,6 +43,7 @@ public class GroupsActivity extends AppCompatActivity implements
     private String[] pageTitle = {"Events", "Interests"};
     public  LocationManager locationManager = new LocationManager();
 
+    private String groupCategory;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -49,7 +55,7 @@ public class GroupsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups);
         Bundle extras = getIntent().getExtras();
-        String groupCategory = extras.getString("GROUP_CATEGORY");
+        groupCategory = extras.getString("GROUP_CATEGORY");
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,6 +127,18 @@ public class GroupsActivity extends AppCompatActivity implements
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put("Group Category", groupCategory);
+            Amplitude.getInstance().logEvent("Browsing " + groupCategory+ " Category", jo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 }

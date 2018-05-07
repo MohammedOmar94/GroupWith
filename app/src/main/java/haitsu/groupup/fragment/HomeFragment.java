@@ -189,13 +189,6 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             categoryLabel.getText(), Toast.LENGTH_SHORT).show();
 
-                    JSONObject jo = new JSONObject();
-                    try {
-                        jo.put("Group Category", categoryLabel.getText().toString());
-                        Amplitude.getInstance().logEvent("Selected " + categoryLabel.getText().toString() + " Category", jo);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
                     Intent intent = new Intent(getActivity(), GroupsActivity.class);
                     Bundle extras = new Bundle();
                     extras.putString("GROUP_CATEGORY",
@@ -262,7 +255,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Amplitude.getInstance().logEvent("Viewing Home");
+        Amplitude.getInstance().logEvent("Viewing Home screen");
     }
 
     /**
