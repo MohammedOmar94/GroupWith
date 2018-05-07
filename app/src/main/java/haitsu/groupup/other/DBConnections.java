@@ -3,6 +3,7 @@ package haitsu.groupup.other;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -17,6 +18,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -324,6 +328,23 @@ public class DBConnections {
 
         //Add to notifications
         notifications.setValue(new Notification("You created the group " + groupName.toString() + "!"));
+
+
+        // Amplitude Event Tracking.
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put("Group ID", groupId);
+            jo.put("Group Name", groupName);
+            jo.put("Group Description", groupDescription);
+            jo.put("Group Category", groupCategory);
+            jo.put("Group Type", groupType);
+            jo.put("Group Size", memberLimit);
+            jo.put("Group Gemder", groupGender);
+            Amplitude.getInstance().logEvent("Created Group in " + groupCategory, jo);
+            Amplitude.getInstance().logEvent("Created Group of type " + groupType, jo);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void createChatRoom(String groupId) {
