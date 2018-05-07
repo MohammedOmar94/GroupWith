@@ -333,12 +333,13 @@ public class DBConnections {
         // Amplitude Event Tracking.
         JSONObject jo = new JSONObject();
         try {
+            jo.put("Admin ID", mFirebaseUser.getUid());
             jo.put("Group ID", groupId);
             jo.put("Group Name", groupName);
             jo.put("Group Description", groupDescription);
             jo.put("Group Category", groupCategory);
             jo.put("Group Type", groupType);
-            jo.put("Group Size", memberLimit);
+            jo.put("Member Limit", memberLimit);
             jo.put("Group Gemder", groupGender);
             Amplitude.getInstance().logEvent("Created Group in " + groupCategory, jo);
             Amplitude.getInstance().logEvent("Created Group of type " + groupType, jo);
@@ -390,7 +391,8 @@ public class DBConnections {
         // Need to delete firebase instance too.
     }
 
-    public void checkGroup(final String groupID, final String groupCategory, final String groupType) {
+    public void checkGroup(final String groupID, final String groupCategory, final String groupType, final String groupName
+            , final int groupSize, final int groupLimit, final String groupGender) {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(groupID);
         Query query = databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").orderByChild("admin").equalTo(true);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -409,6 +411,25 @@ public class DBConnections {
 
                     //Deletes the chatroom for everyone.
                     databaseRef.child("chatrooms").child(groupID).removeValue();
+
+                    // Amplitude Event Tracking.
+                    JSONObject jo = new JSONObject();
+                    try {
+                        jo.put("Group ID", groupID);
+                        jo.put("Group Name", groupName);
+                        jo.put("Admin ID", mFirebaseUser.getUid());
+                        jo.put("Member Count", groupSize);
+                        jo.put("Member Limit", groupLimit);
+                        jo.put("Group Gemder", groupGender);
+                        jo.put("Group Category", groupCategory);
+                        jo.put("Group Type", groupType);
+                        Amplitude.getInstance().logEvent("Deleted Group in " + groupCategory, jo);
+                        Amplitude.getInstance().logEvent("Deleted Group of type " + groupType, jo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
             }
 
@@ -565,12 +586,14 @@ public class DBConnections {
         requestRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
-                for (DataSnapshot requestSnapshot : dataSnapshot.getChildren()) {
-                    UserRequest request = requestSnapshot.getValue(UserRequest.class);
-                    if (request.getGroupId().equals(groupID)) {
+                for (DataSnapshot groupSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot requestSnapshot : groupSnapshot.getChildren()) {
+                        UserRequest request = requestSnapshot.getValue(UserRequest.class);
+                        if (request.getGroupId().equals(groupID)) {
 //                        System.out.println("Ref is " + request.getGroupId() + " grouo id" + request.getGroupId());
-                        System.out.println("Ref is " + requestSnapshot.getRef());
-                        requestSnapshot.getRef().removeValue();
+                            System.out.println("Ref is " + requestSnapshot.getRef());
+                            requestSnapshot.getRef().removeValue();
+                        }
                     }
                 }
                 //dataSnapshot.getRef().removeValue()

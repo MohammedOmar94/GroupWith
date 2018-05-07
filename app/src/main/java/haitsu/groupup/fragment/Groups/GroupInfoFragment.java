@@ -73,6 +73,9 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
     private String groupAdminId;
     private String groupType;
     private String selectedGroupName;
+    private String groupGender;
+    private int groupSize;
+    private int groupLimit;
 
 
     private FirebaseAuth mFirebaseAuth;
@@ -156,6 +159,9 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 Group groupInfo = snapshot.getValue(Group.class);
                 selectedGroupName = groupInfo.getName();
                 groupAdminId = groupInfo.getAdminID();
+                groupSize = groupInfo.getMemberCount();
+                groupLimit = groupInfo.getMemberLimit();
+                groupGender = groupInfo.getGenders();
                 System.out.println("Ayy " + groupInfo.getMemberLimit());
                 //selectedGroupCategory = InterestsGroupFragment.filteredCategory;
                 ((TextView) view.findViewById(R.id.group_name)).setText(groupInfo.getName());
@@ -293,7 +299,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 });
                 break;
             case R.id.delete_button:
-                dbConnections.checkGroup(groupID, groupCategory, groupType);
+                dbConnections.checkGroup(groupID, groupCategory, groupType, selectedGroupName,  groupSize, groupLimit, groupGender);
                 getActivity().finish();
                 break;
             case R.id.leave_button:
