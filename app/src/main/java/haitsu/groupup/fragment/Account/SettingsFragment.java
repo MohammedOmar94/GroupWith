@@ -62,6 +62,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -132,6 +135,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private ValueEventListener listener;
 
     private EditTextPreference editText;
+
+    private String currentUsername;
 
     private Boolean mRequestingLocationUpdates;
     private final String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -272,6 +277,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                     signOut();
                 } else {
                     User user = snapshot.getValue(User.class);
+                    currentUsername = user.getUsername();
                     editText.setSummary(user.getUsername());
                     editText.setText(user.getUsername());
                     pref3.setSummary(user.getAge());
@@ -398,6 +404,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 databaseRef.child("users").child(mFirebaseUser.getUid()).child("username").setValue(listPref.getText().toString());//Add user}
                 pref.setSummary(listPref.getText().toString());
                 ((EditTextPreference) pref).setText(listPref.getText().toString());
+
+                // Amplitude Event Tracking.
+                JSONObject jo = new JSONObject();
+                try {
+                    jo.put("Old Username", currentUsername);
+                    jo.put("New Username", listPref.getText().toString());
+                    Amplitude.getInstance().logEvent("Cbanged Username", jo);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Username can't be left blank.", Toast.LENGTH_LONG).show();
             }
