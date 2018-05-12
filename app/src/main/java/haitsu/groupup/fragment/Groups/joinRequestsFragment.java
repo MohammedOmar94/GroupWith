@@ -154,32 +154,6 @@ public class joinRequestsFragment extends Fragment {
         requestsRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         requestsRef.keepSynced(true);
 
-        listener = requestsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mListView.setAdapter(null);
-                final ArrayList<DataModel> requestsList = new ArrayList<>();
-                for (final DataSnapshot groupRequestSnapshot : dataSnapshot.child("userRequest").getChildren()) {
-                    for (final DataSnapshot userRequestSnapshot : groupRequestSnapshot.getChildren()) {
-                        System.out.println("Users " + userRequestSnapshot);
-                        DataModel dataModel = new DataModel();
-                        dataModel.setUserSnapshot(dataSnapshot);
-                        dataModel.setJoinRequestSnapshot(userRequestSnapshot);
-                        requestsList.add(dataModel);
-                        System.out.println("data model is  " + dataModel.getJoinRequestSnapshot().getValue(UserRequest.class).getGroupName());
-                        adapter = new JoinRequestsAdapter(getActivity(), requestsList);
-                        mListView.setAdapter(adapter);
-                    }
-                    System.out.println("size is " + requestsList.size());
-                }
-                crossfade(mainContent, dataSnapshot.child("userRequest"));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 //        usersAdapter = new FirebaseListAdapter<UserRequest>(getActivity(), UserRequest.class, R.layout.requests_item, requestsRef) {
 //            protected void populateView(View view, UserRequest request, int position) {
 //                System.out.println("ayy " + request.getGroupCategory());
@@ -336,6 +310,38 @@ public class joinRequestsFragment extends Fragment {
         });
     }
 
+    public void setJoinRequestListener() {
+        listener = requestsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mListView.setAdapter(null);
+                final ArrayList<DataModel> requestsList = new ArrayList<>();
+                for (final DataSnapshot groupRequestSnapshot : dataSnapshot.child("userRequest").getChildren()) {
+                    for (final DataSnapshot userRequestSnapshot : groupRequestSnapshot.getChildren()) {
+                        System.out.println("Users " + userRequestSnapshot);
+                        DataModel dataModel = new DataModel();
+                        dataModel.setUserSnapshot(dataSnapshot);
+                        dataModel.setJoinRequestSnapshot(userRequestSnapshot);
+                        requestsList.add(dataModel);
+                        System.out.println("data model is  " + dataModel.getJoinRequestSnapshot().getValue(UserRequest.class).getGroupName());
+                        System.out.println("Join request activity is " + getActivity());
+                        if (getActivity()!= null) {
+                            adapter = new JoinRequestsAdapter(getActivity(), requestsList);
+                            mListView.setAdapter(adapter);
+                        }
+                    }
+                    System.out.println("size is " + requestsList.size());
+                }
+                crossfade(mainContent, dataSnapshot.child("userRequest"));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -369,6 +375,7 @@ public class joinRequestsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        setJoinRequestListener();
         System.out.println("Started listener");
     }
 

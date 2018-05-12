@@ -15,13 +15,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -122,11 +128,45 @@ public class JoinRequestsAdapter extends ArrayAdapter<DataModel> {
                         .setMessage(Html.fromHtml(joinRequestDialogMessage(request)))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                // Amplitude Event Tracking.
+                                JSONObject jo = new JSONObject();
+                                try {
+                                    jo.put("Group ID", request.getGroupId());
+                                    jo.put("Group Name", request.getGroupName());
+                                    jo.put("Admin ID", mFirebaseUser.getUid());
+                                    jo.put("User ID", request.getUserId());
+                                    jo.put("Date requested", request.getTimeOfRequest());
+                                    jo.put("Users Gemder", request.getGender());
+                                    jo.put("Users Age", calculateAge(request.getAge()));
+                                    jo.put("Users Location", request.getCity() + ", " + request.getCountry());
+                                    jo.put("Group Category", request.getGroupCategory());
+                                    jo.put("Group Type", request.getType());
+                                    Amplitude.getInstance().logEvent("Accepted Join Request", jo);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                                 acceptJoinRequest(request);
                             }
                         })
                         .setNegativeButton(R.string.option_decline, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                // Amplitude Event Tracking.
+                                JSONObject jo = new JSONObject();
+                                try {
+                                    jo.put("Group ID", request.getGroupId());
+                                    jo.put("Group Name", request.getGroupName());
+                                    jo.put("Admin ID", mFirebaseUser.getUid());
+                                    jo.put("User ID", request.getUserId());
+                                    jo.put("Date requested", request.getTimeOfRequest());
+                                    jo.put("Users Gemder", request.getGender());
+                                    jo.put("Users Age", calculateAge(request.getAge()));
+                                    jo.put("Users Location", request.getCity() + ", " + request.getCountry());
+                                    jo.put("Group Category", request.getGroupCategory());
+                                    jo.put("Group Type", request.getType());
+                                    Amplitude.getInstance().logEvent("Declined Join Request", jo);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                                 declineJoinRequest(request);
                             }
                         })
@@ -166,25 +206,59 @@ public class JoinRequestsAdapter extends ArrayAdapter<DataModel> {
         return message;
     }
 
-    public void acceptJoinRequest(UserRequest request) {
+    public void acceptJoinRequest(final UserRequest request) {
+        DatabaseReference groupMembersRef = databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("members");
+
         // Remove request from admin.
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(request.getGroupId()).
                 child(request.getUserId()).removeValue();
 
         // Approve user.
         databaseRef.child("users").child(request.getUserId()).child("groups").child(request.getGroupId()).child("userApproved").setValue(true);
-        databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("members").child(request.getUserId()).setValue(true);
+        groupMembersRef.child(request.getUserId()).setValue(true);
+
+        // Update Admins User groups tree with new group count for Groups Joined counter.
+        groupMembersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(request.getGroupId()).
+                        child("memberCount").setValue(dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
         // Need to add groups tree for that user who was accepted to join.
     }
 
-    public void declineJoinRequest(UserRequest request) {
+    public void declineJoinRequest(final UserRequest request) {
+        DatabaseReference groupMembersRef = databaseRef.child("group").child(request.getGroupCategory()).child(request.getType()).child(request.getGroupId()).child("members");
+
         // Remove request from admin.
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("userRequest").child(request.getGroupId())
                 .child(request.getUserId()).removeValue();
 
         // Remove user from group.
         dbConnections.removeUser(request.getUserId(), request.getGroupId(), request.getGroupCategory(), request.getType());
+
+        // Update Admins User groups tree with new group count for Groups Joined counter.
+        groupMembersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(request.getGroupId()).
+                        child("memberCount").setValue(dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
