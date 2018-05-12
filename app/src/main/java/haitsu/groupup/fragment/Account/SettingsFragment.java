@@ -227,6 +227,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             public void onClick(DialogInterface dialog, int which) {
                                 Amplitude.getInstance().logEvent("Deleted account");
                                 new DBConnections().deleteAccount();
+                                Amplitude.getInstance().setUserId("");
 //                                signOut();
                             }
                         })
@@ -367,6 +368,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private void signOut() {
+        Amplitude.getInstance().setUserId("");
         FirebaseAuth.getInstance().signOut();//Sign out of Firebase.
         Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
         startActivity(new Intent(getActivity(), SignInActivity.class));

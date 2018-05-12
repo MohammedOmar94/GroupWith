@@ -97,13 +97,13 @@ public class SignInActivity extends AppCompatActivity implements
         usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
+                Amplitude.getInstance().setUserId(mFirebaseUser.getEmail());
                 // If the user hasn't setup their account details like Username and DoB...
                 if (!snapshot.hasChild((mFirebaseUser.getUid()))) {
                     startActivity(new Intent(SignInActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                    Amplitude.getInstance().setUserId(mFirebaseUser.getUid());
                     Amplitude.getInstance().logEvent("Logged in");
                     snapshot.child((mFirebaseUser.getUid())).child("lastLogin").getRef().setValue(new Date().getTime());
                     startActivity(intent);
