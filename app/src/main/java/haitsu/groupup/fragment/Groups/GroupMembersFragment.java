@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.ads.AdRequest;
@@ -138,6 +139,7 @@ public class GroupMembersFragment extends Fragment implements GoogleApiClient.On
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Amplitude.getInstance().logEvent("Viewing Group Members");
 
     }
 

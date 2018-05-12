@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.amplitude.api.Amplitude;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -110,6 +113,18 @@ public class UsersAdapter extends ArrayAdapter<DataModel> {
                             .setMessage(Html.fromHtml(removeMemberDialogMessage(user)))
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+                                    // Amplitude Event Tracking.
+                                    JSONObject jo = new JSONObject();
+                                    try {
+                                        jo.put("Group ID", groupId);
+                                        jo.put("Admin ID", mFirebaseUser.getUid());
+                                        jo.put("User ID", userId);
+                                        jo.put("Group Category", groupCategory);
+                                        jo.put("Group Type", groupType);
+                                        Amplitude.getInstance().logEvent("Removed Group member", jo);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                     dbConnections.removeUser(userId, groupId, groupCategory, groupType);
 
                                 }
