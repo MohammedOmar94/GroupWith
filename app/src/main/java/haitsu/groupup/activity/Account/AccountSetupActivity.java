@@ -23,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplitude.api.Amplitude;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -35,6 +36,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -111,6 +117,8 @@ public class AccountSetupActivity extends AppCompatActivity
 
         permissionUtils.check_permission(permissions, "Need GPS permission for getting your location", 1);
 
+        Amplitude.getInstance().logEvent("Viewing Account Setup screen");
+
 
 //        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 //
@@ -157,6 +165,20 @@ public class AccountSetupActivity extends AppCompatActivity
                     //Redirects user to the Home screen.
                     startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));
                     finish();
+
+                    // Amplitude Event Tracking.
+                    JSONObject jo = new JSONObject();
+                    try {
+                        jo.put("User ID", mFirebaseUser.getUid());
+                        jo.put("Username", (((EditText) findViewById(R.id.username)).getText().toString()));
+                        jo.put("Name", mFirebaseUser.getDisplayName());
+                        jo.put("Gender", selectedGender);
+                        jo.put("Email", mFirebaseUser.getEmail());
+                        jo.put("Age", calculateAge(birthdayLabel.getText().toString()));
+                        Amplitude.getInstance().logEvent("Completed Registration", jo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
@@ -167,6 +189,17 @@ public class AccountSetupActivity extends AppCompatActivity
         newFragment.show(getSupportFragmentManager(), "datePicker");
 
 
+    }
+
+    public int calculateAge(String birthday) {
+        String[] parts = birthday.split("/");
+        int year = Integer.parseInt(parts[2]);
+        int month = Integer.parseInt(parts[1]);
+        int day = Integer.parseInt(parts[0]);
+        LocalDate birthdate = new LocalDate(year, month, day);
+        LocalDate now = new LocalDate();
+        Years age = Years.yearsBetween(birthdate, now);
+        return age.getYears();
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
