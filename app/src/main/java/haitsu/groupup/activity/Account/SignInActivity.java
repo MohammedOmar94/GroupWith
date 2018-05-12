@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.amplitude.api.Amplitude;
+import com.amplitude.api.Identify;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -32,12 +33,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
+
 import java.util.Date;
 
 import haitsu.groupup.R;
 import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.activity.SplashActivity;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.Models.User;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -103,6 +108,13 @@ public class SignInActivity extends AppCompatActivity implements
                     startActivity(new Intent(SignInActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
+                    User user = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);
+                    Identify identify = new Identify()
+                            .set("Name", mFirebaseUser.getDisplayName())
+                            .set("Gender", user.getGender())
+                            .set("Age", calculateAge(user.getAge()))
+                            .set("Email", mFirebaseUser.getEmail());
+                    Amplitude.getInstance().identify(identify);
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                     Amplitude.getInstance().logEvent("Logged in");
                     snapshot.child((mFirebaseUser.getUid())).child("lastLogin").getRef().setValue(new Date().getTime());
@@ -189,6 +201,17 @@ public class SignInActivity extends AppCompatActivity implements
                         }
                     }
                 });
+    }
+
+    public int calculateAge(String birthday) {
+        String[] parts = birthday.split("/");
+        int year = Integer.parseInt(parts[2]);
+        int month = Integer.parseInt(parts[1]);
+        int day = Integer.parseInt(parts[0]);
+        LocalDate birthdate = new LocalDate(year, month, day);
+        LocalDate now = new LocalDate();
+        Years age = Years.yearsBetween(birthdate, now);
+        return age.getYears();
     }
 
     @Override

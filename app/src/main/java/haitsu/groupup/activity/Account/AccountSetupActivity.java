@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amplitude.api.Amplitude;
+import com.amplitude.api.Identify;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -55,6 +56,7 @@ import haitsu.groupup.fragment.DatePickerFragment;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.LocationManager;
 import haitsu.groupup.other.Models.Group;
+import haitsu.groupup.other.Models.User;
 
 public class AccountSetupActivity extends AppCompatActivity
         implements View.OnClickListener, AdapterView.OnItemSelectedListener,
@@ -161,6 +163,13 @@ public class AccountSetupActivity extends AppCompatActivity
 //                            "Please turn on your location.", Toast.LENGTH_LONG)
 //                            .show();
                 } else {
+                    Identify identify = new Identify()
+                            .set("Name", mFirebaseUser.getDisplayName())
+                            .set("Gender", selectedGender)
+                            .set("Age", calculateAge(birthdayLabel.getText().toString()))
+                            .set("Email", mFirebaseUser.getEmail());
+                    Amplitude.getInstance().identify(identify);
+
                     dbConnections.createUserAccount(((EditText) findViewById(R.id.username)), selectedGender, mFirebaseUser.getEmail(), birthdayLabel);
                     //Redirects user to the Home screen.
                     startActivity(new Intent(AccountSetupActivity.this, MainActivity.class));

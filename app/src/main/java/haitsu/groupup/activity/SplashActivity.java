@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.amplitude.api.Amplitude;
+import com.amplitude.api.Identify;
 import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -17,6 +18,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
 
 import haitsu.groupup.activity.Account.AccountSetupActivity;
 import haitsu.groupup.activity.Account.SignInActivity;
@@ -77,6 +81,13 @@ public class SplashActivity extends AppCompatActivity {
                     startActivity(new Intent(SplashActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
+                    User user = snapshot.child(mFirebaseUser.getUid()).getValue(User.class);
+                    Identify identify = new Identify()
+                            .set("Name", mFirebaseUser.getDisplayName())
+                            .set("Gender", user.getGender())
+                            .set("Age", calculateAge(user.getAge()))
+                            .set("Email", mFirebaseUser.getEmail());
+                    Amplitude.getInstance().identify(identify);
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -89,4 +100,16 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
     }
+
+    public int calculateAge(String birthday) {
+        String[] parts = birthday.split("/");
+        int year = Integer.parseInt(parts[2]);
+        int month = Integer.parseInt(parts[1]);
+        int day = Integer.parseInt(parts[0]);
+        LocalDate birthdate = new LocalDate(year, month, day);
+        LocalDate now = new LocalDate();
+        Years age = Years.yearsBetween(birthdate, now);
+        return age.getYears();
+    }
+
 }
