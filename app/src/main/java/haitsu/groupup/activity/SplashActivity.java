@@ -71,12 +71,12 @@ public class SplashActivity extends AppCompatActivity {
         usersNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
+                Amplitude.getInstance().setUserId(mFirebaseUser.getEmail());
                 // If the user hasn't setup their account details like Username and DoB...
                 if (!snapshot.hasChild((mFirebaseUser.getUid())) || !snapshot.child(mFirebaseUser.getUid()).hasChild("username")) {
                     startActivity(new Intent(SplashActivity.this, AccountSetupActivity.class));
                     finish();
                 } else {
-                    Amplitude.getInstance().setUserId(mFirebaseUser.getUid());
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
