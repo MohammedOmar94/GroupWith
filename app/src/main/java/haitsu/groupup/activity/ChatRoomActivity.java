@@ -139,7 +139,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             jo.put("Username", username);
             jo.put("Group name", groupName);
             jo.put("Group Category", groupCategory);
-            jo.put("Group tyoe", groupType);
+            jo.put("Group type", groupType);
             jo.put("Group ID", groupID);
 //                        Amplitude.getInstance().initialize(MainActivity.this, "945da593068312c2f8521a681f457c2b").enableForegroundTracking(getApplication());
             Amplitude.getInstance().logEvent("Entered Group Chatroom", jo);
@@ -224,6 +224,18 @@ public class ChatRoomActivity extends AppCompatActivity {
                 System.out.println("photo old " + account.getPhotoUrl());
                 // Regexp ensures that at least one non-blank character is used.
                 if (Pattern.compile("\\S").matcher(message).find()) {
+                    JSONObject jo = new JSONObject();
+                    try {
+                        jo.put("Group name", groupName);
+                        jo.put("Group Category", groupCategory);
+                        jo.put("Group type", groupType);
+                        jo.put("Group ID", groupID);
+//                        Amplitude.getInstance().initialize(MainActivity.this, "945da593068312c2f8521a681f457c2b").enableForegroundTracking(getApplication());
+                        Amplitude.getInstance().logEvent("Sent message", jo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                     // Read the input field and push a new instance
                     // of ChatMessage to the Firebase database
                     chatrooms.push()
