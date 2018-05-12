@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 
 import com.amplitude.api.Amplitude;
+import com.amplitude.api.Identify;
 import com.takisoft.fix.support.v7.preference.EditTextPreference;
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
@@ -206,6 +207,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             public boolean onPreferenceClick(Preference preference) {
                 // TODO Auto-generated method stub
                 Amplitude.getInstance().logEvent("Logged out");
+                Amplitude.getInstance().setUserId("");
+                Identify identify = new Identify()
+                        .unset("Name")
+                        .unset("Gender")
+                        .unset("Age")
+                        .unset("Email");
+                Amplitude.getInstance().identify(identify);
                 databaseRef.child("users").child((mFirebaseUser.getUid())).child("lastLogout").setValue(new Date().getTime());
                 signOut();
                 //finish();
@@ -232,7 +240,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                             public void onClick(DialogInterface dialog, int which) {
                                 Amplitude.getInstance().logEvent("Deleted account");
                                 new DBConnections().deleteAccount();
+
                                 Amplitude.getInstance().setUserId("");
+                                Identify identify = new Identify()
+                                        .unset("Name")
+                                        .unset("Gender")
+                                        .unset("Age")
+                                        .unset("Email");
+                                Amplitude.getInstance().identify(identify);
 //                                signOut();
                             }
                         })
