@@ -133,6 +133,11 @@
             android:name=".activity.Account.ReportActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.Account.PrivacyPolicyActivity"
+            android:label="@string/title_activity_privacy"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

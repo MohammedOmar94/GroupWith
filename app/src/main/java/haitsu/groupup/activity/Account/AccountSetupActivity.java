@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,8 +94,14 @@ public class AccountSetupActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_setup);
 
+        RadioButton termsOfService = (RadioButton) findViewById(R.id.terms_label);
+//        int startPos = termsOfService.getText().toString().indexOf("Terms of Service");
 
+        TextView termsText = (TextView) findViewById(R.id.terms_text);
+//        termsText.setPaintFlags(termsText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+//        termsText.setText(termsText.getText());
 
+        TextView privacyText = (TextView) findViewById(R.id.privacy_text);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -105,6 +113,8 @@ public class AccountSetupActivity extends AppCompatActivity
         spinner = (Spinner) findViewById(R.id.gender_spinner);
         birthdayLabel = (TextView) findViewById(R.id.birthday_label);
 //        locationLabel = (TextView) findViewById(R.id.location_label);
+        termsText.setOnClickListener(this);
+        privacyText.setOnClickListener(this);
         mfinishSetup.setOnClickListener(this);
         spinner.setOnItemSelectedListener(this);
 
@@ -148,6 +158,14 @@ public class AccountSetupActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.privacy_text:
+                startActivity(new Intent(AccountSetupActivity.this, PrivacyPolicyActivity.class));
+                break;
+            case R.id.terms_text:
+                Toast.makeText(getApplicationContext(),
+                        "Terms of Service.", Toast.LENGTH_LONG)
+                        .show();
+                break;
             case R.id.finish_setup:
                 if(((EditText) findViewById(R.id.username)).getText().toString().equals("")){
                     Toast.makeText(getApplicationContext(),
