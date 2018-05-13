@@ -81,9 +81,10 @@
 
     <TextView
         android:id="@+id/terms_text"
+        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginStart="48dp"
         android:text="Terms of Service"
         android:textAllCaps="false"
@@ -94,10 +95,11 @@
 
     <TextView
         android:id="@+id/privacy_text"
+        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginStart="36dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="44dp"
         android:text="Privacy Policy"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
@@ -109,12 +111,13 @@
         android:layout_width="282dp"
         android:layout_height="41dp"
         android:layout_marginBottom="28dp"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="36dp"
         android:text="I have read and agree with the Terms of Service."
         app:layout_constraintBottom_toTopOf="@+id/finish_setup"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
+        style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/finish_setup"
         android:layout_width="match_parent"
         android:layout_height="65dp"
