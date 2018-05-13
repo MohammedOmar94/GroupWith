@@ -252,7 +252,7 @@
 
         <b>\n\nInformation Collection and Use</b>
 
-        \n\nFor a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to Email Address, Name, Age, Location, Gender. The information that I request is retained on your device and is not collected by me in any way
+        \n\nFor a better experience, while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to Email Address, Name, Age, Location, Gender. The information that I request is retained on our servers, so long as you haven\'t deleted you account in app.
 
         \n\nThe app does use third party services that may collect information used to identify you.
 
@@ -293,7 +293,7 @@
 
         <b>\n\nChildren’s Privacy</b>
 
-        \n\nThese Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13. In the case I discover that a child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able to do necessary actions.
+        \n\nThese Services do not address anyone under the age of 18. I do not knowingly collect personally identifiable information from individuals under the age of 18. In the case I discover that a individual under the age of 18 has provided me with personal information, I immediately delete this data from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact me so that I will be able act accordingly.
 
         <b>\n\nChanges to This Privacy Policy</b>
 
@@ -301,7 +301,8 @@
 
         <b>\n\nContact Us</b>
 
-        \n\nIf you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me.
+        \n\nIf you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me at <a href="mailto:haitsu.gw@gmail.com">haitsu.gw@gmail.com.</a>
+        \n\n\n\n\n
     </string>
 
     <string name="terms_paragraph">
@@ -319,7 +320,7 @@
 
         \n\nWith respect to Haitsu’s responsibility for your use of the app, when you’re using the app, it’s important to bear in mind that although we endeavour to ensure that it is updated and correct at all times, we do rely on third parties to provide information to us so that we can make it available to you. Haitsu accepts no liability for any loss, direct or indirect, you experience as a result of relying wholly on this functionality of the app.
 
-        \n\nAt some point, we may wish to update the app. The app is currently available on Android and iOS – the requirements for both systems (and for any additional systems we decide to extend the availability of the app to) may change, and you’ll need to download the updates if you want to keep using the app. Haitsu does not promise that it will always update the app so that it is relevant to you and/or works with the iOS/Android version that you have installed on your device. However, you promise to always accept updates to the application when offered to you, We may also wish to stop providing the app, and may terminate use of it at any time without giving notice of termination to you. Unless we tell you otherwise, upon any termination, (a) the rights and licenses granted to you in these terms will end; (b) you must stop using the app, and (if needed) delete it from your device.
+        \n\nAt some point, we may wish to update the app. The app is currently available on Android – the requirements (and for any additional systems we decide to extend the availability of the app to) may change, and you’ll need to download the updates if you want to keep using the app. Haitsu does not promise that it will always update the app so that it is relevant to you and/or works with the version that you have installed on your device. However, you promise to always accept updates to the application when offered to you, We may also wish to stop providing the app, and may terminate use of it at any time without giving notice of termination to you. Unless we tell you otherwise, upon any termination, (a) the rights and licenses granted to you in these terms will end; (b) you must stop using the app, and (if needed) delete it from your device.
 
         \n\n<b>Changes to This Terms of Service</b>
 
@@ -327,7 +328,8 @@
 
         \n\n<b>Contact Us</b>
 
-        \n\nIf you have any questions or suggestions about my Terms of Service, do not hesitate to contact me.
+        \n\nIf you have any questions or suggestions about my Terms of Service, do not hesitate to contact me at <a href="mailto:haitsu.gw@gmail.com">haitsu.gw@gmail.com.</a>
+        \n\n\n\n\n
     </string>
 
 </resources>

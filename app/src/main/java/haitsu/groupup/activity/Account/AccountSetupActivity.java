@@ -3,19 +3,12 @@ package haitsu.groupup.activity.Account;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -27,16 +20,10 @@ import android.widget.Toast;
 
 import com.amplitude.api.Amplitude;
 import com.amplitude.api.Identify;
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -45,11 +32,8 @@ import org.joda.time.Years;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
@@ -57,8 +41,6 @@ import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.fragment.DatePickerFragment;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.LocationManager;
-import haitsu.groupup.other.Models.Group;
-import haitsu.groupup.other.Models.User;
 
 public class AccountSetupActivity extends AppCompatActivity
         implements View.OnClickListener, AdapterView.OnItemSelectedListener,
@@ -89,12 +71,14 @@ public class AccountSetupActivity extends AppCompatActivity
     FirebaseAuth mFirebaseAuth;
     FirebaseUser mFirebaseUser;
 
+    private RadioButton termsOfService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_setup);
 
-        RadioButton termsOfService = (RadioButton) findViewById(R.id.terms_label);
+        termsOfService = (RadioButton) findViewById(R.id.terms_radio);
 //        int startPos = termsOfService.getText().toString().indexOf("Terms of Service");
 
         TextView termsText = (TextView) findViewById(R.id.terms_text);
@@ -165,12 +149,11 @@ public class AccountSetupActivity extends AppCompatActivity
                 startActivity(new Intent(AccountSetupActivity.this, TermsOfServiceActivity.class));
                 break;
             case R.id.finish_setup:
-                if(((EditText) findViewById(R.id.username)).getText().toString().equals("")){
+                if (((EditText) findViewById(R.id.username)).getText().toString().equals("")) {
                     Toast.makeText(getApplicationContext(),
                             "Please enter a username.", Toast.LENGTH_LONG)
                             .show();
-                }
-                else if(birthdayLabel.getText().equals("Add birthday")){
+                } else if (birthdayLabel.getText().equals("--/--/----")) {
                     Toast.makeText(getApplicationContext(),
                             "Please enter your date of birth.", Toast.LENGTH_LONG)
                             .show();
@@ -178,6 +161,10 @@ public class AccountSetupActivity extends AppCompatActivity
 //                    Toast.makeText(getApplicationContext(),
 //                            "Please turn on your location.", Toast.LENGTH_LONG)
 //                            .show();
+                } else if (!termsOfService.isChecked()) {
+                    Toast.makeText(getApplicationContext(),
+                            "You must read and agree to our Terms of Service in order to proceed.", Toast.LENGTH_LONG)
+                            .show();
                 } else {
                     Identify identify = new Identify()
                             .set("Name", mFirebaseUser.getDisplayName())
