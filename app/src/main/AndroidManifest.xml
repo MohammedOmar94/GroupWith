@@ -138,6 +138,11 @@
             android:label="@string/title_activity_privacy"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.Account.TermsOfServiceActivity"
+            android:label="@string/title_activity_terms"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

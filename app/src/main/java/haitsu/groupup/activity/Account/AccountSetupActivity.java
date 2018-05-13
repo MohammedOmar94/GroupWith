@@ -162,9 +162,7 @@ public class AccountSetupActivity extends AppCompatActivity
                 startActivity(new Intent(AccountSetupActivity.this, PrivacyPolicyActivity.class));
                 break;
             case R.id.terms_text:
-                Toast.makeText(getApplicationContext(),
-                        "Terms of Service.", Toast.LENGTH_LONG)
-                        .show();
+                startActivity(new Intent(AccountSetupActivity.this, TermsOfServiceActivity.class));
                 break;
             case R.id.finish_setup:
                 if(((EditText) findViewById(R.id.username)).getText().toString().equals("")){

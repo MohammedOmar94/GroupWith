@@ -110,7 +110,7 @@
         android:id="@+id/terms_label"
         android:layout_width="282dp"
         android:layout_height="41dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="48dp"
         android:layout_marginStart="36dp"
         android:text="I have read and agree with the Terms of Service."
         app:layout_constraintBottom_toTopOf="@+id/finish_setup"
