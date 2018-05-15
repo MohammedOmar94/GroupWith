@@ -44,9 +44,7 @@ import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
 import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
 
 import haitsu.groupup.R;
-import haitsu.groupup.activity.Account.AccountSetupActivity;
-import haitsu.groupup.activity.Account.SettingsActivity;
-import haitsu.groupup.activity.Account.SignInActivity;
+import haitsu.groupup.activity.Account.*;
 import haitsu.groupup.activity.Groups.CreateGroupActivity;
 import haitsu.groupup.activity.Groups.MyGroupsActivity;
 import haitsu.groupup.activity.Search.SearchActivity;
@@ -363,16 +361,16 @@ public class MainActivity extends AppCompatActivity
                         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                         drawer.closeDrawers();
                         return true;
-                   /* case R.id.nav_about_us:
+                    case R.id.nav_terms_of_service:
                         // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+                        startActivity(new Intent(MainActivity.this, TermsOfServiceActivity.class));
                         drawer.closeDrawers();
                         return true;
                     case R.id.nav_privacy_policy:
                         // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+                        startActivity(new Intent(MainActivity.this, haitsu.groupup.activity.Account.PrivacyPolicyActivity.class));
                         drawer.closeDrawers();
-                        return true;*/
+                        return true;
                     default:
                         navItemIndex = 0;
                 }

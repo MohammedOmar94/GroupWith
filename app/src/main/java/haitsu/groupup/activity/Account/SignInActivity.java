@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,7 +51,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
-    private Button mSignInButton;
+    private SignInButton mSignInButton;
 
 
     private DBConnections dbConnections = new DBConnections();
@@ -72,7 +73,7 @@ public class SignInActivity extends AppCompatActivity implements
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         // Assign fields
-        mSignInButton = (Button) findViewById(R.id.sign_in_Google);
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_Google);
 
         // Set click listeners
         mSignInButton.setOnClickListener(this);

@@ -8,9 +8,9 @@
             android:icon="@drawable/ic_home_black_24dp"
             android:title="@string/nav_home" />
         <!--<item-->
-            <!--android:id="@+id/nav_notifications"-->
-            <!--android:icon="@drawable/ic_notifications_black_24dp"-->
-            <!--android:title="@string/nav_notifications" />-->
+        <!--android:id="@+id/nav_notifications"-->
+        <!--android:icon="@drawable/ic_notifications_black_24dp"-->
+        <!--android:title="@string/nav_notifications" />-->
 
 
     </group>
@@ -33,4 +33,14 @@
             android:title="@string/nav_settings" />
     </item>
 
+    <item android:title="Legal">
+        <menu>
+            <item
+                android:id="@+id/nav_terms_of_service"
+                android:title="@string/nav_terms_of_service" />
+            <item
+                android:id="@+id/nav_privacy_policy"
+                android:title="@string/privacy_policy" />
+        </menu>
+    </item>
 </menu>
