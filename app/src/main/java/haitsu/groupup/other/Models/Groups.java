@@ -9,10 +9,12 @@ public class Groups implements Comparable<Groups> {
     private String groupId;
     private String category;
     private String type;
+    private String gender;
     private String name;
     private int memberCount;
     private int memberLimit;
     private Boolean admin;
+    private String adminID;
     private Boolean userApproved;
     private ChatMessage lastMessage;
 
@@ -106,6 +108,22 @@ public class Groups implements Comparable<Groups> {
         } else {
             return 0;
         }
+    }
+
+    public String getAdminId() {
+        return adminID;
+    }
+
+    public void setAdminId(String adminID) {
+        this.adminID = adminID;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }
 

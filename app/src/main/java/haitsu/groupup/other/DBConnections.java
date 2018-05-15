@@ -23,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import haitsu.groupup.activity.MainActivity;
 import haitsu.groupup.other.Models.ChatMessage;
@@ -156,7 +158,7 @@ public class DBConnections {
     }
 
     public void userRequest(final String groupID, final String groupName, final String groupCategory, final String groupAdminId,
-                            final String groupType) {
+                            final String groupType, final String groupGender) {
         DatabaseReference userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -170,7 +172,7 @@ public class DBConnections {
                 // Not even needed, what has the users own groups has to do with anything.
                 // Groups group = snapshot.child("groups").getValue(Groups.class);
                 // System.out.println("group admin is " + group.getName());
-                joinGroup(groupID, groupName, groupCategory, groupAdminId, groupType, request);
+                joinGroup(groupID, groupName, groupCategory, groupAdminId, groupType, groupGender, request);
             }
 
             @Override
@@ -200,7 +202,8 @@ public class DBConnections {
     }
 
 
-    public void joinGroup(final String groupID, String groupName, String groupCategory, final String groupAdminId, String groupType,
+    public void joinGroup(final String groupID, String groupName, String groupCategory, final String groupAdminId,
+                          String groupType, String groupGender,
                           UserRequest request) {
         //String userid = databaseRef.child("Group").push().getKey();
         final DatabaseReference groupRef = databaseRef.child("group").child(groupCategory).child(groupType).child(groupID);
@@ -214,7 +217,9 @@ public class DBConnections {
         usersGroupsTree.child("name").setValue(request.getGroupName());
         usersGroupsTree.child("category").setValue(request.getGroupCategory());
         usersGroupsTree.child("type").setValue(groupType);
+        usersGroupsTree.child("gender").setValue(groupGender);
         usersGroupsTree.child("admin").setValue(false);
+        usersGroupsTree.child("adminID").setValue(groupAdminId);
         usersGroupsTree.child("userApproved").setValue(false);
 
         databaseRef.child("users").child(groupAdminId).child("userRequest").child(groupID).child(request.getUserId()).setValue(request);
@@ -319,8 +324,10 @@ public class DBConnections {
         //Adds to users tree
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("category").setValue(groupCategory);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("type").setValue(groupType);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("gender").setValue(groupGender);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("name").setValue(groupName.toString());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("admin").setValue(true);
+        databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("adminID").setValue(mFirebaseUser.getUid());
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("userApproved").setValue(true);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("memberCount").setValue(1);
         databaseRef.child("users").child(mFirebaseUser.getUid()).child("groups").child(groupId).child("memberLimit").setValue(Integer.parseInt(memberLimit));
@@ -355,31 +362,47 @@ public class DBConnections {
 
     public void deleteAccount() {
         final String userId = mFirebaseUser.getUid();
-        Query findGroupsWithUserId = databaseRef.child("group").orderByChild(userId);
+        final CountDownLatch lock = new CountDownLatch(1);
+        Query findGroupsWithUserId = databaseRef.child("users").child(mFirebaseUser.getUid());
         findGroupsWithUserId.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildrenCount() > 0) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        for (DataSnapshot groupSnapshot : snapshot.getChildren()) {
-                            System.out.println("GROUP " + groupSnapshot.getValue());
-                            for (DataSnapshot eventSnapshot : groupSnapshot.getChildren()) {
-                                System.out.println("events " + eventSnapshot.getValue());
-                                String adminID = eventSnapshot.child("adminID").getValue(String.class);
-                                if (adminID != "" && adminID.equals(mFirebaseUser.getUid())) {
-                                    eventSnapshot.getRef().removeValue();
-                                } else if (eventSnapshot.child("members").hasChild(userId)) {
-                                    eventSnapshot.child("members").child(userId).getRef().removeValue();
-                                    long memberCount = eventSnapshot.child("members").getChildrenCount();
-                                    System.out.println("count is  " + memberCount + " " + eventSnapshot.child("memberCount").getRef());
-                                    eventSnapshot.child("memberCount").getRef().setValue(memberCount - 1);
-                                }
-                            }
+                System.out.println("datasnapshot parent is " + dataSnapshot);
+                if (dataSnapshot.hasChild("groups")) {
+                    for (DataSnapshot groupsSnapshot : dataSnapshot.child("groups").getChildren()) {
+                        Groups group = groupsSnapshot.getValue(Groups.class);
+                        String groupId = groupsSnapshot.getKey();
+                        System.out.println("events " + groupsSnapshot.getValue());
+                        if (group.getAdmin()) {
+                            // Delete group the user is admin of.
+                            checkGroup(groupId, group.getCategory(), group.getType(), group.getName(), group.getMemberCount(),
+                                    group.getMemberLimit(), group.getGender());
+                        } else {
+                            // Remove user from group where they were a non-admin member.
+
+//                                    eventSnapshot.child("members").child(userId).getRef().removeValue();
+//                                    long memberCount = eventSnapshot.child("members").getChildrenCount();
+//                                    System.out.println("count is  " + memberCount + " " + eventSnapshot.child("memberCount").getRef());
+//                                    eventSnapshot.child("memberCount").getRef().setValue(memberCount - 1);
+                                    System.out.println("group id is " + group.getAdminId());
+                                    databaseRef.child("users").child(group.getAdminId()).child("userRequest").child(groupId).child(mFirebaseUser.getUid()).removeValue();
+                                    leaveGroup(groupId, group.getAdminId(), group.getCategory(), group.getType());
                         }
                     }
+                    System.out.println("User is waiting.");
+                    lock.countDown();
                 }
+                try
 
-                databaseRef.child("users").child(userId).removeValue();
+                {
+                    lock.await(2000, TimeUnit.MILLISECONDS);
+                    readyToDelete();
+                } catch (
+                        InterruptedException e)
+
+                {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -387,8 +410,32 @@ public class DBConnections {
 
             }
         });
+
+
         // Need the ability to kick members too
         // Need to delete firebase instance too.
+    }
+
+    public void readyToDelete() {
+        final ValueEventListener listener = databaseRef.child("users").child(mFirebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot groupSnapshot) {
+                if (!groupSnapshot.hasChild("groups")) {
+                    System.out.println("User is deleted.");
+//                    databaseRef.child("users").child(mFirebaseUser.getUid()).removeValue();
+//                    databaseRef.child("users").child(mFirebaseUser.getUid()).removeEventListener(listener);
+                    System.out.println("group admin snapshot is " + groupSnapshot);
+                }
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     public void checkGroup(final String groupID, final String groupCategory, final String groupType, final String groupName
@@ -479,7 +526,9 @@ public class DBConnections {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             long memberCount = dataSnapshot.child("members").getChildrenCount();
+                            // Updates member count for group for all members.
                             getUserByGroup(groupAdminId, groupID, memberCount, dataSnapshot.child("memberLimit").getValue(Long.class));
+                            // Updates member count for group.
                             groupRef.child("memberCount").setValue(memberCount);
                         }
 

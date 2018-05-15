@@ -305,7 +305,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                                     .setPositiveButton(android.R.string.yes, null)
                                     .show();
                         } else {
-                            dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId, groupType);
+                            dbConnections.userRequest(groupID, selectedGroupName, groupCategory, groupAdminId, groupType, groupGender);
                             Toast.makeText(getContext().getApplicationContext(), "Request to join  " + selectedGroupName + " sent", Toast.LENGTH_LONG).show();
                             // Amplitude Event Tracking.
                             JSONObject jo = new JSONObject();
