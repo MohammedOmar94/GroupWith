@@ -45,16 +45,16 @@
         <item>Adventures</item>
         <item>Books</item>
         <item>Cultures</item>
-        <item>Gaming</item>
+        <!--<item>Gaming</item>-->
         <item>Language Learning</item>
-        <item>Movies</item>
+        <!--<item>Movies</item>-->
         <item>Programming</item>
         <item>Photography</item>
         <item>Sports</item>
     </string-array>
 
     <string-array name="group_gender_arrays">
-        <item>Any</item>
+        <!--<item>Any</item>-->
         <item>Male</item>
         <item>Female</item>
     </string-array>
@@ -124,7 +124,7 @@
 
     <string name="pref_summary_gender">Choose which gender you want to join your group.</string>
     <string-array name="pref_gender_list">
-        <item>Mixed</item>
+        <!--<item>Mixed</item>-->
         <item>Male only</item>
         <item>Female only</item>
     </string-array>

@@ -14,6 +14,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.amplitude.api.Amplitude;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +49,8 @@ public class GroupsActivity extends AppCompatActivity implements
     private String[] pageTitle = {"Events", "Interests"};
     public  LocationManager locationManager = new LocationManager();
 
+    private DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
     private String groupCategory;
 
     /**
@@ -54,7 +62,8 @@ public class GroupsActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups);
-        Bundle extras = getIntent().getExtras();
+        final Bundle extras = getIntent().getExtras();
+
         groupCategory = extras.getString("GROUP_CATEGORY");
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

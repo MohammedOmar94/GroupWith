@@ -106,14 +106,14 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
 
         mSubmitButton.setOnClickListener(this);
         Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
-        Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
+//        Spinner spinner2 = (Spinner) view.findViewById(R.id.group_gender);
         Spinner memberCount = (Spinner) view.findViewById(R.id.member_count);
         spinner3 = (Spinner) view.findViewById(R.id.spinner3);
         groupName = ((EditText) view.findViewById(R.id.group_name));
         groupDescription = ((EditText) view.findViewById(R.id.group_description));
 
         spinner.setOnItemSelectedListener(this);
-        spinner2.setOnItemSelectedListener(this);
+//        spinner2.setOnItemSelectedListener(this);
         spinner3.setOnItemSelectedListener(this);
         memberCount.setOnItemSelectedListener(this);
 
@@ -155,7 +155,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
                 String groupDescriptionText = groupDescription.getText().toString();
                 // Regexp ensures that at least one non-blank character is used.
                 if(Pattern.compile("\\S").matcher(groupNameText).find() && Pattern.compile("\\S").matcher(groupDescriptionText).find()) {
-                    dbConnections.newGroupRequest(selectedCategory, selectedGroupType, groupNameText, groupDescriptionText, selectedGender, selectedMemberCount);
+                    dbConnections.newGroupRequest(selectedCategory, selectedGroupType, groupNameText, groupDescriptionText, selectedMemberCount);
                     Toast.makeText(getActivity().getApplicationContext(), "New group created!", Toast.LENGTH_LONG).show();
                     mInterstitialAd.show();
                     getActivity().finish();
@@ -188,9 +188,9 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
                 spinner3.setAdapter(spinnerArrayAdapter);
 //            }
             //do this
-        } else if (spinner.getId() == R.id.group_gender) {
-            selectedGender = (String) parent.getItemAtPosition(pos);
-            //do this
+//        } else if (spinner.getId() == R.id.group_gender) {
+//            selectedGender = (String) parent.getItemAtPosition(pos);
+//            //do this
         } else if (spinner.getId() == R.id.spinner3) {
             selectedGroupType = (String) parent.getItemAtPosition(pos);
             //  parent.getItemAtPosition(pos);

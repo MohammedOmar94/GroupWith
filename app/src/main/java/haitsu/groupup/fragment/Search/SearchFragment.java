@@ -24,8 +24,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -227,62 +230,76 @@ public class SearchFragment extends PreferenceFragment implements SharedPreferen
 
     public void search() {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        listPreference = (ListPreference) findPreference("example_list");
+//        listPreference = (ListPreference) findPreference("example_list");
         listPreference2 = (ListPreference) findPreference("example_list2");
         listPreference3 = (ListPreference) findPreference("example_list3");
         listPreference4 = (ListPreference) findPreference("example_list4");
         listPreference5 = (ListPreference) findPreference("example_list5");
 
-        CharSequence currText = listPreference.getEntry();
-        CharSequence currText2 = listPreference2.getEntry();
-        CharSequence currText3 = listPreference3.getEntry();
-        CharSequence currText4 = listPreference4.getEntry();
-        CharSequence currText5 = listPreference5.getEntry();
-        if (currText.toString().equals("Mixed")) {
-            genderValue = "Any";
-        } else if (currText.toString().equals("Male only")) {
-            genderValue = "Male";
-        } else if (currText.toString().equals("Female only")) {
-            genderValue = "Female";
-        }
-        categoryValue = currText2.toString();
-        typeValue = currText3.toString();
-        sizeValue = Integer.parseInt(currText4.toString());
-        milesConverted = Integer.parseInt(currText5.toString());
-        // With default values already selected, not sure if this case is even possible...
-        if (genderValue == null || categoryValue == null || typeValue == null) {
-            //
-            System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
-        } else {
-            System.out.println("THIS IS NOT NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
-            Intent intent = new Intent(getActivity(), ResultsActivity.class);
-            Bundle extras = new Bundle();
-            extras.putString("GROUP_GENDER", genderValue);
-            extras.putString("GROUP_CATEGORY", categoryValue);
-            extras.putString("GROUP_TYPE", typeValue);
-            extras.putInt("MEMBER_LIMIT", sizeValue);
-            extras.putInt("MILES_CONVERTED", milesConverted);
-            intent.putExtras(extras);
-            startActivity(intent);
+//        CharSequence currText = listPreference.getEntry();
+//        if (currText.toString().equals("Mixed")) {
+//            genderValue = "Any";
+//        } else if (currText.toString().equals("Male only")) {
+//            genderValue = "Male";
+//        } else if (currText.toString().equals("Female only")) {
+//            genderValue = "Female";
+//        }
+        databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                CharSequence currText2 = listPreference2.getEntry();
+                CharSequence currText3 = listPreference3.getEntry();
+                CharSequence currText4 = listPreference4.getEntry();
+                CharSequence currText5 = listPreference5.getEntry();
 
-            JSONObject jo = new JSONObject();
-            try {
-                jo.put("User ID", mFirebaseUser.getUid());
-                jo.put("Member Limit", sizeValue);
-                jo.put("Group Gemder", genderValue);
-                jo.put("Group Category", categoryValue);
-                jo.put("Group Type", typeValue);
-                jo.put("Group Distance", milesConverted + " Miles or less");
-                Amplitude.getInstance().logEvent("Filter for Gender  -  " + genderValue);
-                Amplitude.getInstance().logEvent("Filter for Group Category  -  " + categoryValue);
-                Amplitude.getInstance().logEvent("Filter for Member Limit  -  " + sizeValue);
-                Amplitude.getInstance().logEvent("Filter for Group Type  -  " + typeValue);
-                Amplitude.getInstance().logEvent("Filter for Group Distance  -  " + milesConverted + " Miles or less");
-                Amplitude.getInstance().logEvent("Submitted Search Filters", jo);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                genderValue = dataSnapshot.child("gender").getValue(String.class);
+
+
+                categoryValue = currText2.toString();
+                typeValue = currText3.toString();
+                sizeValue = Integer.parseInt(currText4.toString());
+                milesConverted = Integer.parseInt(currText5.toString());
+                // With default values already selected, not sure if this case is even possible...
+                if (genderValue == null || categoryValue == null || typeValue == null) {
+                    //
+                    System.out.println("THIS IS NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
+                } else {
+                    System.out.println("THIS IS NOT NULL " + genderValue + " " + categoryValue + " " + typeValue + " " + sizeValue);
+                    Intent intent = new Intent(getActivity(), ResultsActivity.class);
+                    Bundle extras = new Bundle();
+                    extras.putString("GROUP_GENDER", genderValue);
+                    extras.putString("GROUP_CATEGORY", categoryValue);
+                    extras.putString("GROUP_TYPE", typeValue);
+                    extras.putInt("MEMBER_LIMIT", sizeValue);
+                    extras.putInt("MILES_CONVERTED", milesConverted);
+                    intent.putExtras(extras);
+                    startActivity(intent);
+
+                    JSONObject jo = new JSONObject();
+                    try {
+                        jo.put("User ID", mFirebaseUser.getUid());
+                        jo.put("Member Limit", sizeValue);
+                        jo.put("Group Gemder", genderValue);
+                        jo.put("Group Category", categoryValue);
+                        jo.put("Group Type", typeValue);
+                        jo.put("Group Distance", milesConverted + " Miles or less");
+                        Amplitude.getInstance().logEvent("Filter for Gender  -  " + genderValue);
+                        Amplitude.getInstance().logEvent("Filter for Group Category  -  " + categoryValue);
+                        Amplitude.getInstance().logEvent("Filter for Member Limit  -  " + sizeValue);
+                        Amplitude.getInstance().logEvent("Filter for Group Type  -  " + typeValue);
+                        Amplitude.getInstance().logEvent("Filter for Group Distance  -  " + milesConverted + " Miles or less");
+                        Amplitude.getInstance().logEvent("Submitted Search Filters", jo);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public double calculateKilometers(String milesStr) {

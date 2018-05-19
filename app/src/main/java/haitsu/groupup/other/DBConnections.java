@@ -182,7 +182,7 @@ public class DBConnections {
         });
     }
 
-    public void newGroupRequest(final String groupCategory, final String groupType, final String groupName, final String groupDescription, final String groupGender, final String memberCount) {
+    public void newGroupRequest(final String groupCategory, final String groupType, final String groupName, final String groupDescription, final String memberCount) {
         DatabaseReference userRef = databaseRef.child("users").child(mFirebaseUser.getUid());
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -191,7 +191,7 @@ public class DBConnections {
                 // Not even needed, what has the users own groups has to do with anything.
                 // Groups group = snapshot.child("groups").getValue(Groups.class);
                 // System.out.println("group admin is " + group.getName());
-                submitNewGroup(groupCategory, groupType, groupName, groupDescription, groupGender, memberCount, user);
+                submitNewGroup(groupCategory, groupType, groupName, groupDescription, user.getGender(), memberCount, user);
             }
 
             @Override
@@ -422,7 +422,7 @@ public class DBConnections {
             public void onDataChange(final DataSnapshot groupSnapshot) {
                 if (!groupSnapshot.hasChild("groups")) {
                     System.out.println("User is deleted.");
-//                    databaseRef.child("users").child(mFirebaseUser.getUid()).removeValue();
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).removeValue();
 //                    databaseRef.child("users").child(mFirebaseUser.getUid()).removeEventListener(listener);
                     System.out.println("group admin snapshot is " + groupSnapshot);
                 }

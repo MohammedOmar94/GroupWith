@@ -60,6 +60,7 @@ import haitsu.groupup.other.Adapters.GroupsAdapter;
 import haitsu.groupup.other.DBConnections;
 import haitsu.groupup.other.LocationManager;
 import haitsu.groupup.other.Models.Group;
+import haitsu.groupup.other.Models.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -135,6 +136,8 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
     private AdView mAdView;
 
+    private String usersGender;
+
     public EventsGroupFragment() {
         // Required empty public constructor
     }
@@ -208,16 +211,31 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
         Bundle extras = getActivity().getIntent().getExtras();
         groupCategory = extras.getString("GROUP_CATEGORY");
-
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-
+//        usersGender = extras.getString("GENDER");
 
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                usersGender = dataSnapshot.child("gender").getValue(String.class);
+                eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByChild("genders").equalTo(usersGender)
+                        .limitToFirst(mPageLimit);
+                eventsByLocation.keepSynced(true);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
 
         // Handles all location logic
         lm.setmFusedLocationClient(mFusedLocationClient);
@@ -229,8 +247,6 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
             mGoogleApiClient = locationManager.getmGoogleApiClient();
         }
 
-        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().limitToFirst(mPageLimit);
-        eventsByLocation.keepSynced(true);
         return view;
     }
 
@@ -241,10 +257,9 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                 mNoGroupsText.setText("");
                 // Somehow need to get a 2nd value.
                 boolean hasGroups = false;
+
+                int resultsShowing = 0;
                 mListView.removeFooterView(footerView);
-                if (dataSnapshot.getChildrenCount() == 9) {
-                    mListView.addFooterView(footerView);
-                }
                 System.out.println("Activity is " + getActivity() + " in Events " + groupCategory);
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     System.out.println("snap " + snapshot.getValue());
@@ -266,23 +281,26 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
                     group.setGroupId(snapshot.getKey());
                     group.setCategory(groupCategory);
-                    if (group.getType().equals("Events")) {
-                        if (distanceInMiles < 15) {
-                            // Prevents adding the group again when pressing "See more", we only need it as a starting point.
-                            if (!lastKey.equals(snapshot.getKey())) {
-                                System.out.println("Group name is " + group.getName());
-                                groupsList.add(group);
-                            }
-                            if(getActivity() == null) {
-                                System.out.println("Return activity");
-                                return;
-                            }
-                            adapter = new GroupsAdapter(getActivity(), groupsList);
-                            mListView.setAdapter(adapter);
-                            hasGroups = true;
-                            lastKey = snapshot.getKey();
+                    if (distanceInMiles < 15) {
+                        resultsShowing++;
+                        // Prevents adding the group again when pressing "See more", we only need it as a starting point.
+                        if (!lastKey.equals(snapshot.getKey())) {
+                            System.out.println("Group name is " + group.getName());
+                            groupsList.add(group);
                         }
+                        if (getActivity() == null) {
+                            System.out.println("Return activity");
+                            return;
+                        }
+                        adapter = new GroupsAdapter(getActivity(), groupsList);
+                        mListView.setAdapter(adapter);
+                        hasGroups = true;
+                        lastKey = snapshot.getKey();
                     }
+                }
+
+                if (resultsShowing == 9) {
+                    mListView.addFooterView(footerView);
                 }
                 crossfade(mainContent, hasGroups);
                 mListView.setSelection(lastItem);
@@ -355,7 +373,8 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         groupsList.clear();
         lastKey = "";
         lastItem = 0;
-        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByKey().limitToFirst(mPageLimit);
+        eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByChild("genders").equalTo(usersGender)
+                .limitToFirst(mPageLimit);
         lm.stopLocationUpdates();
     }
 
