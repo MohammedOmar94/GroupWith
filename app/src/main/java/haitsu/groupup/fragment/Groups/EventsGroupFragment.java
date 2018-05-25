@@ -218,20 +218,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                usersGender = dataSnapshot.child("gender").getValue(String.class);
-                eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByChild("genders").equalTo(usersGender)
-                        .limitToFirst(mPageLimit);
-                eventsByLocation.keepSynced(true);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -281,7 +268,7 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
 
                     group.setGroupId(snapshot.getKey());
                     group.setCategory(groupCategory);
-                    if (distanceInMiles < 15) {
+                    if (distanceInMiles < 15 && !group.getType().contains("FULL")) {
                         resultsShowing++;
                         // Prevents adding the group again when pressing "See more", we only need it as a starting point.
                         if (!lastKey.equals(snapshot.getKey())) {
@@ -408,8 +395,22 @@ public class EventsGroupFragment extends Fragment implements GoogleApiClient.OnC
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
                     System.out.println("Updating");
-                    getGroups();
-                    lm.stopLocationUpdates();
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            usersGender = dataSnapshot.child("gender").getValue(String.class);
+                            eventsByLocation = databaseRef.child("group").child(groupCategory).child("Events").orderByChild("genders").equalTo(usersGender)
+                                    .limitToFirst(mPageLimit);
+                            eventsByLocation.keepSynced(true);
+                            getGroups();
+                            lm.stopLocationUpdates();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
 
                 }

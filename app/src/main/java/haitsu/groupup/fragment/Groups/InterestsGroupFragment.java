@@ -203,20 +203,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                usersGender = dataSnapshot.child("gender").getValue(String.class);
-                eventsByLocation = databaseRef.child("group").child(groupCategory).child("Interests").orderByChild("genders").equalTo(usersGender)
-                        .limitToFirst(mPageLimit);
-                eventsByLocation.keepSynced(true);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -266,7 +253,7 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
 
                     group.setGroupId(snapshot.getKey());
                     group.setCategory(groupCategory);
-                    if (distanceInMiles < 15) {
+                    if (distanceInMiles < 15 && !group.getType().contains("FULL")) {
                         resultsShowing++;
                         // Prevents adding the group again when pressing "See more", we only need it as a starting point.
                         if (!lastKey.equals(snapshot.getKey())) {
@@ -393,8 +380,22 @@ public class InterestsGroupFragment extends Fragment implements GoogleApiClient.
                 for (Location location : locationResult.getLocations()) {
                     lm.storeLocationData(location);
                     System.out.println("Updating");
-                    getGroups();
-                    lm.stopLocationUpdates();
+                    databaseRef.child("users").child(mFirebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            usersGender = dataSnapshot.child("gender").getValue(String.class);
+                            eventsByLocation = databaseRef.child("group").child(groupCategory).child("Interests").orderByChild("genders").equalTo(usersGender)
+                                    .limitToFirst(mPageLimit);
+                            eventsByLocation.keepSynced(true);
+                            getGroups();
+                            lm.stopLocationUpdates();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
 
                 }
