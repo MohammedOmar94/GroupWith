@@ -264,7 +264,7 @@ public class ResultsActivity extends AppCompatActivity implements
 
                     group.setGroupId(snapshot.getKey());
                     group.setCategory(groupCategory);
-                    if (distanceInMiles < selectedDistance) {
+                    if (distanceInMiles < selectedDistance && !group.getType().contains("FULL")) {
                         System.out.println("Final is " + distanceInMiles + " " + selectedDistance);
                         groupsList.add(group);
                         adapter = new ResultsAdapter(ResultsActivity.this, groupsList);
