@@ -37,7 +37,7 @@ public class ResultsAdapter extends ArrayAdapter<Group> {
         }
 
         ((TextView) convertView.findViewById(R.id.group_name)).setText(group.getName());
-        ((TextView) convertView.findViewById(R.id.group_gender)).setText("Members: " + group.getGenders());
+        ((TextView) convertView.findViewById(R.id.group_gender)).setText("Description: " + group.getDescription());
         ((TextView) convertView.findViewById(R.id.group_limit)).setText(group.getMemberCount() + "/"
                 + group.getMemberLimit());
 

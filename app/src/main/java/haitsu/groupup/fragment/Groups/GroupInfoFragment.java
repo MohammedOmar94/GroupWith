@@ -169,7 +169,7 @@ public class GroupInfoFragment extends Fragment implements View.OnClickListener 
                 System.out.println("Ayy " + groupInfo.getMemberLimit());
                 //selectedGroupCategory = InterestsGroupFragment.filteredCategory;
                 ((TextView) view.findViewById(R.id.group_name)).setText(groupInfo.getName());
-                ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
+//                ((TextView) view.findViewById(R.id.Members)).setText(groupInfo.getGenders());
                 ((TextView) view.findViewById(R.id.member_count)).setText(Integer.toString(groupInfo.getMemberCount()) + "/" +
                         Integer.toString(groupInfo.getMemberLimit()));
                 ((TextView) view.findViewById(R.id.group_description)).setText(groupInfo.getDescription());
