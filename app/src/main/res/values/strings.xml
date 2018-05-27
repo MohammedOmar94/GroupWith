@@ -44,8 +44,11 @@
     <string-array name="category_arrays">
         <item>Adventures</item>
         <item>Books</item>
+        <item>Charity</item>
         <item>Cultures</item>
+        <!--<item>Food</item>-->
         <!--<item>Gaming</item>-->
+        <item>Gym</item>
         <item>Language Learning</item>
         <!--<item>Movies</item>-->
         <item>Programming</item>
