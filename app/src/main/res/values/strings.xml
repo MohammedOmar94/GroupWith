@@ -168,7 +168,7 @@
     </string-array>
 
     <string name="pref_title_category">Group category</string>
-    <string name="pref_summary_category">Choose what a group category.</string>
+    <string name="pref_summary_category">Choose a group category.</string>
     <string-array name="pref_category_values">
         <item>-1</item>
         <item>0</item>
@@ -176,6 +176,9 @@
         <item>2</item>
         <item>3</item>
         <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
     </string-array>
 
     <string name="pref_title_type">Group type</string>
