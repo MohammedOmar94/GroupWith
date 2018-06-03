@@ -301,7 +301,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             public void onDataChange(final DataSnapshot snapshot) {
                 if (snapshot.getChildrenCount() == 0) {
                     System.out.println("snake " + snapshot.getValue());
-                    signOut();
+                    Amplitude.getInstance().setUserId("");
+                    FirebaseAuth.getInstance().getCurrentUser().delete();
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient);//Sign out of Google.
+                    startActivity(new Intent(getActivity(), SignInActivity.class));
+                    getActivity().finishAffinity();//Works for Android 4.1 and above only.
                 } else {
                     User user = snapshot.getValue(User.class);
                     currentUsername = user.getUsername();
