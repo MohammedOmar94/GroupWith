@@ -37,6 +37,7 @@ import com.android.volley.toolbox.Volley;
 import com.takisoft.fix.support.v7.preference.EditTextPreference;
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -89,6 +90,7 @@ import haitsu.groupup.PermissionUtils;
 import haitsu.groupup.R;
 import haitsu.groupup.activity.Account.SignInActivity;
 import haitsu.groupup.other.DBConnections;
+import haitsu.groupup.other.Models.Groups;
 import haitsu.groupup.other.Models.User;
 
 /**
@@ -210,6 +212,52 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         editText = (EditTextPreference) findPreference("username");
         user = databaseRef.child("users").child(mFirebaseUser.getUid());
+
+        final Preference pref = findPreference("request_data");
+        user.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final User userData = dataSnapshot.getValue(User.class);
+                final Groups groupData = dataSnapshot.child("groups").getValue(Groups.class);
+                pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        // TODO Auto-generated method stub
+                        final AlertDialog.Builder builder;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            builder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogStyle);
+                        } else {
+                            builder = new AlertDialog.Builder(getActivity());
+                        }
+                        // TODO Auto-generated method stub
+                        builder.setTitle("Data we store")
+                                .setMessage(Html.fromHtml("<b>Name: </b>" + userData.getUsername() + "<br>" +
+                                        "<b>Date of Birth: </b>" + userData.getAge() + "<br>" +
+                                        "<b>Gender: </b>" + userData.getGender() + "<br>" +
+                                        "<b>Email Address: </b>" + userData.getEmail() + "<br>" +
+                                        "<b>City: </b>" + userData.getCity() + "<br>" +
+                                        "<b>Country: </b>" + userData.getCountry() + "<br>" +
+                                        "<b>Latitude: </b>" + userData.getLatitude() + "<br>" +
+                                        "<b>Longitude: </b>" + userData.getLongitude() + "<br><br>" +
+                                        "Everything else within the app (including chat messages) is stored on our servers" +
+                                        " up until the corresponding user deletes their account or group. <br>")
+                                )
+                                .show();
+                        //finish();
+                        // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
 
 //        Preference pref = findPreference("sign_out");

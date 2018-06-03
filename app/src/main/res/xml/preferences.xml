@@ -33,6 +33,10 @@
         <!--android:title="Sign out"></Preference>-->
 
     <Preference
+        android:key="request_data"
+        android:title="View my data"></Preference>
+
+    <Preference
         android:key="delete_account"
         android:title="Delete account"></Preference>
 
