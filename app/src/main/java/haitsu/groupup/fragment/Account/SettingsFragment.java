@@ -26,10 +26,20 @@ import android.support.v7.app.AlertDialog;
 
 import com.amplitude.api.Amplitude;
 import com.amplitude.api.Identify;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.takisoft.fix.support.v7.preference.EditTextPreference;
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,8 +79,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import haitsu.groupup.PermissionUtils;
@@ -248,6 +260,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                                         .unset("Age")
                                         .unset("Email");
                                 Amplitude.getInstance().identify(identify);
+                                amplitudeDeleteRequest();
 //                                signOut();
                             }
                         })
@@ -279,7 +292,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(mLocationRequest);
 
-
         return view;
     }
 
@@ -309,6 +321,60 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             }
         });
+    }
+
+    public void amplitudeDeleteRequest() {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        String url = "https://amplitude.com/api/2/deletions/users";
+
+        JSONObject js = new JSONObject();
+        try {
+            //            String [] userIds = {"heightz.nintyfour@gmail.com"};
+            //            JSONObject jsonobject = new JSONObject();
+
+            //            jsonobject.put("", userIds);
+            //            jsonobject.put("amplitude_id", "53883690663");
+            //            jsonobject.put("requester", "Mo");
+            //            System.out.println("Response param " + userIds[0]);
+            js.put("user_ids", mFirebaseUser.getEmail());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(
+                Request.Method.POST,url, js,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println("Response is " + response);
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("Response is error " + error);
+            }
+        }) {
+
+            /**
+             * Passing some request headers
+             * */
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = "945da593068312c2f8521a681f457c2b:34c96a145c140f1fe2b56492632675ad";
+                String auth = "Basic "
+                        + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonObjReq);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

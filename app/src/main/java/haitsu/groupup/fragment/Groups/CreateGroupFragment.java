@@ -101,7 +101,7 @@ public class CreateGroupFragment extends Fragment implements View.OnClickListene
         mSubmitButton = (Button) view.findViewById(R.id.submit_button);
 
         mInterstitialAd = new InterstitialAd(getActivity());
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId("ca-app-pub-7072858762761381/1400425438");
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         mSubmitButton.setOnClickListener(this);
