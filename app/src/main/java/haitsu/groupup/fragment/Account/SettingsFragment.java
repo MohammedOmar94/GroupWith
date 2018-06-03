@@ -212,27 +212,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         user = databaseRef.child("users").child(mFirebaseUser.getUid());
 
 
-        Preference pref = findPreference("sign_out");
-        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // TODO Auto-generated method stub
-                Amplitude.getInstance().logEvent("Logged out");
-                Amplitude.getInstance().setUserId("");
-                Identify identify = new Identify()
-                        .unset("Name")
-                        .unset("Gender")
-                        .unset("Age")
-                        .unset("Email");
-                Amplitude.getInstance().identify(identify);
-                databaseRef.child("users").child((mFirebaseUser.getUid())).child("lastLogout").setValue(new Date().getTime());
-                signOut();
-                //finish();
-                // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+//        Preference pref = findPreference("sign_out");
+//        pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                // TODO Auto-generated method stub
+//                Amplitude.getInstance().logEvent("Logged out");
+//                Amplitude.getInstance().setUserId("");
+//                Identify identify = new Identify()
+//                        .unset("Name")
+//                        .unset("Gender")
+//                        .unset("Age")
+//                        .unset("Email");
+//                Amplitude.getInstance().identify(identify);
+//                databaseRef.child("users").child((mFirebaseUser.getUid())).child("lastLogout").setValue(new Date().getTime());
+//                signOut();
+//                //finish();
+//                // Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+//                return true;
+//            }
+//        });
 
         Preference delete_pref = findPreference("delete_account");
         delete_pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

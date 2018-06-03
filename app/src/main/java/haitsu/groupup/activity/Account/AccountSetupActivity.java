@@ -219,9 +219,9 @@ public class AccountSetupActivity extends AppCompatActivity
         if (spinner.getId() == R.id.gender_spinner) {
             selectedGender = (String) parent.getItemAtPosition(position);
 
-            Toast.makeText(getApplicationContext(),
-                    selectedGender, Toast.LENGTH_LONG)
-                    .show();
+//            Toast.makeText(getApplicationContext(),
+//                    selectedGender, Toast.LENGTH_LONG)
+//                    .show();
         }
     }
 

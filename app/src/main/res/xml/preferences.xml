@@ -28,9 +28,9 @@
         android:key="update_location"
         android:title="Location"></Preference>
 
-    <Preference
-        android:key="sign_out"
-        android:title="Sign out"></Preference>
+    <!--<Preference-->
+        <!--android:key="sign_out"-->
+        <!--android:title="Sign out"></Preference>-->
 
     <Preference
         android:key="delete_account"
