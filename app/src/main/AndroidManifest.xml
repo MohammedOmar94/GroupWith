@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="haitsu.groupup">
+    package="haitsu.groupwith">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -17,20 +17,20 @@
         android:theme="@style/AppTheme">
 
         <service
-            android:name=".MyFirebaseMessagingService">
+            android:name="haitsu.groupwith.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".MyFirebaseInstanceIDService">
+            android:name="haitsu.groupwith.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
-        <service android:name=".MyJobService"
+        <service android:name="haitsu.groupwith.MyJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
@@ -38,7 +38,7 @@
         </service>
 
 
-        <activity android:name=".activity.SplashActivity" android:theme="@style/SplashTheme">
+        <activity android:name="haitsu.groupwith.activity.SplashActivity" android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -58,88 +58,88 @@
 
         </activity>
         <activity
-            android:name=".activity.MainActivity"
+            android:name="haitsu.groupwith.activity.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
-            android:name=".activity.Account.SignInActivity"
+            android:name="haitsu.groupwith.activity.Account.SignInActivity"
             android:label="@string/title_activity_signin"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"/>
         <activity
-            android:name=".activity.PrivacyPolicyActivity"
+            android:name="haitsu.groupwith.activity.PrivacyPolicyActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AboutUsActivity"
+            android:name="haitsu.groupwith.activity.AboutUsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.Account.SettingsActivity"
+            android:name="haitsu.groupwith.activity.Account.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupwith.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Settings" />
         <activity
-            android:name=".activity.ChatsActivity"
+            android:name="haitsu.groupwith.activity.ChatsActivity"
             android:label="@string/title_activity_chats"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupwith.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.ChatRoomActivity"
+            android:name="haitsu.groupwith.activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.Groups.MyGroupsActivity"
+            android:name="haitsu.groupwith.activity.Groups.MyGroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupwith.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.CreateGroupActivity"
+            android:name="haitsu.groupwith.activity.Groups.CreateGroupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupMembersActivity"
+            android:name="haitsu.groupwith.activity.Groups.GroupMembersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupInfoActivity"
+            android:name="haitsu.groupwith.activity.Groups.GroupInfoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Account.AccountSetupActivity"
+            android:name="haitsu.groupwith.activity.Account.AccountSetupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Groups.GroupsActivity"
+            android:name="haitsu.groupwith.activity.Groups.GroupsActivity"
             android:label="@string/title_activity_tabbed_groups"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.Search.ResultsActivity"
+            android:name="haitsu.groupwith.activity.Search.ResultsActivity"
             android:label="@string/title_activity_results"
-            android:parentActivityName=".activity.Search.SearchActivity"
+            android:parentActivityName="haitsu.groupwith.activity.Search.SearchActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.Search.SearchActivity"
+            android:name="haitsu.groupwith.activity.Search.SearchActivity"
             android:label="@string/title_activity_search"
-            android:parentActivityName=".activity.MainActivity"
+            android:parentActivityName="haitsu.groupwith.activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.Account.ReportActivity"
+            android:name="haitsu.groupwith.activity.Account.ReportActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.Account.PrivacyPolicyActivity"
+            android:name="haitsu.groupwith.activity.Account.PrivacyPolicyActivity"
             android:label="@string/title_activity_privacy"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.Account.TermsOfServiceActivity"
+            android:name="haitsu.groupwith.activity.Account.TermsOfServiceActivity"
             android:label="@string/title_activity_terms"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />

@@ -8,19 +8,23 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:286270725289:android:facfb416e3b23b7f",
+        "mobilesdk_app_id": "1:286270725289:android:29aa95ce051a32b2",
         "android_client_info": {
-          "package_name": "haitsu.groupup"
+          "package_name": "haitsu.groupwith"
         }
       },
       "oauth_client": [
         {
-          "client_id": "286270725289-41chabkm6r8i87muk7ib2v0oauns3c63.apps.googleusercontent.com",
+          "client_id": "286270725289-sl7lk4l9k5t5g7oj43glkg2rsgaotpt2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "haitsu.groupup",
+            "package_name": "haitsu.groupwith",
             "certificate_hash": "aca31e76a2808f0588d64ec83f39fe71611212b0"
           }
+        },
+        {
+          "client_id": "286270725289-h4h4oh7n1lapcci2tduu87r7rvavi0np.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "286270725289-h4h4oh7n1lapcci2tduu87r7rvavi0np.apps.googleusercontent.com",

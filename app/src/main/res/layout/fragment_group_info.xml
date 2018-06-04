@@ -8,7 +8,7 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="haitsu.groupup.fragment.Groups.GroupInfoFragment">
+        tools:context="haitsu.groupwith.fragment.Groups.GroupInfoFragment">
 
 
         <TextView
